@@ -17,10 +17,13 @@ const numbered_pages = [
 makedocs(;
     modules = [GPUEventGenerators],
     authors = "Uwe Hernandez Acosta <u.hernandez@hzdr.de>, Simeon Ehrig, Anton Reinhard, René Widera",
-    repo = "https://github.com/QEDjl-project/GPUEventGenerators.jl/blob/{commit}{path}#{line}",
+    repo = "https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/blob/{commit}{path}#{line}",
     sitename = "GPUEventGenerators.jl",
     format = Documenter.HTML(;
-        canonical = "https://QEDjl-project.github.io/GPUEventGenerators.jl",
+        prettyurls = get(ENV, "CI", "false") == "true",
+        repolink = "https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/blob/{commit}{path}#{line}",
+        canonical = "https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl",
+        assets = String[],
     ),
     pages = ["index.md"; numbered_pages],
 )
