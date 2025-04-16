@@ -18,13 +18,13 @@ Fills the first `g_out_size` values of the given buffers `out_Q` and `out_T` wit
     all of the same length `N`, and that `out_Q` and `out_T` have at least `N+g_out_size` length.
 """
 @kernel inbounds = true function filter_scan(
-        @Const(in_Q),
-        @Const(in_T),
-        @Const(in_RNG),
-        out_Q,
-        out_T,
-        g_out_size
-    )
+    @Const(in_Q),
+    @Const(in_T),
+    @Const(in_RNG),
+    out_Q,
+    out_T,
+    g_out_size,
+)
     count = @localmem Int32 (1,)
     g_out_idx = @localmem Int64 (1,)
 

@@ -60,6 +60,6 @@ end
     (expected_accepts_2, out_Q_gt, out_T_gt) = _groundtruth_filter_scan(in_Q, in_T, in_RNG)
 
     @test g_out_size[1] == expected_accepts + expected_accepts_2
-    @test all([out_Q[x + expected_accepts] == out_Q_gt[x] for x in 1:N])
-    @test all([out_T[x + expected_accepts] == out_T_gt[x] for x in 1:N])
+    @test all([out_Q[x+expected_accepts] == out_Q_gt[x] for x = 1:N])
+    @test all([out_T[x+expected_accepts] == out_T_gt[x] for x = 1:N])
 end
