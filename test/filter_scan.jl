@@ -6,64 +6,69 @@ RNG = MersenneTwister(628)
 
 N = 256
 
-function _groundtruth_filter_scan(in_Q, in_T, in_RNG)
+@inline Base.zero(::Type{Tuple{}}) = ()
+@inline Base.zero(::Type{Tuple{Vararg{T, N}}}) where {T, N} = (zero(T), zero(NTuple{N - 1, T})...)
+
+function _groundtruth_filter_scan(payload, weights, random_numbers)
     c = 0
 
-    out_Q = zeros(eltype(in_Q), size(in_Q))   # output buffer 1
-    out_T = zeros(eltype(in_T), size(in_T))   # output buffer 2
-    for i in eachindex(in_Q)
-        if in_T[i] < in_RNG[i]
+    out_payload = zeros(eltype(payload), size(payload))   # output buffer 1
+    out_weights = zeros(eltype(weights), size(weights))   # output buffer 2
+    for i in eachindex(payload)
+        if weights[i] < random_numbers[i]
             c += 1
-            out_Q[c] = in_Q[i]
-            out_T[c] = in_T[i]
+            out_payload[c] = payload[i]
+            out_weights[c] = weights[i]
         end
     end
-    return (c, out_Q, out_T)
+    return (c, out_payload, out_weights)
 end
 
 @testset "testing with $VECTOR_T" for VECTOR_T in VECTOR_TYPES
     @info "Starting $VECTOR_T tests..."
     @testset "filtering scan with $T" for T in FLOAT_TYPES[VECTOR_T]
+        PAYLOAD_T = NTuple{4, T}   # make a "bigger" payload type
+
         # we don't really care for the test what the payload is
-        in_Q = VECTOR_T(rand(RNG, T, N)) # "payload"
-        in_T = VECTOR_T(rand(RNG, T, N)) # calculated "probability"
-        in_RNG = VECTOR_T(rand(RNG, T, N)) # random values to filter against
+        payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
+        weights = VECTOR_T(rand(RNG, T, N)) # calculated "probability"
+        random_numbers = VECTOR_T(rand(RNG, T, N)) # random values to filter against
 
-        out_Q = VECTOR_T(zeros(eltype(in_Q), size(in_Q)))   # output buffer 1
-        out_T = VECTOR_T(zeros(eltype(in_T), size(in_T)))   # output buffer 2
-        g_out_size = VECTOR_T(zeros(Int64, 1)) # global memory counter
+        out_payload = VECTOR_T(zeros(eltype(payload), size(payload)))   # output buffer 1
+        out_weights = VECTOR_T(zeros(eltype(weights), size(weights)))   # output buffer 2
+        accepted_count = VECTOR_T(zeros(Int64, 1)) # global memory counter
 
-        BACKEND = get_backend(in_Q)
+        BACKEND = get_backend(payload)
 
         # call kernel
-        filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
+        filter_scan(BACKEND, 32)(payload, weights, random_numbers, out_payload, out_weights, accepted_count; ndrange = N)
         KernelAbstractions.synchronize(BACKEND)
 
-        (expected_accepts, out_Q_gt, out_T_gt) =
-            _groundtruth_filter_scan(Vector(in_Q), Vector(in_T), Vector(in_RNG))
+        (expected_accepts, out_payload_gt, out_weights_gt) =
+            _groundtruth_filter_scan(Vector(payload), Vector(weights), Vector(random_numbers))
 
-        @test Vector(g_out_size)[1] == expected_accepts
-        @test all(sort(Vector(out_Q)) .== sort(out_Q_gt))
-        @test all(sort(Vector(out_T)) .== sort(out_T_gt))
+        @test Vector(accepted_count)[1] == expected_accepts
+        @test all(sort(Vector(out_payload)) .== sort(out_payload_gt))
+        @test all(sort(Vector(out_weights)) .== sort(out_weights_gt))
 
         # second call, only make buffers larger but otherwise keep going
 
-        in_Q = VECTOR_T(rand(RNG, T, N))
-        in_T = VECTOR_T(rand(RNG, T, N))
-        in_RNG = VECTOR_T(rand(RNG, T, N))
+        payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
+        weights = VECTOR_T(rand(RNG, T, N))
+        random_numbers = VECTOR_T(rand(RNG, T, N))
 
-        append!(out_Q, zeros(eltype(in_Q), expected_accepts))
-        append!(out_T, zeros(eltype(in_T), expected_accepts))
+        append!(out_payload, zeros(eltype(payload), expected_accepts))
+        append!(out_weights, zeros(eltype(weights), expected_accepts))
 
         # call kernel
-        filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
+        filter_scan(BACKEND, 32)(payload, weights, random_numbers, out_payload, out_weights, accepted_count; ndrange = N)
         KernelAbstractions.synchronize(BACKEND)
 
-        (expected_accepts_2, out_Q_gt, out_T_gt) =
-            _groundtruth_filter_scan(Vector(in_Q), Vector(in_T), Vector(in_RNG))
+        (expected_accepts_2, out_payload_gt, out_weights_gt) =
+            _groundtruth_filter_scan(Vector(payload), Vector(weights), Vector(random_numbers))
 
-        @test Vector(g_out_size)[1] == expected_accepts + expected_accepts_2
-        @test all(sort(Vector(out_Q[(expected_accepts+1):end])) .== sort(out_Q_gt))
-        @test all(sort(Vector(out_T[(expected_accepts+1):end])) .== sort(out_T_gt))
+        @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
+        @test all(sort(Vector(out_payload[(expected_accepts + 1):end])) .== sort(out_payload_gt))
+        @test all(sort(Vector(out_weights[(expected_accepts + 1):end])) .== sort(out_weights_gt))
     end
 end
