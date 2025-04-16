@@ -2,8 +2,6 @@ using GPUEventGenerators
 using Random
 using KernelAbstractions
 
-BACKEND = CPU()
-
 RNG = MersenneTwister(628)
 
 N = 256
@@ -23,42 +21,49 @@ function _groundtruth_filter_scan(in_Q, in_T, in_RNG)
     return (c, out_Q, out_T)
 end
 
-@testset "filtering scan with $T" for T in [Float16, Float32, Float64]
-    # we don't really care for the test what the payload is
-    in_Q = rand(RNG, T, N) # "payload"
-    in_T = rand(RNG, T, N) # calculated "probability"
-    in_RNG = rand(RNG, T, N) # random values to filter against
+@testset "testing with $VECTOR_T" for VECTOR_T in VECTOR_TYPES
+    @info "Starting $VECTOR_T tests..."
+    @testset "filtering scan with $T" for T in FLOAT_TYPES[VECTOR_T]
+        # we don't really care for the test what the payload is
+        in_Q = VECTOR_T(rand(RNG, T, N)) # "payload"
+        in_T = VECTOR_T(rand(RNG, T, N)) # calculated "probability"
+        in_RNG = VECTOR_T(rand(RNG, T, N)) # random values to filter against
 
-    out_Q = zeros(eltype(in_Q), size(in_Q))   # output buffer 1
-    out_T = zeros(eltype(in_T), size(in_T))   # output buffer 2
-    g_out_size = zeros(Int64, 1) # global memory counter
+        out_Q = VECTOR_T(zeros(eltype(in_Q), size(in_Q)))   # output buffer 1
+        out_T = VECTOR_T(zeros(eltype(in_T), size(in_T)))   # output buffer 2
+        g_out_size = VECTOR_T(zeros(Int64, 1)) # global memory counter
 
-    # call kernel
-    filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
-    KernelAbstractions.synchronize(BACKEND)
+        BACKEND = get_backend(in_Q)
 
-    (expected_accepts, out_Q_gt, out_T_gt) = _groundtruth_filter_scan(in_Q, in_T, in_RNG)
+        # call kernel
+        filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
+        KernelAbstractions.synchronize(BACKEND)
 
-    @test g_out_size[1] == expected_accepts
-    @test out_Q == out_Q_gt
-    @test out_T == out_T_gt
+        (expected_accepts, out_Q_gt, out_T_gt) =
+            _groundtruth_filter_scan(Vector(in_Q), Vector(in_T), Vector(in_RNG))
 
-    # second call, only make buffers larger but otherwise keep going
+        @test Vector(g_out_size)[1] == expected_accepts
+        @test all(sort(Vector(out_Q)) .== sort(out_Q_gt))
+        @test all(sort(Vector(out_T)) .== sort(out_T_gt))
 
-    in_Q = rand(RNG, T, N)
-    in_T = rand(RNG, T, N)
-    in_RNG = rand(RNG, T, N)
+        # second call, only make buffers larger but otherwise keep going
 
-    append!(out_Q, zeros(eltype(in_Q), N))
-    append!(out_T, zeros(eltype(in_T), N))
+        in_Q = VECTOR_T(rand(RNG, T, N))
+        in_T = VECTOR_T(rand(RNG, T, N))
+        in_RNG = VECTOR_T(rand(RNG, T, N))
 
-    # call kernel
-    filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
-    KernelAbstractions.synchronize(BACKEND)
+        append!(out_Q, zeros(eltype(in_Q), expected_accepts))
+        append!(out_T, zeros(eltype(in_T), expected_accepts))
 
-    (expected_accepts_2, out_Q_gt, out_T_gt) = _groundtruth_filter_scan(in_Q, in_T, in_RNG)
+        # call kernel
+        filter_scan(BACKEND, 32)(in_Q, in_T, in_RNG, out_Q, out_T, g_out_size; ndrange = N)
+        KernelAbstractions.synchronize(BACKEND)
 
-    @test g_out_size[1] == expected_accepts + expected_accepts_2
-    @test all([out_Q[x+expected_accepts] == out_Q_gt[x] for x = 1:N])
-    @test all([out_T[x+expected_accepts] == out_T_gt[x] for x = 1:N])
+        (expected_accepts_2, out_Q_gt, out_T_gt) =
+            _groundtruth_filter_scan(Vector(in_Q), Vector(in_T), Vector(in_RNG))
+
+        @test Vector(g_out_size)[1] == expected_accepts + expected_accepts_2
+        @test all(sort(Vector(out_Q[(expected_accepts+1):end])) .== sort(out_Q_gt))
+        @test all(sort(Vector(out_T[(expected_accepts+1):end])) .== sort(out_T_gt))
+    end
 end
