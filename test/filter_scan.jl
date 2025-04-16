@@ -1,7 +1,6 @@
 using GPUEventGenerators
 using Random
 using KernelAbstractions
-using oneAPI
 
 BACKEND = CPU()
 
