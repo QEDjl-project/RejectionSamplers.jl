@@ -1,6 +1,9 @@
-using GPUEventGenerators
-using Test
+using SafeTestsets
 
-@testset "GPUEventGenerators.jl" begin
-    @test GPUEventGenerators.hello_world() == "Hello, World!"
+begin
+
+    @time @safetestset "Scan Tests" begin
+        include("filter_scan.jl")
+    end
+
 end
