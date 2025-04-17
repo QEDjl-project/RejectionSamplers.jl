@@ -15,27 +15,31 @@ where N is the number of accepted values. Also assigns `out_size += N`.
 - `out_size`: a global memory variable containing the current number of elements in `out_payload` and `out_weights`
 
 !!! warn
-    No inbounds checks are performed anywhere! Take care that `payload`, `weights` and `randoms` are 
+    No inbounds checks are performed anywhere! Take care that `payload`, `weights` and `randoms` are
     all of the same length `M`, and that `out_payload` and `out_weights` have at least `M+out_size` length.
-    
+
 !!! warn
     `out_size` must be set correctly (to the number of set elements in `out_payload` and `out_weights`) before
     calling the kernel.
 """
 @kernel inbounds = true function filter_scan(
-        @Const(payload),
-        @Const(weights),
-        @Const(randoms),
-        out_payload,
-        out_weights,
-        out_size,
-    )
+    @Const(payload),
+    @Const(weights),
+    @Const(randoms),
+    out_payload,
+    out_weights,
+    out_size,
+)
     local_accepted_count = @localmem Int32 (1,)
-    global_accepted_count = @localmem Int64 (1,)
+    global_accepted_count = @localmem Int32 (1,)
 
     global_idx = @index(Global, Linear)
     thread_idx = @index(Local, Linear)
 
+    if thread_idx == 1
+        local_accepted_count[1] = 0
+    end
+    @synchronize
     # filter using randoms
     weight = weights[global_idx]
     random = randoms[global_idx]
@@ -50,7 +54,9 @@ where N is the number of accepted values. Also assigns `out_size += N`.
 
     # increase global output buffer index
     if thread_idx == 1
-        global_accepted_count[1] = Atomix.@atomic out_size[1] += local_accepted_count[1]
+        temp = local_accepted_count[1]
+        global_accepted_count[1] = Atomix.@atomic out_size[1] += temp
+        #local_accepted_idx[1] = Atomix.@atomic out_size[1] += temp
         # this seems pointless but there doesn't seem to be an atomicadd that returns
         # the previous value in Atomix currently
         global_accepted_count[1] -= local_accepted_count[1]

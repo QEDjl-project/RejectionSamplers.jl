@@ -6,10 +6,12 @@ version = "0.1.0"
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 
 [compat]
 Atomix = "1.1.1"
 KernelAbstractions = "0.9.34"
+Metal = "1.5.1"
 julia = "1.10"
 
 [extras]
