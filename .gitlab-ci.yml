@@ -153,6 +153,5 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    - main
-    - UHA-fix-docs
+  rules:
+    - if: $CI_PIPELINESOURCE =='merge_request_event'
