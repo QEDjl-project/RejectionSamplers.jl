@@ -10,3 +10,7 @@ coverage
 docs/build/
 env
 node_modules
+
+DEV*
+
+example*.pdf

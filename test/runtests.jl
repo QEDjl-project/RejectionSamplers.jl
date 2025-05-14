@@ -1,4 +1,7 @@
 using Test
+using GPUEventGenerators
+using Random
+using KernelAbstractions
 
 VECTOR_TYPES = Vector{Type}()
 FLOAT_TYPES = Dict{Type,Vector{Type}}()
@@ -108,4 +111,8 @@ if isempty(VECTOR_TYPES)
     return nothing
 end
 
+
 include("filter_scan.jl")
+include("proposal.jl")
+include("target.jl")
+include("generate.jl")

@@ -1,11 +1,9 @@
-using GPUEventGenerators
-using Random
-using KernelAbstractions
 
 RNG = MersenneTwister(628)
 
 N = 256
 
+# FIXME: avoid piracy
 @inline Base.zero(::Type{Tuple{}}) = ()
 @inline Base.zero(::Type{Tuple{Vararg{T,N}}}) where {T,N} =
     (zero(T), zero(NTuple{N - 1,T})...)
@@ -30,77 +28,83 @@ function _groundtruth_filter_scan(payload, weights, random_numbers)
     return (c, out_payload, out_weights)
 end
 
-@testset "testing with $VECTOR_T" for VECTOR_T in VECTOR_TYPES
-    @info "Starting $VECTOR_T tests..."
-    @testset "filtering scan with $T" for T in FLOAT_TYPES[VECTOR_T]
-        PAYLOAD_T = NTuple{4,T}   # make a "bigger" payload type
+@testset "filter scan" begin
+    @testset "$VECTOR_T" for VECTOR_T in VECTOR_TYPES
+        @testset "$T" for T in FLOAT_TYPES[VECTOR_T]
+            PAYLOAD_T = NTuple{4,T}   # make a "bigger" payload type
 
-        # we don't really care for the test what the payload is
-        payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
-        weights = VECTOR_T(rand(RNG, T, N) .* T(1.05)) # calculated "probability", make slightly larger to test the behaviour with weights > 1
-        random_numbers = VECTOR_T(rand(RNG, T, N)) # random values to filter against
+            # we don't really care for the test what the payload is
+            payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
+            weights = VECTOR_T(rand(RNG, T, N) .* T(1.05)) # calculated "probability", make slightly larger to test the behaviour with weights > 1
+            random_numbers = VECTOR_T(rand(RNG, T, N)) # random values to filter against
 
-        out_payload = VECTOR_T(zeros(eltype(payload), size(payload)))   # output buffer 1
-        out_weights = VECTOR_T(zeros(eltype(weights), size(weights)))   # output buffer 2
-        accepted_count = VECTOR_T(zeros(Int32, 1)) # global memory counter
+            out_payload = VECTOR_T(zeros(eltype(payload), size(payload)))   # output buffer 1
+            out_weights = VECTOR_T(zeros(eltype(weights), size(weights)))   # output buffer 2
+            accepted_count = VECTOR_T(zeros(Int32, 1)) # global memory counter
 
-        BACKEND = get_backend(payload)
+            BACKEND = get_backend(payload)
 
-        # call kernel
-        filter_scan(BACKEND, 32)(
-            payload,
-            weights,
-            random_numbers,
-            out_payload,
-            out_weights,
-            accepted_count;
-            ndrange = N,
-        )
-        KernelAbstractions.synchronize(BACKEND)
 
-        (expected_accepts, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
-            Vector(payload),
-            Vector(weights),
-            Vector(random_numbers),
-        )
+            # TODO: is 32 the best number? (KA uses 128)
 
-        @test Vector(accepted_count)[1] == expected_accepts
-        @test all(sort(Vector(out_payload)) .== sort(out_payload_gt))
-        @test all(sort(Vector(out_weights)) .== sort(out_weights_gt))
+            # call kernel
+            filter_scan(BACKEND, 32)(
+                payload,
+                weights,
+                random_numbers,
+                out_payload,
+                out_weights,
+                accepted_count;
+                ndrange = N,
+            )
+            KernelAbstractions.synchronize(BACKEND)
 
-        # second call, only make buffers larger but otherwise keep going
+            (expected_accepts, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
+                Vector(payload),
+                Vector(weights),
+                Vector(random_numbers),
+            )
 
-        payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
-        weights = VECTOR_T(rand(RNG, T, N) .* T(1.05))
-        random_numbers = VECTOR_T(rand(RNG, T, N))
+            @test Vector(accepted_count)[1] == expected_accepts
+            @test all(sort(Vector(out_payload)) .== sort(out_payload_gt))
+            @test all(sort(Vector(out_weights)) .== sort(out_weights_gt))
 
-        append!(out_payload, zeros(eltype(payload), expected_accepts))
-        append!(out_weights, zeros(eltype(weights), expected_accepts))
+            # second call, only make buffers larger but otherwise keep going
 
-        # call kernel
-        filter_scan(BACKEND, 32)(
-            payload,
-            weights,
-            random_numbers,
-            out_payload,
-            out_weights,
-            accepted_count;
-            ndrange = N,
-        )
-        KernelAbstractions.synchronize(BACKEND)
+            payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
+            weights = VECTOR_T(rand(RNG, T, N) .* T(1.05))
+            random_numbers = VECTOR_T(rand(RNG, T, N))
 
-        (expected_accepts_2, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
-            Vector(payload),
-            Vector(weights),
-            Vector(random_numbers),
-        )
+            append!(out_payload, zeros(eltype(payload), expected_accepts))
+            append!(out_weights, zeros(eltype(weights), expected_accepts))
 
-        @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
-        @test all(
-            sort(Vector(out_payload[(expected_accepts+1):end])) .== sort(out_payload_gt),
-        )
-        @test all(
-            sort(Vector(out_weights[(expected_accepts+1):end])) .== sort(out_weights_gt),
-        )
+            # call kernel
+            filter_scan(BACKEND, 32)(
+                payload,
+                weights,
+                random_numbers,
+                out_payload,
+                out_weights,
+                accepted_count;
+                ndrange = N,
+            )
+            KernelAbstractions.synchronize(BACKEND)
+
+            (expected_accepts_2, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
+                Vector(payload),
+                Vector(weights),
+                Vector(random_numbers),
+            )
+
+            @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
+            @test all(
+                sort(Vector(out_payload[(expected_accepts+1):end])) .==
+                sort(out_payload_gt),
+            )
+            @test all(
+                sort(Vector(out_weights[(expected_accepts+1):end])) .==
+                sort(out_weights_gt),
+            )
+        end
     end
 end
