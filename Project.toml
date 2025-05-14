@@ -1,21 +1,32 @@
 name = "GPUEventGenerators"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
+authors = [
+  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
+  "Simeon Ehrig",
+  "Anton Reinhard",
+  "René Widera",
+]
 version = "0.1.0"
 
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 Atomix = "1.1.1"
+Distributions = "0.25.119"
 KernelAbstractions = "0.9.34"
+Random = "1.11.0"
+StatsFuns = "1.5.0"
 julia = "1.10"
 
 [extras]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Pkg", "Random"]
+test = ["Test", "Pkg", "Random", "StatsFuns"]
