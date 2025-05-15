@@ -9,8 +9,11 @@ const RNG = MersenneTwister(1234)
 
 using GPUEventGenerators
 
-# import the example
-using TruncatedGaussians
+# import example
+using GPUEventGenerators.TruncatedGaussians
+
+using StatsPlots
+
 
 const PLOTDIR = "plots"
 
@@ -39,7 +42,7 @@ function run_example(
     ## max value (bit smaller to enable partial unweighting)
     scale =
         partial_unweighting ? (@info "partial unweighting enabled"; dtype(0.9)) : one(dtype)
-    max_value = TruncatedGaussians.norm(dist) * scale
+    max_value = maximum_value(dist) * scale
 
     ## number of samples to be generated
 

@@ -1,10 +1,10 @@
+
 module TruncatedGaussians
 
 using Distributions
 using StatsFuns
 using Random
 using QuadGK
-using StatsPlots
 
 using GPUEventGenerators
 
@@ -35,7 +35,7 @@ end
 endpoints(dist::TruncatedGaussian1D) = (dist.low, dist.high)
 is_in_domain(d, x) = d.low <= x <= d.high
 
-function norm(d::TruncatedGaussian1D{T}) where {T}
+function GPUEventGenerators.maximum_value(d::TruncatedGaussian1D{T}) where {T}
     mu = d.mu
 
     if is_in_domain(d, mu)
@@ -54,6 +54,5 @@ GPUEventGenerators._compute(d::TruncatedGaussian1D{T}, x) where {T} =
     is_in_domain(d, x) ? _unsafe_compute(d, x) : zero(T)
 
 
-include("plot_compare.jl")
 
 end
