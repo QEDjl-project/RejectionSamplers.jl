@@ -1,7 +1,9 @@
 using Test
-using GPUEventGenerators
 using Random
 using KernelAbstractions
+
+using GPUEventGenerators
+using GPUEventGenerators.TruncatedGaussians
 
 VECTOR_TYPES = Vector{Type}()
 FLOAT_TYPES = Dict{Type,Vector{Type}}()

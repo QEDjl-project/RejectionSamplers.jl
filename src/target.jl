@@ -20,6 +20,15 @@ Return value of `dist` computed at `x`.
 """
 function _compute end
 
+"""
+
+    maximum_value(dist::AbstractTargetDistribution)
+
+Interface function: return the (approximate) maximum_value of a given target distribution.
+
+"""
+function maximum_value end
+
 @inline function _compute!(
     dist::D,
     dest::A,

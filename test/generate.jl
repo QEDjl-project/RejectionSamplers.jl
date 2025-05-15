@@ -1,6 +1,3 @@
-include("test_impl.jl")
-
-
 RNG = Xoshiro(137137)
 N = Int(2^10)
 batch_size = Int(2^10)

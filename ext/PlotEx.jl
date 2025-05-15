@@ -1,4 +1,13 @@
-function plot_compare(samples, dist; kwargs...)
+module PlotEx
+
+using StatsPlots
+using GPUEventGenerators
+
+function GPUEventGenerators.plot_compare(
+    samples::AbstractVector,
+    dist::GPUEventGenerators.AbstractUnivariatTargetDistribution;
+    kwargs...,
+)
     P = histogram(
         samples;
         label = "samples",
@@ -21,4 +30,6 @@ function plot_compare(samples, dist; kwargs...)
     )
 
     return P
+end
+
 end

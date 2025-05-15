@@ -39,6 +39,11 @@ N = 256
 
                     @test !any(iszero.(Array(d_payload)))
 
+                    Random.seed!(137)
+                    rand!(u, d_payload)
+
+                    @test !any(iszero.(Array(d_payload)))
+
                 end
             end
         end
