@@ -1,5 +1,5 @@
 
-RNG = MersenneTwister(628)
+RNG = Xoshiro(628)
 
 N = 256
 
@@ -28,83 +28,62 @@ function _groundtruth_filter_scan(payload, weights, random_numbers)
     return (c, out_payload, out_weights)
 end
 
-@testset "filter scan" begin
-    @testset "$VECTOR_T" for VECTOR_T in VECTOR_TYPES
-        @testset "$T" for T in FLOAT_TYPES[VECTOR_T]
-            PAYLOAD_T = NTuple{4,T}   # make a "bigger" payload type
+function testsuite_filter_scan(backend, vec_type, el_type, payload_type)
 
-            # we don't really care for the test what the payload is
-            payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
-            weights = VECTOR_T(rand(RNG, T, N) .* T(1.05)) # calculated "probability", make slightly larger to test the behaviour with weights > 1
-            random_numbers = VECTOR_T(rand(RNG, T, N)) # random values to filter against
+    payload = vec_type(rand(RNG, payload_type, N))
+    weights = vec_type(rand(RNG, el_type, N) .* el_type(1.05)) # calculated "probability", make slightly larger to test the behaviour with weights > 1
+    random_numbers = vec_type(rand(RNG, el_type, N)) # random values to filter against
 
-            out_payload = VECTOR_T(zeros(eltype(payload), size(payload)))   # output buffer 1
-            out_weights = VECTOR_T(zeros(eltype(weights), size(weights)))   # output buffer 2
-            accepted_count = VECTOR_T(zeros(Int32, 1)) # global memory counter
+    out_payload = vec_type(zeros(eltype(payload), size(payload)))   # output buffer 1
+    out_weights = vec_type(zeros(eltype(weights), size(weights)))   # output buffer 2
+    accepted_count = vec_type(zeros(Int32, 1)) # global memory counter
 
-            BACKEND = get_backend(payload)
+    # TODO: is 32 the best number? (KA uses 128)
 
+    # call kernel
+    filter_scan(backend, 32)(
+        payload,
+        weights,
+        random_numbers,
+        out_payload,
+        out_weights,
+        accepted_count;
+        ndrange = N,
+    )
+    KernelAbstractions.synchronize(backend)
 
-            # TODO: is 32 the best number? (KA uses 128)
+    (expected_accepts, out_payload_gt, out_weights_gt) =
+        _groundtruth_filter_scan(Vector(payload), Vector(weights), Vector(random_numbers))
 
-            # call kernel
-            filter_scan(BACKEND, 32)(
-                payload,
-                weights,
-                random_numbers,
-                out_payload,
-                out_weights,
-                accepted_count;
-                ndrange = N,
-            )
-            KernelAbstractions.synchronize(BACKEND)
+    @test Vector(accepted_count)[1] == expected_accepts
+    @test all(sort(Vector(out_payload)) .== sort(out_payload_gt))
+    @test all(sort(Vector(out_weights)) .== sort(out_weights_gt))
 
-            (expected_accepts, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
-                Vector(payload),
-                Vector(weights),
-                Vector(random_numbers),
-            )
+    # second call, only make buffers larger but otherwise keep going
 
-            @test Vector(accepted_count)[1] == expected_accepts
-            @test all(sort(Vector(out_payload)) .== sort(out_payload_gt))
-            @test all(sort(Vector(out_weights)) .== sort(out_weights_gt))
+    payload = vec_type(rand(RNG, payload_type, N))
+    weights = vec_type(rand(RNG, el_type, N) .* el_type(1.05))
+    random_numbers = vec_type(rand(RNG, el_type, N))
 
-            # second call, only make buffers larger but otherwise keep going
+    append!(out_payload, zeros(eltype(payload), expected_accepts))
+    append!(out_weights, zeros(eltype(weights), expected_accepts))
 
-            payload = VECTOR_T(rand(RNG, PAYLOAD_T, N))
-            weights = VECTOR_T(rand(RNG, T, N) .* T(1.05))
-            random_numbers = VECTOR_T(rand(RNG, T, N))
+    # call kernel
+    filter_scan(backend, 32)(
+        payload,
+        weights,
+        random_numbers,
+        out_payload,
+        out_weights,
+        accepted_count;
+        ndrange = N,
+    )
+    KernelAbstractions.synchronize(backend)
 
-            append!(out_payload, zeros(eltype(payload), expected_accepts))
-            append!(out_weights, zeros(eltype(weights), expected_accepts))
+    (expected_accepts_2, out_payload_gt, out_weights_gt) =
+        _groundtruth_filter_scan(Vector(payload), Vector(weights), Vector(random_numbers))
 
-            # call kernel
-            filter_scan(BACKEND, 32)(
-                payload,
-                weights,
-                random_numbers,
-                out_payload,
-                out_weights,
-                accepted_count;
-                ndrange = N,
-            )
-            KernelAbstractions.synchronize(BACKEND)
-
-            (expected_accepts_2, out_payload_gt, out_weights_gt) = _groundtruth_filter_scan(
-                Vector(payload),
-                Vector(weights),
-                Vector(random_numbers),
-            )
-
-            @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
-            @test all(
-                sort(Vector(out_payload[(expected_accepts+1):end])) .==
-                sort(out_payload_gt),
-            )
-            @test all(
-                sort(Vector(out_weights[(expected_accepts+1):end])) .==
-                sort(out_weights_gt),
-            )
-        end
-    end
+    @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
+    @test all(sort(Vector(out_payload[(expected_accepts+1):end])) .== sort(out_payload_gt))
+    @test all(sort(Vector(out_weights[(expected_accepts+1):end])) .== sort(out_weights_gt))
 end

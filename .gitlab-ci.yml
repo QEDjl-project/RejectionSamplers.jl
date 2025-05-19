@@ -29,8 +29,15 @@ format:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
 
-unittest:
+unit_test_cpu:
   stage: test
+  variables:
+    TEST_AMDGPU: "0"
+    TEST_CUDA: "0"
+    TEST_METAL: "0"
+    TEST_CPU: "1"
+    TEST_ONEAPI: "0"
+  image: "julia:1.11"
   script:
     - |
       julia --project=@. -e '
@@ -47,6 +54,93 @@ unittest:
         c, t = get_summary(process_folder())
         using Printf
         @printf "Test coverage %.2f%%\n" 100c / t'
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
+
+unit_test_cuda:
+  stage: test
+  tags:
+    - "cuda"
+    - "x86_64"
+  interruptible: true
+  variables:
+    TEST_AMDGPU: "0"
+    TEST_CUDA: "1"
+    TEST_METAL: "0"
+    TEST_CPU: "0"
+    TEST_ONEAPI: "0"
+  image: "julia:1.11"
+  script:
+    - |
+      julia --project=@. -e '
+        using Pkg
+        Pkg.build()
+        Pkg.test(coverage=true)'
+  coverage: /Test coverage (\d+\.\d+%)/
+  after_script:
+    - |
+      julia -e '
+        using Pkg
+        Pkg.add("Coverage")
+        using Coverage
+        c, t = get_summary(process_folder())
+        using Printf
+        @printf "Test coverage %.2f%%\n" 100c / t'
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
+
+unit_test_amdgpu:
+  stage: test
+  tags:
+    - "rocm"
+    - "x86_64"
+  interruptible: true
+  variables:
+    TEST_AMDGPU: "1"
+    TEST_CUDA: "0"
+    TEST_METAL: "0"
+    TEST_CPU: "0"
+    TEST_ONEAPI: "0"
+  image: "rocm/dev-ubuntu-24.04:6.2.4-complete"
+  script:
+    - |
+      julia --project=@. -e '
+        using Pkg
+        Pkg.build()
+        Pkg.test(coverage=true)'
+  coverage: /Test coverage (\d+\.\d+%)/
+  before_script:
+    - "curl -fsSL https://install.julialang.org | sh -s -- -y -p /julia"
+    - "export PATH=/julia/bin:$PATH"
+    - "echo $PATH"
+    - "juliaup add 1.11"
+    - "juliaup default 1.11"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
+
+unit_test_metal:
+  stage: test
+  tags:
+    - "macos-medium-m1"
+  interruptible: true
+  variables:
+    TEST_AMDGPU: "0"
+    TEST_CUDA: "0"
+    TEST_METAL: "1"
+    TEST_CPU: "0"
+    TEST_ONEAPI: "0"
+  image: "ghcr.io/cirruslabs/macos-sequoia-xcode:16"
+  script:
+    - |
+      julia --project=@. -e '
+        using Pkg
+        Pkg.build()
+        Pkg.test(coverage=true)'
+  coverage: /Test coverage (\d+\.\d+%)/
+  before_script:
+    - brew install --cask julia
+    - julia --version
+  allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
 
