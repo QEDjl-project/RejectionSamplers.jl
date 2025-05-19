@@ -6,7 +6,6 @@ using BenchmarkTools
 using Random
 using Plots
 const RNG = MersenneTwister(1234)
-
 using GPUEventGenerators
 
 # import example

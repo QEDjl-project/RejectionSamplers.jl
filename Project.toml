@@ -1,6 +1,11 @@
 name = "GPUEventGenerators"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
+authors = [
+  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
+  "Simeon Ehrig",
+  "Anton Reinhard",
+  "René Widera",
+]
 version = "0.1.0"
 
 [deps]
@@ -12,26 +17,37 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 
 [weakdeps]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
+oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [extensions]
+AMDGPUTestExt = "AMDGPU"
+CUDATestExt = "CUDA"
+MetalTestExt = "Metal"
 PlotEx = "StatsPlots"
+oneAPITestExt = "oneAPI"
 
 [compat]
+AMDGPU = "1.3.2"
 Atomix = "1.1.1"
+CUDA = "5.8.1"
 Distributions = "0.25.119"
 KernelAbstractions = "0.9.34"
+Metal = "1.5.1"
 QuadGK = "2.11.2"
 Random = "1.11.0"
 StatsFuns = "1.5.0"
 StatsPlots = "0.15.7"
 julia = "1.10"
+oneAPI = "2.0.3"
 
 [extras]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Pkg", "Random", "StatsFuns"]
+test = ["Test", "Pkg", "Random"]
