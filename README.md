@@ -7,6 +7,8 @@
 on GPU. Its main goal is the investigation of end-to-end workflows to generate events for
 scattering processes.
 
+> 🚧 **Warning**: This package is under rapid development. Expect **breaking changes without notice**.
+
 ## Installation
 
 Since `GPUEventGenerators.jl` is not registered (and probably never will), you need to
