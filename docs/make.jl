@@ -28,4 +28,4 @@ makedocs(;
     pages = ["index.md"; numbered_pages],
 )
 
-deploydocs(; repo = "github.com/QEDjl-project/GPUEventGenerators.jl")
+#deploydocs(; repo = "github.com/QEDjl-project/GPUEventGenerators.jl")
