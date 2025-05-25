@@ -1,4 +1,5 @@
 using GPUEventGenerators
+using GPUEventGenerators.TestUtils
 using Documenter
 
 DocMeta.setdocmeta!(
