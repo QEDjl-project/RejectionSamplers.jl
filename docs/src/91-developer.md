@@ -1,7 +1,8 @@
 # [Developer documentation](@id dev_docs)
 
-!!! note "Contributing guidelines" If you haven't, please read the [Contributing
-guidelines](90-contributing.md) first.
+!!! note "Contributing guidelines"
+
+    If you haven't, please read the [Contributing guidelines](90-contributing.md) first.
 
 If you want to make contributions to this package that involves code, then this guide is
 for you.
@@ -10,8 +11,8 @@ for you.
 
 !!! tip "If you have writing rights"
 
-If you have writing rights, you don't have to fork. Instead, simply clone and skip
-ahead. Whenever **upstream** is mentioned, use **origin** instead.
+    If you have writing rights, you don't have to fork. Instead, simply clone and skip
+    ahead. Whenever **upstream** is mentioned, use **origin** instead.
 
 If this is the first time you work with this repository, follow the instructions below to
 clone the repository.
@@ -20,9 +21,9 @@ clone the repository.
 2. Clone your repo (this will create a `git remote` called `origin`)
 3. Add this repo as a remote:
 
-   ```bash
-   git remote add upstream https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
-   ```
+```bash
+git remote add upstream https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
+```
 
 This will ensure that you have two remotes in your git: `origin` and `upstream`. You will
 create branches and push to `origin`, and you will fetch and update your local `main`
@@ -125,8 +126,10 @@ up-to-date.
 
 ### Before creating a pull request
 
-!!! tip "Atomic git commits" Try to create "atomic git commits" (recommended reading: [The
-Utopic Git History](https://blog.esciencecenter.nl/the-utopic-git-history-d44b81c09593)).
+!!! tip "Atomic git commits"
+
+    Try to create "atomic git commits" (recommended reading: [The Utopic Git
+    History](https://blog.esciencecenter.nl/the-utopic-git-history-d44b81c09593)).
 
 - Make sure the tests pass.
 - Make sure the pre-commit tests pass.
