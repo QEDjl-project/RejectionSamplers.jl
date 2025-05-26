@@ -1,6 +1,6 @@
 # GPUEventGenerators.jl
 
-![Stable](https://img.shields.io/badge/docs-main-blue.svg)](<https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl>)
+[![Main](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl)
 [![pipeline status](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/badges/main/pipeline.svg)](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/-/commits/main)
 
 `GPUEventGenerators.jl` is a showcase project for Monte-Carlo Event Generation
