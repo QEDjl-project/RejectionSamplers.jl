@@ -8,7 +8,7 @@ where N is the number of accepted values. Also assigns `out_size += N`.
 
 ## Parameters
 - input `payload`: array of the payload
-- input `weights`: array of weights (normalized to [0,1] (outliers allowed, see `out_weights`), "probabilities")
+- input `weights`: array of weights (normalized to [0,1]; outliers allowed, see `out_weights`; "probabilities")
 - input `randoms`: array of uniform random independent scalar values [0,1]
 - output `out_payload`: buffer for accepted payload to be written
 - output `out_weights`: buffer for accepted weights to be written; every accepted weight will be 1.0, or the original weight if it was larger than 1.0
