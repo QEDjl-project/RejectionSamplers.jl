@@ -1,11 +1,13 @@
 # GPUEventGenerators.jl
 
-![Stable](https://img.shields.io/badge/docs-main-blue.svg)](<https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl>)
+[![Main](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl)
 [![pipeline status](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/badges/main/pipeline.svg)](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/-/commits/main)
 
 `GPUEventGenerators.jl` is a showcase project for Monte-Carlo Event Generation
 on GPU. Its main goal is the investigation of end-to-end workflows to generate events for
 scattering processes.
+
+> 🚧 **Warning**: This package is under rapid development. Expect **breaking changes without notice**.
 
 ## Installation
 
