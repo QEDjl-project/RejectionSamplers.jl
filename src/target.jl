@@ -14,7 +14,8 @@ abstract type AbstractUnivariatTargetDistribution <: AbstractTargetDistribution 
 
 """
 
-    _compute(dist,x::AbstractUnivariatTargetDistribution)::Real
+    _compute(dist::AbstractUnivariatTargetDistribution,x::Real)::Real
+    _compute(dist::AbstractMultivariateTarget,x::NTuple{2,Real})::Real
 
 Return value of `dist` computed at `x`.
 """
@@ -40,6 +41,7 @@ function maximum_value end
     return nothing
 end
 
+# TODO: see if this is necessary
 # generic fallback - calculates on host and copies to device
 #
 # note:
@@ -53,3 +55,85 @@ function _compute!(
 
     copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
 end
+
+# bivariate distributions
+
+abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
+
+
+@inline function _compute!(
+    dist::D,
+    dest::A,
+    x::I,
+) where {
+    N,
+    D<:AbstractMultivariateTarget{N},
+    T<:Real,
+    TT<:NTuple{N,T},
+    A<:AbstractVector{T},
+    I<:AbstractVector{TT},
+}
+
+    broadcast!(Base.Fix1(_compute, dist), dest, x)
+
+    return nothing
+end
+
+# TODO: see if this is necessary
+# generic fallback - calculates on host and copies to device
+#
+# note:
+# - this allocates on host
+#=
+function _compute!(
+    dist::D,
+    dest::AbstractArray{T},
+    x::AbstractArray{TT},
+) where {D<:AbstractUnivariatTargetDistribution,T<:Real,TT<:NTuple{2,T}}
+
+    copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
+end
+=#
+
+
+
+#=
+# scattering process distribution
+
+abstract type AbstractScatteringProcessDistribution <: AbstractTargetDistribution end
+
+@inline function _compute!(
+    dist::D,
+    dest::A,
+    x::I,
+) where {
+        D<:AbstractScatteringProcessDistribution,
+        T<:Real,
+        A<:AbstractArray{T},
+        PSP<:AbstractPhaseSpacePoint,
+        I<:AbstractVector{PSP}
+    }
+
+    broadcast!(Base.Fix1(_compute, dist), dest, x)
+
+    return nothing
+end
+
+# generic fallback - calculates on host and copies to device
+#
+# note:
+# - this allocates on host
+#
+function _compute!(
+    dist::D,
+    dest::AbstractVector{T},
+    x::AbstractVector{PSP},
+) where {
+        D<:AbstractScatteringProcessDistribution,
+        T<:Real,
+        PSP<:AbstractPhaseSpacePoint,
+    }
+
+    copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
+end
+=#
