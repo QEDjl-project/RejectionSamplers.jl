@@ -12,7 +12,18 @@ function testsuite_run(backend, vec_type, el_type)
         NTuple{4,el_type},
     )
     @testset "proposal" testsuite_proposal(backend, vec_type, el_type, 256)
-    @testset "target" testsuite_target(backend, vec_type, el_type, 256)
+    @testset "univariate target" testsuite_univariate_target(
+        backend,
+        vec_type,
+        el_type,
+        256,
+    )
+    @testset "multivariate target" testsuite_multivariate_target(
+        backend,
+        vec_type,
+        el_type,
+        256,
+    )
     @testset "event genertation" testsuite_event_generation(
         backend,
         vec_type,
