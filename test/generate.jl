@@ -7,7 +7,7 @@ function testsuite_event_generation(backend, vec_type, el_type, N, batch_size)
 
     ## example distribution to be sampled
     dist = TruncatedGaussian1D(mu, sig, dom)
-    proposal = UniformProposal(dom)
+    proposal = UniformUnivariateProposal(dom)
 
     ## max value
     max_value = maximum_value(dist)

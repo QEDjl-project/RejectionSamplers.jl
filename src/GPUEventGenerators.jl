@@ -4,7 +4,8 @@ module GPUEventGenerators
 export filter_scan
 
 # proposal
-export UniformProposal
+export UniformUnivariateProposal
+export UniformMultivariateProposal
 
 # target
 export maximum_value
@@ -14,6 +15,7 @@ using Distributions
 using KernelAbstractions
 using Atomix
 using Random
+using GPUArrays
 
 include("filter_scan.jl")
 include("proposal.jl")
