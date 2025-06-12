@@ -1,6 +1,7 @@
 using Pkg
 using Test
 using Random
+using GPUArrays
 using KernelAbstractions
 
 using GPUEventGenerators
