@@ -72,17 +72,26 @@ function _generate_events!(
 end
 
 
-function generate_events(dist, proposal, max_val, res_size, batch_size, backend, dtype)
+function generate_events(
+    dist,
+    proposal,
+    max_val,
+    res_size,
+    batch_size,
+    backend,
+    out_dtype,
+    dtype = out_dtype,
+)
 
     # allocate input buffer on GPU (batch_size)
     d_args = allocate(backend, dtype, (batch_size,))
-    d_probs = allocate(backend, dtype, (batch_size,))
-    d_vals = allocate(backend, dtype, (batch_size,))
+    d_probs = allocate(backend, out_dtype, (batch_size,))
+    d_vals = allocate(backend, out_dtype, (batch_size,))
 
     # allocate output buffer on GPU (out_size = res_size + batch_size)
     out_size = res_size + batch_size
     d_out_args = allocate(backend, dtype, (out_size,))
-    d_out_vals = allocate(backend, dtype, (out_size,))
+    d_out_vals = allocate(backend, out_dtype, (out_size,))
 
     # allocate current_out_size + init with zero
     current_out_size = KernelAbstractions.zeros(backend, UInt32, 1)

@@ -13,4 +13,5 @@ node_modules
 
 DEV*
 
+**/plots/**
 example*.pdf
