@@ -24,7 +24,14 @@ function testsuite_run(backend, vec_type, el_type)
         el_type,
         256,
     )
-    @testset "event genertation" testsuite_event_generation(
+    @testset "univariate generation" testsuite_univariate_generation(
+        backend,
+        vec_type,
+        el_type,
+        Int(2^12),
+        Int(2^10),
+    )
+    @testset "multivariate generation" testsuite_multivariate_generation(
         backend,
         vec_type,
         el_type,
