@@ -1,11 +1,6 @@
 name = "GPUEventGenerators"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-authors = [
-  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
-  "Simeon Ehrig",
-  "Anton Reinhard",
-  "René Widera",
-]
+authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
 version = "0.1.0"
 
 [deps]
