@@ -22,6 +22,8 @@ include("proposal.jl")
 include("target.jl")
 include("generate.jl")
 
+include("plotting.jl")
+
 include("examples/truncated_gaussian.jl")
 include("examples/perturbative_compton.jl")
 
