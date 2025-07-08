@@ -169,12 +169,13 @@ end
 
 function _rand!(
     rng::AbstractRNG,
-    d::UniformMultivariateProposal{N,T},
+    d::UniformMultivariateProposal{T,N},
     A::AbstractVector{TT},
 ) where {N,T,TT<:Tuple}
     isempty(A) && return A
+
     for i in eachindex(A)
-        A[i] = _transform_uniform_val.(rand(rng), d.low, d.up)
+        A[i] = _transform_uniform_val.(ntuple(_ -> rand(rng), N), d.low, d.up)
     end
     return A
 end

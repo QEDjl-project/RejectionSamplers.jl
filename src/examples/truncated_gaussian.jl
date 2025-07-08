@@ -33,7 +33,9 @@ function TruncatedGaussian1D(mu::T, sig::T, domain::NTuple{2,T}) where {T<:Real}
     return TruncatedGaussian1D(mu, sig, domain...)
 end
 
-endpoints(dist::TruncatedGaussian1D) = (dist.lower, dist.upper)
+Base.extrema(d::TruncatedGaussian1D) = (d.lower, d.upper)
+Base.minimum(d::TruncatedGaussian1D) = d.lower
+Base.maximum(d::TruncatedGaussian1D) = d.upper
 is_in_domain(d::TruncatedGaussian1D, x) = d.lower <= x <= d.upper
 
 function GPUEventGenerators.maximum_value(d::TruncatedGaussian1D{T}) where {T}
@@ -85,7 +87,9 @@ struct TruncatedGaussian{T<:Real,N} <: GPUEventGenerators.AbstractMultivariateTa
     end
 end
 
-endpoints(d::TruncatedGaussian) = (d.lower, d.upper)
+Base.extrema(d::TruncatedGaussian) = (d.lower, d.upper)
+Base.minimum(d::TruncatedGaussian) = d.lower
+Base.maximum(d::TruncatedGaussian) = d.upper
 
 function is_in_domain(d::TruncatedGaussian{T,N}, x::NTuple{N,T}) where {N,T}
     return all(d.lower .<= x .<= d.upper)
@@ -100,7 +104,7 @@ function GPUEventGenerators.maximum_value(d::TruncatedGaussian{T,N}) where {T,N}
 end
 
 _unsafe_compute(d::TruncatedGaussian{T,N}, x) where {N,T} =
-    prod(i -> normpdf(d.mu[i], d.sig[i], x[i]), N)
+    prod(ntuple(i -> normpdf(d.mu[i], d.sig[i], x[i]), N))
 GPUEventGenerators._compute(d::TruncatedGaussian{T}, x) where {T} =
     is_in_domain(d, x) ? _unsafe_compute(d, x) : zero(T)
 
