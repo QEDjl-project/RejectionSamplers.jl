@@ -24,6 +24,7 @@ function testsuite_run(backend, vec_type, el_type)
         el_type,
         256,
     )
+    @testset "Compton target" testsuite_Compton_target(backend, vec_type, el_type, 256)
     @testset "univariate generation" testsuite_univariate_generation(
         backend,
         vec_type,

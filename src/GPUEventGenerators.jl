@@ -15,6 +15,8 @@ using Distributions
 using KernelAbstractions
 using Atomix
 using Random
+using QEDbase
+using QEDcore
 using GPUArrays
 
 include("filter_scan.jl")
@@ -28,5 +30,7 @@ include("examples/truncated_gaussian.jl")
 include("examples/perturbative_compton.jl")
 
 include("testutils/TestUtils.jl")
+
+include("patches.jl")
 
 end

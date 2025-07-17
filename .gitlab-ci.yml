@@ -39,6 +39,7 @@ unit_test_cpu:
     TEST_ONEAPI: "0"
   image: "julia:1.11"
   script:
+    - julia --project=@. add_dev.jl
     - |
       julia --project=@. -e '
         using Pkg
@@ -71,6 +72,7 @@ unit_test_cuda:
     TEST_ONEAPI: "0"
   image: "julia:1.11"
   script:
+    - julia --project=@. add_dev.jl
     - |
       julia --project=@. -e '
         using Pkg
@@ -103,6 +105,7 @@ unit_test_amdgpu:
     TEST_ONEAPI: "0"
   image: "rocm/dev-ubuntu-24.04:6.2.4-complete"
   script:
+    - julia --project=@. add_dev.jl
     - |
       julia --project=@. -e '
         using Pkg
@@ -131,6 +134,7 @@ unit_test_metal:
     TEST_ONEAPI: "0"
   image: "ghcr.io/cirruslabs/macos-sequoia-xcode:16"
   script:
+    - julia --project=@. add_dev.jl
     - |
       julia --project=@. -e '
         using Pkg
@@ -147,6 +151,7 @@ unit_test_metal:
 pages:
   stage: deploy
   script:
+    - julia --project=docs add_dev.jl
     - julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
     - julia --project=docs --color=yes docs/make.jl
     - mv docs/build public # move to the directory picked up by Gitlab pages

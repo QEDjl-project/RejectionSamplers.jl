@@ -36,3 +36,38 @@ function testsuite_multivariate_target(backend, vec_type, el_type, N)
         @test isapprox(Vector(d_vals), h_groundtruth)
     end
 end
+
+function _rand_compton_coords(ELTYPE, RNG, om, N)
+    return [
+        (om, rand(RNG, ELTYPE) * 2 - one(ELTYPE), rand(RNG, ELTYPE) * 2 * pi) for _ = 1:N
+    ]
+end
+
+function testsuite_Compton_target(backend, vec_type, el_type, N)
+    if el_type == Float16 && !(backend isa CPU)
+        return nothing
+    end
+    OMS = (el_type(1e-3),)
+    PROC = Compton()
+    MODEL = PerturbativeQED()
+    IN_PSL = ComptonRestSystem()
+    OUT_PSL = ComptonSphericalLayout(IN_PSL)
+
+
+
+    @testset "om = $om" for om in OMS
+
+        h_coords = _rand_compton_coords(el_type, RNG, om, N)
+        d_coords = vec_type(h_coords)
+
+        COMPTON_DIST = ComptonDistribution{el_type}(MODEL, OUT_PSL)
+
+        d_vals = vec_type(rand(RNG, el_type, N))
+
+        h_groundtruth = GPUEventGenerators._compute.(COMPTON_DIST, h_coords)
+
+        GPUEventGenerators._compute!(COMPTON_DIST, d_vals, d_coords)
+
+        @test isapprox(Vector(d_vals), h_groundtruth)
+    end
+end

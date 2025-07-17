@@ -1,11 +1,14 @@
 using Pkg
 using Test
 using Random
+using QEDprocesses
+using QEDcore
 using GPUArrays
 using KernelAbstractions
 
 using GPUEventGenerators
 using GPUEventGenerators.TruncatedGaussians
+using GPUEventGenerators.PerturbativeCompton
 using GPUEventGenerators.TestUtils
 
 SETUPS = TestSetup[]
