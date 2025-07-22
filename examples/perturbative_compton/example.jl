@@ -13,7 +13,7 @@ const PLOTDIR = "plots"
 "Create random `mu`, `sig`, and `dom` values for given dimension and dtype."
 function create_parameters(dtype)
     @info "Create parameters"
-    om = dtype(2e-3) # 1keV
+    om = dtype(2.0e-3) # 1keV
     @info "om = $om"
     #lower = ntuple(i -> mu[i] - dtype(3.0) * sig[i], dim)
     lower = dtype.((-1.0, 0.0))
@@ -24,11 +24,11 @@ function create_parameters(dtype)
 end
 
 function plot_corner(
-    samples,
-    backend,
-    dtype,
-    filename = "corner_plot_$(backend)_$(dtype).png",
-)
+        samples,
+        backend,
+        dtype,
+        filename = "corner_plot_$(backend)_$(dtype).png",
+    )
     @info "Generating corner plot"
     data = ntuple(2) do i
         getindex.(samples, i)
@@ -37,7 +37,7 @@ function plot_corner(
     nt = NamedTuple{labels}(data)
     fig = pairplot(nt)
 
-    save(joinpath(PLOTDIR, filename), fig)
+    return save(joinpath(PLOTDIR, filename), fig)
 end
 
 function plot_weights(weights, backend, dtype, filename = "weights_$(backend)_$(dtype).png")
@@ -47,17 +47,17 @@ function plot_weights(weights, backend, dtype, filename = "weights_$(backend)_$(
 
     hist!(ax, weights, color = :orange, bins = 100)
 
-    save(joinpath(PLOTDIR, filename), f)
+    return save(joinpath(PLOTDIR, filename), f)
 end
 
 function run_example(
-    backend,
-    dtype;
-    plotting = true,
-    partial_unweighting = true,
-    N = Int(2^20),
-    batch_size = 2^20,
-)
+        backend,
+        dtype;
+        plotting = true,
+        partial_unweighting = true,
+        N = Int(2^20),
+        batch_size = 2^20,
+    )
     @info "Running example with backend=$backend, dtype=$dtype"
 
     om, dom = create_parameters(dtype)
@@ -79,7 +79,7 @@ function run_example(
         batch_size,
         backend,
         dtype,
-        NTuple{2,dtype},
+        NTuple{2, dtype},
     )
 
 

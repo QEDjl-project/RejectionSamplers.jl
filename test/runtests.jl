@@ -41,7 +41,7 @@ if metal_tests
 
 else
     metal_installed ? @warn("Metal is installed, but tests skipped.") :
-    @info("Metal tests skipped.")
+        @info("Metal tests skipped.")
 end
 
 # check if we test with CUDA
@@ -63,7 +63,7 @@ if cuda_tests
 
 else
     cuda_installed ? @warn("CUDA is installed, but tests skipped.") :
-    @info("CUDA tests skipped.")
+        @info("CUDA tests skipped.")
 end
 
 # check if we test with oneAPI
@@ -85,7 +85,7 @@ if oneapi_tests
 
 else
     oneapi_installed ? @warn("oneAPI is installed, but tests skipped.") :
-    @info("oneAPI tests skipped.")
+        @info("oneAPI tests skipped.")
 end
 
 # check if we test with AMDGPU
@@ -107,7 +107,7 @@ if amdgpu_tests
 
 else
     amdgpu_installed ? @warn("AMDGPU is installed, but tests skipped.") :
-    @info("AMDGPU tests skipped.")
+        @info("AMDGPU tests skipped.")
 end
 
 # from here on, we cannot use safe test sets or we would unload the GPU libraries again

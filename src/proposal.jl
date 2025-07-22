@@ -1,5 +1,3 @@
-
-
 """
 
     AbstractProposal{T}
@@ -33,7 +31,7 @@ cpu and copyied to the device.
     such `NTuples`.
 
 """
-abstract type AbstractProposal{T} <: Sampleable{Univariate,Continuous} end
+abstract type AbstractProposal{T} <: Sampleable{Univariate, Continuous} end
 Base.broadcastable(d::AbstractProposal) = Ref(d)
 Base.eltype(::AbstractProposal{T}) where {T} = T
 
@@ -43,12 +41,12 @@ abstract type AbstractUnivariateProposal{T} <: AbstractProposal{T} end
 
 # Uniform univariate proposal
 
-struct UniformUnivariateProposal{T<:Real,DIST} <: AbstractUnivariateProposal{T}
+struct UniformUnivariateProposal{T <: Real, DIST} <: AbstractUnivariateProposal{T}
     dist::DIST
 
-    function UniformUnivariateProposal(a::T, b::T) where {T<:Real}
+    function UniformUnivariateProposal(a::T, b::T) where {T <: Real}
         dist = Uniform(a, b)
-        return new{T,typeof(dist)}(dist)
+        return new{T, typeof(dist)}(dist)
     end
 end
 UniformUnivariateProposal(d::NTuple{2}) = UniformUnivariateProposal(d...)
@@ -62,13 +60,13 @@ Distributions.rand(rng::AbstractRNG, d::UniformUnivariateProposal) = rand(rng, d
 
 # Random Interface (important for GPU)
 function Distributions._rand!(
-    rng::AbstractRNG,
-    d::UniformUnivariateProposal{T},
-    A::AbstractArray{T},
-) where {T<:Real}
+        rng::AbstractRNG,
+        d::UniformUnivariateProposal{T},
+        A::AbstractArray{T},
+    ) where {T <: Real}
 
     # fallback on Distributions.Uniform (which works on GPU)
-    rand!(rng, d.dist, A)
+    return rand!(rng, d.dist, A)
 end
 
 # Multivariate proposal
@@ -80,9 +78,9 @@ abstract type AbstractMultivariateProposal{T} <: AbstractProposal{T} end
 function _assert_correct_boundaries(::Tuple{}, ::Tuple{}) end
 
 function _assert_correct_boundaries(
-    low::Tuple{Vararg{T,N}},
-    up::Tuple{Vararg{T,N}},
-) where {T<:Real,N}
+        low::Tuple{Vararg{T, N}},
+        up::Tuple{Vararg{T, N}},
+    ) where {T <: Real, N}
     first(low) <= first(up) || throw(
         ArgumentError(
             "lower boundary need to be smaller or equal to the respective upper boundary",
@@ -91,12 +89,12 @@ function _assert_correct_boundaries(
     return _assert_correct_boundaries(low[2:end], up[2:end])
 end
 
-struct UniformMultivariateProposal{T,N} <: AbstractMultivariateProposal{T}
-    low::NTuple{N,T}
-    up::NTuple{N,T}
-    function UniformMultivariateProposal(low::NTuple{N,T}, up::NTuple{N,T}) where {T,N}
+struct UniformMultivariateProposal{T, N} <: AbstractMultivariateProposal{T}
+    low::NTuple{N, T}
+    up::NTuple{N, T}
+    function UniformMultivariateProposal(low::NTuple{N, T}, up::NTuple{N, T}) where {T, N}
         _assert_correct_boundaries(low, up)
-        return new{T,N}(low, up)
+        return new{T, N}(low, up)
     end
 end
 
@@ -106,16 +104,16 @@ UniformMultivariateProposal(low::AbstractVector, high::AbstractVector) =
 Base.extrema(p::UniformMultivariateProposal) = (minimum(p), maximum(p))
 Base.minimum(p::UniformMultivariateProposal) = p.low
 Base.maximum(p::UniformMultivariateProposal) = p.up
-Base.eltype(::UniformMultivariateProposal{T,N}) where {T,N} = NTuple{N,T}
+Base.eltype(::UniformMultivariateProposal{T, N}) where {T, N} = NTuple{N, T}
 
 
 # based on: https://github.com/JuliaGPU/GPUArrays.jl/blob/55a943ea5c876f6c34cb355eea17fb8290f81497/src/host/random.jl#L56
 # not exported, therefore, no piracy
 function gpu_rand(
-    ::Type{NTuple{N,T}},
-    threadid,
-    randstate::AbstractVector{NTuple{4,UInt32}},
-) where {N,T}
+        ::Type{NTuple{N, T}},
+        threadid,
+        randstate::AbstractVector{NTuple{4, UInt32}},
+    ) where {N, T}
     return ntuple(x -> GPUArrays.gpu_rand(T, threadid, randstate), N)
 end
 
@@ -124,14 +122,14 @@ _transform_uniform_val(x, low, high) = (high - low) * x + low
 
 # version which transforms result of gpu_rand to hyper cube of dist
 function gpu_rand(
-    ::Type{NTuple{N,T}},
-    u::UniformMultivariateProposal,
-    threadid,
-    randstate::AbstractVector{NTuple{4,UInt32}},
-) where {N,T}
+        ::Type{NTuple{N, T}},
+        u::UniformMultivariateProposal,
+        threadid,
+        randstate::AbstractVector{NTuple{4, UInt32}},
+    ) where {N, T}
     return ntuple(
         x ->
-            (getindex(u.up, x) - getindex(u.low, x)) *
+        (getindex(u.up, x) - getindex(u.low, x)) *
             GPUArrays.gpu_rand(T, threadid, randstate) + getindex(u.low, x),
         N,
     )
@@ -140,7 +138,7 @@ end
 # based on: https://github.com/JuliaGPU/GPUArrays.jl/blob/55a943ea5c876f6c34cb355eea17fb8290f81497/src/host/random.jl#L84
 # not exported, therefore, no piracy
 # TODO:
-function _rand!(rng::GPUArrays.RNG, A::GPUArrays.AnyGPUArray{T}) where {T<:Tuple}
+function _rand!(rng::GPUArrays.RNG, A::GPUArrays.AnyGPUArray{T}) where {T <: Tuple}
     isempty(A) && return A
     @kernel function rand!(a, randstate)
         idx = @index(Global, Linear)
@@ -154,10 +152,10 @@ end
 # - figure out, if this should be from GPUArrays to allow correct dispatch for
 # CUDA/AMDGPU/oneAPI
 function _rand!(
-    rng::GPUArrays.RNG,
-    d::UniformMultivariateProposal{N,T},
-    A::GPUArrays.AnyGPUArray{TT},
-) where {N,T,TT<:Tuple}
+        rng::GPUArrays.RNG,
+        d::UniformMultivariateProposal{N, T},
+        A::GPUArrays.AnyGPUArray{TT},
+    ) where {N, T, TT <: Tuple}
     isempty(A) && return A
     @kernel function rand!(a, randstate)
         idx = @index(Global, Linear)
@@ -168,10 +166,10 @@ function _rand!(
 end
 
 function _rand!(
-    rng::AbstractRNG,
-    d::UniformMultivariateProposal{T,N},
-    A::AbstractVector{TT},
-) where {N,T,TT<:Tuple}
+        rng::AbstractRNG,
+        d::UniformMultivariateProposal{T, N},
+        A::AbstractVector{TT},
+    ) where {N, T, TT <: Tuple}
     isempty(A) && return A
 
     for i in eachindex(A)
@@ -182,21 +180,21 @@ end
 
 # need to implement this to get the correct default_rng for Metal
 function Random.rand!(
-    d::UniformMultivariateProposal,
-    A::GPUArrays.AnyGPUArray{TT},
-) where {TT<:Tuple}
+        d::UniformMultivariateProposal,
+        A::GPUArrays.AnyGPUArray{TT},
+    ) where {TT <: Tuple}
     rng = GPUArrays.default_rng(typeof(A))
-    _rand!(rng, d, A)
+    return _rand!(rng, d, A)
 end
 
 function Distributions._rand!(
-    rng::AbstractRNG,
-    d::UniformMultivariateProposal{T,N},
-    A::AbstractArray{TT},
-) where {N,T<:Real,TT<:Tuple}
+        rng::AbstractRNG,
+        d::UniformMultivariateProposal{T, N},
+        A::AbstractArray{TT},
+    ) where {N, T <: Real, TT <: Tuple}
 
     # fallback on Distributions.Uniform (which works on GPU)
-    _rand!(rng, d, A)
+    return _rand!(rng, d, A)
 end
 
 ## TODO:

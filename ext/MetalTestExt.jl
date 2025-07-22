@@ -5,7 +5,7 @@ using GPUEventGenerators.TestUtils
 using Metal
 
 @inline function GPUEventGenerators.TestUtils.get_test_setup(backend::MetalBackend)
-    TestSetup(backend, (MtlVector,), (Float16, Float32))
+    return TestSetup(backend, (MtlVector,), (Float16, Float32))
 end
 
 

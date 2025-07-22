@@ -1,4 +1,4 @@
-struct QuantileReductionMethod{T<:Real} <: AbstractSampleBasedMaxFinder
+struct QuantileReductionMethod{T <: Real} <: AbstractSampleBasedMaxFinder
     p::T
     nsamples::Int
 end
@@ -6,9 +6,9 @@ end
 _nsamples(n::QuantileReductionMethod) = n.nsamples
 #
 function _findmax(
-    method::QuantileReductionMethod{T},
-    weights::AbstractVector{T},
-) where {T<:Real}
+        method::QuantileReductionMethod{T},
+        weights::AbstractVector{T},
+    ) where {T <: Real}
     sorted_weights = sort(weights)
     sum_weight = sum(sorted_weights)
     sum_weight_quantile = method.p * sum_weight

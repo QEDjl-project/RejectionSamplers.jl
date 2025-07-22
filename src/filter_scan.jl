@@ -23,13 +23,13 @@ where N is the number of accepted values. Also assigns `out_size += N`.
     calling the kernel. Also note that `Int64` is not supported on some backends (Metal.jl and oneAPI.jl).
 """
 @kernel inbounds = true function filter_scan(
-    @Const(payload),
-    @Const(weights),
-    @Const(randoms),
-    out_payload,
-    out_weights,
-    out_size,
-)
+        @Const(payload),
+        @Const(weights),
+        @Const(randoms),
+        out_payload,
+        out_weights,
+        out_size,
+    )
     local_accepted_count = @localmem Int32 (1,)
     global_accepted_idx = @localmem Int32 (1,)
 

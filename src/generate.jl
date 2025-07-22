@@ -1,16 +1,15 @@
-
 # TODO: add this to `filter_scan`
 function filter_scan_update!(
-    d_args,
-    d_vals,
-    d_probs,
-    d_out_args,
-    d_out_vals,
-    current_out_size,
+        d_args,
+        d_vals,
+        d_probs,
+        d_out_args,
+        d_out_vals,
+        current_out_size,
 
-    # TODO: add this one
-    max_val,
-)
+        # TODO: add this one
+        max_val,
+    )
 
     # TODO: prettify!
     @inline d_vals ./= max_val
@@ -26,21 +25,21 @@ function filter_scan_update!(
         ndrange = length(d_args),
     )
 
-    KernelAbstractions.synchronize(BACKEND)
+    return KernelAbstractions.synchronize(BACKEND)
 end
 
 # generate event batches
 function _generate_events!(
-    target_dist,
-    proposal_dist,
-    max_val,
-    d_args,
-    d_probs,
-    d_vals,
-    d_out_args,
-    d_out_vals,
-    current_out_size,
-)
+        target_dist,
+        proposal_dist,
+        max_val,
+        d_args,
+        d_probs,
+        d_vals,
+        d_out_args,
+        d_out_vals,
+        current_out_size,
+    )
     BACKEND = get_backend(d_args)
 
     # TODO:
@@ -73,15 +72,15 @@ end
 
 
 function generate_events(
-    dist,
-    proposal,
-    max_val,
-    res_size,
-    batch_size,
-    backend,
-    out_dtype,
-    dtype = out_dtype,
-)
+        dist,
+        proposal,
+        max_val,
+        res_size,
+        batch_size,
+        backend,
+        out_dtype,
+        dtype = out_dtype,
+    )
 
     # allocate input buffer on GPU (batch_size)
     d_args = allocate(backend, dtype, (batch_size,))

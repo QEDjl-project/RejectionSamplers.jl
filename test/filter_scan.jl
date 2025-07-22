@@ -1,12 +1,11 @@
-
 RNG = Xoshiro(628)
 
 N = 256
 
 # FIXME: avoid piracy
 @inline Base.zero(::Type{Tuple{}}) = ()
-@inline Base.zero(::Type{Tuple{Vararg{T,N}}}) where {T,N} =
-    (zero(T), zero(NTuple{N - 1,T})...)
+@inline Base.zero(::Type{Tuple{Vararg{T, N}}}) where {T, N} =
+    (zero(T), zero(NTuple{N - 1, T})...)
 
 function _groundtruth_filter_scan(payload, weights, random_numbers)
     c = 0
@@ -84,6 +83,6 @@ function testsuite_filter_scan(backend, vec_type, el_type, payload_type)
         _groundtruth_filter_scan(Vector(payload), Vector(weights), Vector(random_numbers))
 
     @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
-    @test all(sort(Vector(out_payload[(expected_accepts+1):end])) .== sort(out_payload_gt))
-    @test all(sort(Vector(out_weights[(expected_accepts+1):end])) .== sort(out_weights_gt))
+    @test all(sort(Vector(out_payload[(expected_accepts + 1):end])) .== sort(out_payload_gt))
+    return @test all(sort(Vector(out_weights[(expected_accepts + 1):end])) .== sort(out_weights_gt))
 end
