@@ -25,7 +25,7 @@ function testsuite_multivariate_target(backend, vec_type, el_type, N)
 
     return @testset "dim = $dim" for dim in DIMS
         MULT_DIST = TestMultivariateTarget{dim}()
-        d_input = vec_type(rand(RNG, SVector{dim,el_type}, N))
+        d_input = vec_type(rand(RNG, SVector{dim, el_type}, N))
         d_vals = vec_type(rand(RNG, el_type, N))
 
         h_groundtruth = GPUEventGenerators._compute.(MULT_DIST, Vector(d_input))
@@ -39,7 +39,7 @@ end
 function _rand_compton_coords(ELTYPE, RNG, om, N)
     return [
         SVector(om, rand(RNG, ELTYPE) * 2 - one(ELTYPE), rand(RNG, ELTYPE) * 2 * pi) for
-        _ = 1:N
+            _ in 1:N
     ]
 end
 

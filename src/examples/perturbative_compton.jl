@@ -46,9 +46,9 @@ function GPUEventGenerators.maximum_value(d::KleinNishinaDistribution{T}) where 
 end
 
 function GPUEventGenerators._compute(
-    dist::KleinNishinaDistribution{T},
-    cth_phi::SVector{2,T},
-) where {T<:Real}
+        dist::KleinNishinaDistribution{T},
+        cth_phi::SVector{2, T},
+    ) where {T <: Real}
     return _klein_nishina_formula(dist.omega, cth_phi...)
 end
 
@@ -90,9 +90,9 @@ ComptonDistribution(
 ) = ComptonDistribution{Float64}(model, psl, spin_pol)
 
 function GPUEventGenerators._compute(
-    dist::ComptonDistribution{T,DOF},
-    coords::SVector{DOF,T},
-) where {DOF,T<:Real}
+        dist::ComptonDistribution{T, DOF},
+        coords::SVector{DOF, T},
+    ) where {DOF, T <: Real}
 
     psp = PhaseSpacePoint(dist.proc, dist.model, dist.psl, coords)
 

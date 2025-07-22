@@ -72,18 +72,18 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
             =#
 
             @testset "sanity checks" begin
-                d_payload = vec_type(Vector{SVector{dim,el_type}}(undef, N))
+                d_payload = vec_type(Vector{SVector{dim, el_type}}(undef, N))
 
                 RNG = test_default_rng(vec_type)
                 rand!(u, d_payload)
 
-                @test eltype(Array(d_payload)) == SVector{dim,el_type}
+                @test eltype(Array(d_payload)) == SVector{dim, el_type}
 
             end
         end
     end
 
-    @testset "global transform multivariate" begin
+    return @testset "global transform multivariate" begin
 
         DIMS = (1, rand(RNG, 2:4))
         @testset "dim = $dim" for dim in DIMS
@@ -114,12 +114,12 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
             =#
 
             @testset "sanity checks" begin
-                d_payload = vec_type(Vector{SVector{dim,el_type}}(undef, N))
+                d_payload = vec_type(Vector{SVector{dim, el_type}}(undef, N))
 
                 RNG = test_default_rng(vec_type)
                 rand!(u, d_payload)
 
-                @test eltype(Array(d_payload)) == SVector{dim,el_type}
+                @test eltype(Array(d_payload)) == SVector{dim, el_type}
 
             end
         end
