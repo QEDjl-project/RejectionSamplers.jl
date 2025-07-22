@@ -1,4 +1,3 @@
-
 # some imports
 
 using KernelAbstractions
@@ -31,12 +30,12 @@ function create_parameters(dtype)
 end
 
 function plot_samples(
-    dist,
-    samples,
-    backend,
-    dtype,
-    filename = "compare_$(backend)_$(dtype)_1D.png",
-)
+        dist,
+        samples,
+        backend,
+        dtype,
+        filename = "compare_$(backend)_$(dtype)_1D.png",
+    )
     f = Figure()
     ax = Axis(f[1, 1], xlabel = "x", ylabel = "normalized event count")
     hist!(ax, samples, normalization = :pdf, bins = 100, color = :orange)
@@ -47,33 +46,33 @@ function plot_samples(
 
     lines!(ax, x, vals, linestyle = :dash, color = :black)
 
-    save(joinpath(PLOTDIR, filename), f)
+    return save(joinpath(PLOTDIR, filename), f)
 end
 
 function plot_weights(
-    weights,
-    backend,
-    dtype,
-    filename = "weights_$(backend)_$(dtype)_1D.png",
-)
+        weights,
+        backend,
+        dtype,
+        filename = "weights_$(backend)_$(dtype)_1D.png",
+    )
 
     f = Figure()
     ax = Axis(f[1, 1], xlabel = "weights", ylabel = "event count")
 
     hist!(ax, weights, color = :orange, bins = 100)
 
-    save(joinpath(PLOTDIR, filename), f)
+    return save(joinpath(PLOTDIR, filename), f)
 end
 
 
 function run_example(
-    backend,
-    dtype;
-    plotting = true,
-    partial_unweighting = true,
-    N = Int(2^20),
-    batch_size = 2^20,
-)
+        backend,
+        dtype;
+        plotting = true,
+        partial_unweighting = true,
+        N = Int(2^20),
+        batch_size = 2^20,
+    )
 
     @info "run example for $backend with $dtype"
     # setup
@@ -101,7 +100,7 @@ function run_example(
         dtype,
     )
 
-    if plotting
+    return if plotting
         @info "plot samples"
         ## plotting: histogram samples vs target_dist
         plot_samples(dist, data[1], backend, dtype)

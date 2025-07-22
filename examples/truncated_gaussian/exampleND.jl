@@ -1,4 +1,3 @@
-
 using KernelAbstractions
 using BenchmarkTools
 using Random
@@ -29,12 +28,12 @@ function create_parameters(dim::Int, dtype)
 end
 
 function plot_corner(
-    samples,
-    backend,
-    dim,
-    dtype,
-    filename = "corner_plot_$(backend)_$(dtype)_$(dim)D.png",
-)
+        samples,
+        backend,
+        dim,
+        dtype,
+        filename = "corner_plot_$(backend)_$(dtype)_$(dim)D.png",
+    )
     @info "Generating corner plot"
     data = ntuple(dim) do i
         getindex.(samples, i)
@@ -43,34 +42,34 @@ function plot_corner(
     nt = NamedTuple{labels}(data)
     fig = PairPlots.pairplot(nt)
 
-    save(joinpath(PLOTDIR, filename), fig)
+    return save(joinpath(PLOTDIR, filename), fig)
 end
 
 function plot_weights(
-    weights,
-    backend,
-    dim,
-    dtype,
-    filename = "weights_$(backend)_$(dtype)_$(dim)D.png",
-)
+        weights,
+        backend,
+        dim,
+        dtype,
+        filename = "weights_$(backend)_$(dtype)_$(dim)D.png",
+    )
 
     f = Figure()
     ax = Axis(f[1, 1], xlabel = "weights", ylabel = "event count")
 
     hist!(ax, weights, color = :orange, bins = 100)
 
-    save(joinpath(PLOTDIR, filename), f)
+    return save(joinpath(PLOTDIR, filename), f)
 end
 
 function run_example(
-    backend,
-    dtype;
-    plotting = true,
-    partial_unweighting = true,
-    dim = 2,
-    N = Int(2^20),
-    batch_size = 2^20,
-)
+        backend,
+        dtype;
+        plotting = true,
+        partial_unweighting = true,
+        dim = 2,
+        N = Int(2^20),
+        batch_size = 2^20,
+    )
     @info "Running example with backend=$backend, dtype=$dtype, dim=$dim"
 
     mu, sig, dom = create_parameters(dim, dtype)
@@ -93,7 +92,7 @@ function run_example(
         batch_size,
         backend,
         dtype,
-        NTuple{dim,dtype},
+        NTuple{dim, dtype},
     )
 
 

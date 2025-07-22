@@ -10,14 +10,14 @@ function get_test_setup end
 
 abstract type AbstractTestSetup end
 
-struct TestSetup{B<:KernelAbstractions.Backend,VT<:Tuple,T<:Tuple}
+struct TestSetup{B <: KernelAbstractions.Backend, VT <: Tuple, T <: Tuple}
     backend::B
     vector_types::VT
     element_types::T
 end
 
 function combinations(stp::TestSetup)
-    Iterators.product(stp.vector_types, stp.element_types)
+    return Iterators.product(stp.vector_types, stp.element_types)
 end
 
 # CPU test setup

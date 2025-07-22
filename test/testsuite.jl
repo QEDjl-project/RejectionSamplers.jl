@@ -1,4 +1,3 @@
-
 include("filter_scan.jl")
 include("proposal.jl")
 include("target.jl")
@@ -10,7 +9,7 @@ function testsuite_run(backend, vec_type, el_type)
         backend,
         vec_type,
         el_type,
-        NTuple{4,el_type},
+        NTuple{4, el_type},
     )
     @testset "proposal" testsuite_proposal(backend, vec_type, el_type, 256)
     @testset "univariate target" testsuite_univariate_target(
@@ -34,7 +33,7 @@ function testsuite_run(backend, vec_type, el_type)
         Int(2^12),
         Int(2^10),
     )
-    @testset "multivariate generation" testsuite_multivariate_generation(
+    return @testset "multivariate generation" testsuite_multivariate_generation(
         backend,
         vec_type,
         el_type,

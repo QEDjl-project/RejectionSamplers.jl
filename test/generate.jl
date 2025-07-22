@@ -22,7 +22,7 @@ function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_si
         el_type,
     )
 
-    @testset "shape and type preservation" begin
+    return @testset "shape and type preservation" begin
         @test size(data[1]) == (N,)
         @test size(data[2]) == (N,)
         @test eltype(data[1]) == el_type # for TruncatedGaussian1D
@@ -33,7 +33,7 @@ end
 function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_size)
 
     DIMS = (1, rand(RNG, 2:5))
-    @testset "dim = $dim" for dim in DIMS
+    return @testset "dim = $dim" for dim in DIMS
         mu = Tuple(5 .* rand(RNG, el_type, dim))                  # central value
         sig = Tuple(rand(RNG, el_type, dim))                     # variance
         low = mu .- el_type(0.5) .* sig
@@ -54,13 +54,13 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
             batch_size,
             backend,
             el_type,
-            NTuple{dim,el_type},
+            NTuple{dim, el_type},
         )
 
         @testset "shape and type preservation" begin
             @test size(data[1]) == (N,)
             @test size(data[2]) == (N,)
-            @test eltype(data[1]) == NTuple{dim,el_type}
+            @test eltype(data[1]) == NTuple{dim, el_type}
             @test eltype(data[2]) == el_type
         end
     end

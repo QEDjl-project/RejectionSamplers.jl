@@ -1,4 +1,3 @@
-
 RNG = Xoshiro(137)
 
 function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
@@ -22,29 +21,29 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
     groundtruth = maximum_value(dist)
 
     @testset "Naive max finder" begin
-        max_finder = NaiveMaxFinder(Int(1e7))
+        max_finder = NaiveMaxFinder(Int(1.0e7))
         max_val = findmax(
             RNG,
             out_dtype,
             dist,
             proposal,
             max_finder;
-            dtype = NTuple{dim,out_dtype},
+            dtype = NTuple{dim, out_dtype},
         )
 
-        @test isapprox(groundtruth, max_val, atol = 1e-4)
+        @test isapprox(groundtruth, max_val, atol = 1.0e-4)
     end
 
-    @testset "quantile reduction" begin
+    return @testset "quantile reduction" begin
         p = out_dtype(0.001) # quantile which is ignored
-        max_finder = QuantileReductionMethod(p, Int(1e6))
+        max_finder = QuantileReductionMethod(p, Int(1.0e6))
         max_val = findmax(
             RNG,
             out_dtype,
             dist,
             proposal,
             max_finder;
-            dtype = NTuple{dim,out_dtype},
+            dtype = NTuple{dim, out_dtype},
         )
 
 
@@ -55,13 +54,13 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             #FIXME: quantile estimate seems broken for F16
             if !(out_dtype == Float16)
                 # groundtruth
-                samples = Vector{NTuple{dim,out_dtype}}(undef, n)
+                samples = Vector{NTuple{dim, out_dtype}}(undef, n)
                 rand!(RNG, proposal, samples)
                 weights = sort(GPUEventGenerators._compute.(dist, samples))
                 residual_weights = @. max(1, weights / max_val)
                 idx_last_unit_weight =
                     length(residual_weights) -
-                    length(residual_weights[residual_weights.>1.0])
+                    length(residual_weights[residual_weights .> 1.0])
 
                 test_quantile =
                     1.0 -

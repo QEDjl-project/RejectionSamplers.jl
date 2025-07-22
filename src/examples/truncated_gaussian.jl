@@ -1,4 +1,3 @@
-
 module TruncatedGaussians
 
 using Distributions
@@ -13,14 +12,14 @@ export TruncatedGaussian
 
 # test target distribution
 
-struct TruncatedGaussian1D{T<:Real} <:
-       GPUEventGenerators.AbstractUnivariatTargetDistribution
+struct TruncatedGaussian1D{T <: Real} <:
+    GPUEventGenerators.AbstractUnivariatTargetDistribution
     mu::T
     sig::T
     lower::T
     upper::T
 
-    function TruncatedGaussian1D(mu::T, sig::T, lower::T, upper::T) where {T<:Real}
+    function TruncatedGaussian1D(mu::T, sig::T, lower::T, upper::T) where {T <: Real}
 
         @assert lower < upper
         @assert sig > zero(sig)
@@ -29,7 +28,7 @@ struct TruncatedGaussian1D{T<:Real} <:
     end
 end
 
-function TruncatedGaussian1D(mu::T, sig::T, domain::NTuple{2,T}) where {T<:Real}
+function TruncatedGaussian1D(mu::T, sig::T, domain::NTuple{2, T}) where {T <: Real}
     return TruncatedGaussian1D(mu, sig, domain...)
 end
 
@@ -53,10 +52,10 @@ GPUEventGenerators._compute(d::TruncatedGaussian1D{T}, x) where {T} =
 # checks if lower < upper for all dims
 
 function _assert_correct_boundaries(
-    lower::NTuple{N,T},
-    upper::NTuple{N,T},
-) where {T<:Real,N}
-    for i = 1:N
+        lower::NTuple{N, T},
+        upper::NTuple{N, T},
+    ) where {T <: Real, N}
+    for i in 1:N
         lower[i] <= upper[i] || throw(
             ArgumentError(
                 """
@@ -69,21 +68,21 @@ function _assert_correct_boundaries(
     return nothing
 end
 
-struct TruncatedGaussian{T<:Real,N} <: GPUEventGenerators.AbstractMultivariateTarget{N}
+struct TruncatedGaussian{T <: Real, N} <: GPUEventGenerators.AbstractMultivariateTarget{N}
 
-    mu::NTuple{N,T}
-    sig::NTuple{N,T}
-    lower::NTuple{N,T}
-    upper::NTuple{N,T}
+    mu::NTuple{N, T}
+    sig::NTuple{N, T}
+    lower::NTuple{N, T}
+    upper::NTuple{N, T}
 
     function TruncatedGaussian(
-        mu::TT,
-        sig::TT,
-        lower::TT,
-        upper::TT,
-    ) where {N,T<:Real,TT<:NTuple{N,T}}
+            mu::TT,
+            sig::TT,
+            lower::TT,
+            upper::TT,
+        ) where {N, T <: Real, TT <: NTuple{N, T}}
         _assert_correct_boundaries(lower, upper)
-        return new{T,N}(mu, sig, lower, upper)
+        return new{T, N}(mu, sig, lower, upper)
     end
 end
 
@@ -91,19 +90,18 @@ Base.extrema(d::TruncatedGaussian) = (d.lower, d.upper)
 Base.minimum(d::TruncatedGaussian) = d.lower
 Base.maximum(d::TruncatedGaussian) = d.upper
 
-function is_in_domain(d::TruncatedGaussian{T,N}, x::NTuple{N,T}) where {N,T}
+function is_in_domain(d::TruncatedGaussian{T, N}, x::NTuple{N, T}) where {N, T}
     return all(d.lower .<= x .<= d.upper)
 end
 
 
-
-function GPUEventGenerators.maximum_value(d::TruncatedGaussian{T,N}) where {T,N}
+function GPUEventGenerators.maximum_value(d::TruncatedGaussian{T, N}) where {T, N}
     crit_pt = @. min(max(d.mu, d.lower), d.upper)
 
     return _unsafe_compute(d, crit_pt)
 end
 
-_unsafe_compute(d::TruncatedGaussian{T,N}, x) where {N,T} =
+_unsafe_compute(d::TruncatedGaussian{T, N}, x) where {N, T} =
     prod(ntuple(i -> normpdf(d.mu[i], d.sig[i], x[i]), N))
 GPUEventGenerators._compute(d::TruncatedGaussian{T}, x) where {T} =
     is_in_domain(d, x) ? _unsafe_compute(d, x) : zero(T)

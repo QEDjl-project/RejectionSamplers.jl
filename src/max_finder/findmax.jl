@@ -1,11 +1,11 @@
 function Base.findmax(
-    rng::AbstractRNG,
-    out_dtype::Type{T},
-    target::AbstractTargetDistribution,
-    proposal::AbstractProposal,
-    method::AbstractSampleBasedMaxFinder;
-    dtype = out_dtype,
-) where {T<:Real}
+        rng::AbstractRNG,
+        out_dtype::Type{T},
+        target::AbstractTargetDistribution,
+        proposal::AbstractProposal,
+        method::AbstractSampleBasedMaxFinder;
+        dtype = out_dtype,
+    ) where {T <: Real}
 
     # Stages:
     # - build samples (momenta)

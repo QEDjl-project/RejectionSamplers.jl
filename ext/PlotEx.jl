@@ -5,10 +5,10 @@ using QuadGK
 using GPUEventGenerators
 
 function GPUEventGenerators.plot_compare(
-    samples::AbstractVector,
-    dist::GPUEventGenerators.AbstractUnivariatTargetDistribution;
-    kwargs...,
-)
+        samples::AbstractVector,
+        dist::GPUEventGenerators.AbstractUnivariatTargetDistribution;
+        kwargs...,
+    )
     P = histogram(
         samples;
         label = "samples",

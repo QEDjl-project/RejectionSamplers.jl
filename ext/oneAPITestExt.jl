@@ -8,13 +8,13 @@ using oneAPI
 
     # check if f64 is supported
     if oneL0.module_properties(oneAPI.device()).fp64flags &
-       oneL0.ZE_DEVICE_MODULE_FLAG_FP64 == oneL0.ZE_DEVICE_MODULE_FLAG_FP64
+            oneL0.ZE_DEVICE_MODULE_FLAG_FP64 == oneL0.ZE_DEVICE_MODULE_FLAG_FP64
         element_types = (Float32, Float64)
     else
         element_types = (Float32,)
     end
 
-    TestSetup(backend, (oneVector,), element_types)
+    return TestSetup(backend, (oneVector,), element_types)
 end
 
 end

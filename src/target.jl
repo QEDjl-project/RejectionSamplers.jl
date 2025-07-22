@@ -1,4 +1,3 @@
-
 abstract type AbstractTargetDistribution end
 Base.broadcastable(dist::AbstractTargetDistribution) = Ref(dist)
 
@@ -31,10 +30,10 @@ Interface function: return the (approximate) maximum_value of a given target dis
 function maximum_value end
 
 @inline function _compute!(
-    dist::D,
-    dest::A,
-    x::A,
-) where {D<:AbstractUnivariatTargetDistribution,T<:Real,A<:AbstractArray{T}}
+        dist::D,
+        dest::A,
+        x::A,
+    ) where {D <: AbstractUnivariatTargetDistribution, T <: Real, A <: AbstractArray{T}}
 
     broadcast!(Base.Fix1(_compute, dist), dest, x)
 
@@ -48,12 +47,12 @@ end
 # - this allocates on host
 #
 function _compute!(
-    dist::D,
-    dest::AbstractArray{T},
-    x::AbstractArray{T},
-) where {D<:AbstractUnivariatTargetDistribution,T<:Real}
+        dist::D,
+        dest::AbstractArray{T},
+        x::AbstractArray{T},
+    ) where {D <: AbstractUnivariatTargetDistribution, T <: Real}
 
-    copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
+    return copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
 end
 
 # bivariate distributions
@@ -62,17 +61,17 @@ abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
 
 
 @inline function _compute!(
-    dist::D,
-    dest::A,
-    x::I,
-) where {
-    N,
-    D<:AbstractMultivariateTarget{N},
-    T<:Real,
-    TT<:NTuple{N,T},
-    A<:AbstractVector{T},
-    I<:AbstractVector{TT},
-}
+        dist::D,
+        dest::A,
+        x::I,
+    ) where {
+        N,
+        D <: AbstractMultivariateTarget{N},
+        T <: Real,
+        TT <: NTuple{N, T},
+        A <: AbstractVector{T},
+        I <: AbstractVector{TT},
+    }
 
     broadcast!(Base.Fix1(_compute, dist), dest, x)
 
@@ -94,7 +93,6 @@ function _compute!(
     copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
 end
 =#
-
 
 
 #=
