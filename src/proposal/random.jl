@@ -4,7 +4,8 @@ function gpu_rand(
     threadid,
     randstate::AbstractVector{NTuple{4,UInt32}},
 ) where {N,T,TT<:SVector{N,T}}
-    return sacollect(TT, _ -> GPUArrays.gpu_rand(T, threadid, randstate))
+    #return sacollect(TT, _ -> GPUArrays.gpu_rand(T, threadid, randstate))
+    return TT(ntuple(x -> GPUArrays.gpu_rand(T, threadid, randstate), N))
 end
 
 function _rand!(
@@ -32,5 +33,5 @@ Return default rng to randomize given vector. Uses fallbacks on `Random.default_
 """
 function default_rng end
 
-default_rng(v) = Random.default_rng()
-default_rng(v::GPUArrays.AnyGPUArray) = GPUArrays.default_rng(v)
+default_rng(::Type{T}) where {T} = Random.default_rng()
+default_rng(::Type{V}) where {V<:GPUArrays.AnyGPUArray} = GPUArrays.default_rng(V)

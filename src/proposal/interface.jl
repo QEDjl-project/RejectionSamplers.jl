@@ -123,7 +123,7 @@ function gpu_rand(
     threadid,
     randstate::AbstractVector{NTuple{4,UInt32}},
 ) where {N,T,TT<:SVector{N,T}}
-    return _local_transform(sacollect(TT, _ -> GPUArrays.gpu_rand(T, threadid, randstate)))
+    return _local_transform(u, gpu_rand(TT, threadid, randstate))
 end
 
 function _rand!(

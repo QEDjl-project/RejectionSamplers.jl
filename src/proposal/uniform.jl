@@ -119,7 +119,29 @@ Base.minimum(p::LocalTransformUniformProposal) = p.lower
 Base.maximum(p::LocalTransformUniformProposal) = p.upper
 Base.eltype(::LocalTransformUniformProposal{T,N}) where {T,N} = SVector{N,T}
 
-_local_transform(
+function _local_transform(
     proposal::LocalTransformUniformProposal{T,N},
-    x::SVector{N,T},
-) where {T,N} = _transform_uniform_val(x, proposal.lower, proposal.upper)
+    v::SVector{N,T},
+) where {T,N}
+
+    return SVector{N,T}(
+        ntuple(
+            x -> _transform_uniform_val(
+                getindex(v, x),
+                getindex(proposal.lower, x),
+                getindex(proposal.upper, x),
+            ),
+            N,
+        ),
+    )
+    #=
+    return SVector{N,T}(
+        ntuple(
+            x ->
+                (getindex(proposal.upper, x) - getindex(proposal.lower, x)) *
+            getindex(v,x) + getindex(proposal.lower, x),
+            N,
+        )
+    )
+    =#
+end
