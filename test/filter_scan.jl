@@ -85,4 +85,6 @@ function testsuite_filter_scan(backend, vec_type, el_type, payload_type)
     @test Vector(accepted_count)[1] == expected_accepts + expected_accepts_2
     @test all(sort(Vector(out_payload[(expected_accepts + 1):end])) .== sort(out_payload_gt))
     return @test all(sort(Vector(out_weights[(expected_accepts + 1):end])) .== sort(out_weights_gt))
+
+
 end

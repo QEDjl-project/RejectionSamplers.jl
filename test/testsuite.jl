@@ -32,6 +32,7 @@ function testsuite_run(backend, vec_type, el_type)
 
     @testset "Compton target" testsuite_Compton_target(backend, vec_type, el_type, 256)
     @testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
+
     return @testset "event generation" begin
         @testset "univariate generation" testsuite_univariate_generation(
             backend,
@@ -48,4 +49,5 @@ function testsuite_run(backend, vec_type, el_type)
             Int(2^10),
         )
     end
+
 end
