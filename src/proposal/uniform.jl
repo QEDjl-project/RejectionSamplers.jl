@@ -85,9 +85,9 @@ Base.maximum(p::GlobalTransformUniformProposal) = p.upper
 Base.eltype(::GlobalTransformUniformProposal{T,N}) where {T,N} = SVector{N,T}
 
 function _global_transform!(
-    proposal::GlobalTransformUniformProposal{T},
-    A::AbstractVector{T},
-) where {T}
+    proposal::GlobalTransformUniformProposal{T,N},
+    A::AbstractVector{TT},
+) where {T,N,TT<:SVector{N,T}}
     A .= _transform_uniform_val.(A, Ref(proposal.lower), Ref(proposal.upper))
 end
 

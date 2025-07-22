@@ -85,8 +85,8 @@ function _rand!(
     proposal::AbstractGlobalTransformProposal{TT},
     dest::AbstractVector{TT},
 ) where {T,N,TT<:SVector{N,T}}
-    _rand!(rng, dest)
-    _global_transform!(proposal, dest)
+    @inline _rand!(rng, dest)
+    @inline _global_transform!(proposal, dest)
 
     return dest
 end
