@@ -61,17 +61,17 @@ abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
 
 
 @inline function _compute!(
-        dist::D,
-        dest::A,
-        x::I,
-    ) where {
-        N,
-        D <: AbstractMultivariateTarget{N},
-        T <: Real,
-        TT <: SVector{N, T},
-        A <: AbstractVector{T},
-        I <: AbstractVector{TT},
-    }
+    dist::D,
+    dest::A,
+    x::I,
+) where {
+    N,
+    D<:AbstractMultivariateTarget{N},
+    T<:Real,
+    TT<:SVector{N,T},
+    A<:AbstractVector{T},
+    I<:AbstractVector{TT},
+}
 
     broadcast!(Base.Fix1(_compute, dist), dest, x)
 

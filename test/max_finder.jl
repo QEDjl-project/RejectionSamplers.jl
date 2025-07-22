@@ -54,7 +54,7 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             #FIXME: quantile estimate seems broken for F16
             if !(out_dtype == Float16)
                 # groundtruth
-                samples = Vector{SVector{dim, out_dtype}}(undef, n)
+                samples = Vector{SVector{dim,dtype}}(undef, n)
                 GPUEventGenerators._rand!(RNG, proposal, samples)
                 weights = sort(GPUEventGenerators._compute.(dist, samples))
                 residual_weights = @. max(1, weights / max_val)

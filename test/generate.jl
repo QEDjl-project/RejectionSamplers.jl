@@ -54,13 +54,13 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
             batch_size,
             backend,
             el_type,
-            SVector{dim, el_type},
+            SVector{dim,el_type},
         )
 
         @testset "shape and type preservation" begin
             @test size(data[1]) == (N,)
             @test size(data[2]) == (N,)
-            @test eltype(data[1]) == SVector{dim, el_type}
+            @test eltype(data[1]) == SVector{dim,el_type}
             @test eltype(data[2]) == el_type
         end
     end
