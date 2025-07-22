@@ -1,4 +1,3 @@
-
 macro safebenchmark(args...)
     length(args) != 2 && throw(err)
     name, expr = args
@@ -17,7 +16,7 @@ macro safebenchmark(args...)
             end
         )
     end
-    quote
+    return quote
         @eval module $mod
         $expr
         end

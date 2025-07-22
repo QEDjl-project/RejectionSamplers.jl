@@ -1,4 +1,3 @@
-
 include("utils.jl")
 
 benchmark_all = tryparse(Bool, get(ENV, "BENCH_ALL", "0"))

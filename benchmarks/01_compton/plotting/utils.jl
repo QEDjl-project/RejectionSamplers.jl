@@ -53,11 +53,11 @@ function plot_median_times(backend, results)
         end
 
         if i == length(dtypes)
-            Legend(f[1, length(dtypes)+1], ax, "batch_size")
+            Legend(f[1, length(dtypes) + 1], ax, "batch_size")
         end
     end
     filename = "generation_$(backend).pdf"
-    @info "plot saved in $(joinpath(plotpath,filename))"
-    save(joinpath(plotpath, filename), f)
+    @info "plot saved in $(joinpath(plotpath, filename))"
+    return save(joinpath(plotpath, filename), f)
 
 end

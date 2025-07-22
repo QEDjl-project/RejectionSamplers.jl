@@ -54,7 +54,6 @@ Base.eltype(::AbstractProposal{T}) where {T} = T
 variate_form(::AbstractProposal{T, F}) where {T, F} = F
 
 
-
 """
 
     _rand!(rng::AbstractRNG, proposal::AbstractProposal{T}, dest::AbstractVector{T}) where T

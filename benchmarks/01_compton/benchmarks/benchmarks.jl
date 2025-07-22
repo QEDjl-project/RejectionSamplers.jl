@@ -1,4 +1,3 @@
-
 # WARNING:
 # needs to be included into a scope with the right packages loaded
 
@@ -8,7 +7,7 @@ function benchmark_generation(rng, backend, dtype, mod, psl, nevent_vec, batch_s
 
     dom = create_parameters(dtype)
 
-    arg_type = SVector{3,dtype}
+    arg_type = SVector{3, dtype}
 
     dist = ComptonDistribution{dtype}(mod, psl)
     proposal = UniformMultivariateProposal(dom...)
@@ -19,7 +18,7 @@ function benchmark_generation(rng, backend, dtype, mod, psl, nevent_vec, batch_s
         dtype,
         dist,
         proposal,
-        QuantileReductionMethod(dtype(0.001), Int(1e6));
+        QuantileReductionMethod(dtype(0.001), Int(1.0e6));
         dtype = arg_type,
     )
     @info "found at $max_value with type $(typeof(max_value))"
