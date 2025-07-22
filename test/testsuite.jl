@@ -49,5 +49,4 @@ function testsuite_run(backend, vec_type, el_type)
             Int(2^10),
         )
     end
-
 end

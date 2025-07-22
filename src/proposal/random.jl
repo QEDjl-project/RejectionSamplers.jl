@@ -1,6 +1,9 @@
 # generic fallback to Random.rand! (used on CPU)
 _rand!(rng::AbstractRNG, a::Vector) = Random.rand!(rng, a)
 
+# generic fallback to Random.rand! (used on CPU)
+_rand!(rng::AbstractRNG, a::Vector) = Random.rand!(rng, a)
+
 function gpu_rand(
         ::Type{TT},
         threadid,

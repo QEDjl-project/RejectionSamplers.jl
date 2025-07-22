@@ -88,7 +88,8 @@ function _global_transform!(
         proposal::GlobalTransformUniformProposal{T, N},
         A::AbstractVector{TT},
     ) where {T, N, TT <: SVector{N, T}}
-    return A .= _transform_uniform_val.(A, Ref(proposal.lower), Ref(proposal.upper))
+    A .= _transform_uniform_val.(A, Ref(proposal.lower), Ref(proposal.upper))
+    return A
 end
 
 # local version
