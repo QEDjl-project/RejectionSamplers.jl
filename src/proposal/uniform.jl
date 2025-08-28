@@ -134,14 +134,4 @@ function _local_transform(
             N,
         ),
     )
-    #=
-    return SVector{N,T}(
-        ntuple(
-            x ->
-                (getindex(proposal.upper, x) - getindex(proposal.lower, x)) *
-            getindex(v,x) + getindex(proposal.lower, x),
-            N,
-        )
-    )
-    =#
 end
