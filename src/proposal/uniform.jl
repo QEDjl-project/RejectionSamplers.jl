@@ -77,7 +77,7 @@ end
 GlobalTransformUniformProposal(lower::AbstractVector, upper::AbstractVector) =
     GlobalTransformUniformProposal(Tuple(lower), Tuple(upper))
 
-degree_of_freedom(::GlobalTransformUniformProposal{T, N}) where {T, N} = N
+degrees_of_freedom(::GlobalTransformUniformProposal{T, N}) where {T, N} = N
 
 Base.extrema(p::GlobalTransformUniformProposal) = (minimum(p), maximum(p))
 Base.minimum(p::GlobalTransformUniformProposal) = p.lower
@@ -112,7 +112,7 @@ const UniformMultivariateProposal{T, N} = LocalTransformUniformProposal{T, N} wh
 LocalTransformUniformProposal(lower::AbstractVector, upper::AbstractVector) =
     LocalTransformUniformProposal(Tuple(lower), Tuple(upper))
 
-degree_of_freedom(::LocalTransformUniformProposal{T, N}) where {T, N} = N
+degrees_of_freedom(::LocalTransformUniformProposal{T, N}) where {T, N} = N
 
 Base.extrema(p::LocalTransformUniformProposal) = (minimum(p), maximum(p))
 Base.minimum(p::LocalTransformUniformProposal) = p.lower
