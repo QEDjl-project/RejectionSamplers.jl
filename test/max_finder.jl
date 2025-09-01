@@ -28,7 +28,7 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             dist,
             proposal,
             max_finder;
-            dtype = NTuple{dim, out_dtype},
+            dtype = SVector{dim, out_dtype},
         )
 
         @test isapprox(groundtruth, max_val, atol = 1.0e-4)
@@ -43,7 +43,7 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             dist,
             proposal,
             max_finder;
-            dtype = NTuple{dim, out_dtype},
+            dtype = SVector{dim, out_dtype},
         )
 
 
@@ -54,8 +54,8 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             #FIXME: quantile estimate seems broken for F16
             if !(out_dtype == Float16)
                 # groundtruth
-                samples = Vector{NTuple{dim, out_dtype}}(undef, n)
-                rand!(RNG, proposal, samples)
+                samples = Vector{SVector{dim, out_dtype}}(undef, n)
+                GPUEventGenerators._rand!(RNG, proposal, samples)
                 weights = sort(GPUEventGenerators._compute.(dist, samples))
                 residual_weights = @. max(1, weights / max_val)
                 idx_last_unit_weight =

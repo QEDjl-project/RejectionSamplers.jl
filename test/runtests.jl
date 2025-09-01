@@ -5,6 +5,7 @@ using QEDprocesses
 using QEDcore
 using GPUArrays
 using KernelAbstractions
+using StaticArrays
 
 using GPUEventGenerators
 using GPUEventGenerators.TruncatedGaussians

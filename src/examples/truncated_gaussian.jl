@@ -4,6 +4,7 @@ using Distributions
 using StatsFuns
 using Random
 using QuadGK
+using StaticArrays
 
 using GPUEventGenerators
 
@@ -90,7 +91,7 @@ Base.extrema(d::TruncatedGaussian) = (d.lower, d.upper)
 Base.minimum(d::TruncatedGaussian) = d.lower
 Base.maximum(d::TruncatedGaussian) = d.upper
 
-function is_in_domain(d::TruncatedGaussian{T, N}, x::NTuple{N, T}) where {N, T}
+function is_in_domain(d::TruncatedGaussian{T, N}, x::SVector{N, T}) where {N, T}
     return all(d.lower .<= x .<= d.upper)
 end
 

@@ -4,7 +4,7 @@ struct QuantileReductionMethod{T <: Real} <: AbstractSampleBasedMaxFinder
 end
 
 _nsamples(n::QuantileReductionMethod) = n.nsamples
-#
+
 function _findmax(
         method::QuantileReductionMethod{T},
         weights::AbstractVector{T},

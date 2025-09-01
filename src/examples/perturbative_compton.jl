@@ -4,6 +4,7 @@ module PerturbativeCompton
 using GPUEventGenerators
 using QEDprocesses
 using QEDcore
+using StaticArrays
 
 
 export KleinNishinaDistribution
@@ -46,7 +47,7 @@ end
 
 function GPUEventGenerators._compute(
         dist::KleinNishinaDistribution{T},
-        cth_phi::NTuple{2, T},
+        cth_phi::SVector{2, T},
     ) where {T <: Real}
     return _klein_nishina_formula(dist.omega, cth_phi...)
 end
@@ -90,7 +91,7 @@ ComptonDistribution(
 
 function GPUEventGenerators._compute(
         dist::ComptonDistribution{T, DOF},
-        coords::NTuple{DOF, T},
+        coords::SVector{DOF, T},
     ) where {DOF, T <: Real}
 
     psp = PhaseSpacePoint(dist.proc, dist.model, dist.psl, coords)

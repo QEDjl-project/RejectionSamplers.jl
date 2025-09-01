@@ -16,7 +16,7 @@ function Base.findmax(
     N = _nsamples(method)
 
     coords = Vector{dtype}(undef, N)
-    rand!(rng, proposal, coords)
+    _rand!(rng, proposal, coords)
 
     weights = _compute.(target, coords)
 

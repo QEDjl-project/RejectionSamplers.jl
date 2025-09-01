@@ -14,7 +14,7 @@ abstract type AbstractUnivariatTargetDistribution <: AbstractTargetDistribution 
 """
 
     _compute(dist::AbstractUnivariatTargetDistribution,x::Real)::Real
-    _compute(dist::AbstractMultivariateTarget,x::NTuple{2,Real})::Real
+    _compute(dist::AbstractMultivariateTarget,x::SVector{2,Real})::Real
 
 Return value of `dist` computed at `x`.
 """
@@ -68,7 +68,7 @@ abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
         N,
         D <: AbstractMultivariateTarget{N},
         T <: Real,
-        TT <: NTuple{N, T},
+        TT <: SVector{N, T},
         A <: AbstractVector{T},
         I <: AbstractVector{TT},
     }
