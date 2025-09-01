@@ -11,33 +11,43 @@ function testsuite_run(backend, vec_type, el_type)
         el_type,
         NTuple{4, el_type},
     )
-    @testset "proposal" testsuite_proposal(backend, vec_type, el_type, 256)
-    @testset "univariate target" testsuite_univariate_target(
-        backend,
-        vec_type,
-        el_type,
-        256,
-    )
-    @testset "multivariate target" testsuite_multivariate_target(
-        backend,
-        vec_type,
-        el_type,
-        256,
-    )
+    @testset "proposal generation" begin
+        testsuite_uniform_proposal(backend, vec_type, el_type, 256)
+    end
+
+    @testset "target evaluation" begin
+        @testset "univariate target" testsuite_univariate_target(
+            backend,
+            vec_type,
+            el_type,
+            256,
+        )
+        @testset "multivariate target" testsuite_multivariate_target(
+            backend,
+            vec_type,
+            el_type,
+            256,
+        )
+    end
+
     @testset "Compton target" testsuite_Compton_target(backend, vec_type, el_type, 256)
     @testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
-    @testset "univariate generation" testsuite_univariate_generation(
-        backend,
-        vec_type,
-        el_type,
-        Int(2^12),
-        Int(2^10),
-    )
-    return @testset "multivariate generation" testsuite_multivariate_generation(
-        backend,
-        vec_type,
-        el_type,
-        Int(2^12),
-        Int(2^10),
-    )
+
+    return @testset "event generation" begin
+        @testset "univariate generation" testsuite_univariate_generation(
+            backend,
+            vec_type,
+            el_type,
+            Int(2^12),
+            Int(2^10),
+        )
+        @testset "multivariate generation" testsuite_multivariate_generation(
+            backend,
+            vec_type,
+            el_type,
+            Int(2^12),
+            Int(2^10),
+        )
+    end
+
 end

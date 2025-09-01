@@ -6,6 +6,7 @@ export filter_scan
 # proposal
 export UniformUnivariateProposal
 export UniformMultivariateProposal
+export GlobalTransformUniformProposal, LocalTransformUniformProposal
 
 # target
 export maximum_value
@@ -21,9 +22,16 @@ using Random
 using QEDbase
 using QEDcore
 using GPUArrays
+using StaticArrays
+using StaticArrays: sacollect
 
 include("filter_scan.jl")
-include("proposal.jl")
+
+include("proposal/random.jl")
+include("proposal/interface.jl")
+include("proposal/generics.jl")
+include("proposal/uniform.jl")
+
 include("target.jl")
 include("generate.jl")
 
