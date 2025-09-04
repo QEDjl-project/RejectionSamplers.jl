@@ -42,7 +42,7 @@ for dtype in DTYPES
 end
 
 #@info "Tune the benchmarks"
-tune!(SUITE; verbose = true)
+#tune!(SUITE; verbose = true)
 
 @info "Run benchmarks"
 result = run(SUITE; verbose = true)
