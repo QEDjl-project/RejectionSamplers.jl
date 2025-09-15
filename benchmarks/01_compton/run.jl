@@ -36,7 +36,7 @@ bench_to_include = isempty(other_args) ? nothing : other_args
 
 # Files to ignore by default. Includes non-benchmark files and
 #  backends can add incompatible benchmarks to this list
-noinclude = ["utils.jl", "full_generation.jl"]
+noinclude = ["utils.jl"]
 
 if backend_arg == "--CUDA"
     @info "Try using CUDA backend."

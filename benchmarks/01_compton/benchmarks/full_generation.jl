@@ -1,45 +1,40 @@
-function benchmark_full_generation(rng, backend, dtype, mod, psl, nevent_vec, batch_size_vec)
-    instance_suite = BenchmarkGroup()
-    @info "building benchmark with backend=$backend, dtype=$dtype"
+mod = PerturbativeQED()
+@info "used model: $mod"
+psl = ComptonSphericalLayout(ComptonRestSystem())
+@info "used psl: $psl"
 
-    dom = create_parameters(dtype)
+nevent_vec = Int.(2.0 .^ (5:6))
+@info "used nevents: $nevent_vec"
+batch_size_vec = Int.(2.0 .^ (5:6))
+@info "used batch sizes: $batch_size_vec"
 
+group = addgroup!(SUITE, "full_generation")
+for dtype in DTYPES
+
+    local _group = addgroup!(group, "$dtype")
     arg_type = SVector{3, dtype}
 
-    dist = ComptonDistribution{dtype}(mod, psl)
-    proposal = UniformMultivariateProposal(dom...)
-
-    @info "Finding maximum ..."
-    max_value = findmax(
-        rng,
-        dtype,
-        dist,
-        proposal,
-        QuantileReductionMethod(dtype(0.001), Int(1.0e6));
-        dtype = arg_type,
-    )
-    @info "found at $max_value with type $(typeof(max_value))"
+    dist, proposal, max_value = generation_setup(RNG, arg_type, dtype, mod, psl)
 
     @info "Adding benchmark problems"
     for N in nevent_vec
-        instance_suite[N] = BenchmarkGroup()
+        _group[N] = BenchmarkGroup()
         for batch_size in batch_size_vec
             bs = min(batch_size, N)
 
-            instance_suite[N][bs] = @benchmarkable begin
+            _group[N][bs] = @benchmarkable begin
                 GPUEventGenerators.generate_events(
                     $dist,
                     $proposal,
                     $max_value,
                     $N,
                     $bs,
-                    $backend,
+                    $BACKEND,
                     $dtype,
                     $arg_type,
                 )
-                KernelAbstractions.synchronize($backend)
+                KernelAbstractions.synchronize($BACKEND)
             end
         end
     end
-    return instance_suite
 end
