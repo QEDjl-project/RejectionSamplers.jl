@@ -41,8 +41,6 @@ for dtype in DTYPES
                             running = false
                         end
                     end
-                    #KernelAbstractions.synchronize($BACKEND)
-                    # free allocations
                 end
             ) setup = begin
 
