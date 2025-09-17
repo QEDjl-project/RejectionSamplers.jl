@@ -22,7 +22,7 @@ for dtype in DTYPES
         for batch_size in batch_size_vec
             bs = min(batch_size, N)
 
-            _group[N][bs] = @benchmarkable begin
+            _group[bs][N] = @benchmarkable begin
                 GPUEventGenerators.generate_events(
                     $dist,
                     $proposal,

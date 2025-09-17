@@ -21,7 +21,7 @@ for dtype in DTYPES
         for batch_size in batch_size_vec
             bs = min(batch_size, N)
 
-            _group[N][bs] = @benchmarkable @sb(
+            _group[bs][N] = @benchmarkable @sb(
                 begin
                     while running
                         @inline GPUEventGenerators._generate_events!(
