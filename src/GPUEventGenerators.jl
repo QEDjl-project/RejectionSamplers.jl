@@ -33,7 +33,10 @@ include("proposal/generics.jl")
 include("proposal/uniform.jl")
 
 include("target.jl")
-include("generate.jl")
+
+include("generation/buffers.jl")
+include("generation/stages.jl")
+include("generation/generate.jl")
 
 # max finding
 include("max_finder/types.jl")
