@@ -15,7 +15,7 @@ sort!(bench_files)
 @info "Found benchmark files: $bench_files"
 
 for bench_file in bench_files
-    backend_str = match(r"^bench(.*)\.json$", bench_file).captures[1]
+    backend_str = match(r"^bench_(.*)\.json$", bench_file).captures[1]
     @info "Plot backend: $backend_str"
 
     # Load benchmark data robustly
@@ -77,7 +77,7 @@ for bench_file in bench_files
         end
 
         # Global legend (below all plots)
-        Legend(f[nrows + 1, 1:ncols], axes[end], "batch_size"; orientation = :horizontal)
+        Legend(f[1:nrows, ncols + 1], axes[end], "batch_size"; orientation = :horizontal)
 
         filename = "$(bench)_$(backend_str).pdf"
         filepath = joinpath(plotpath, filename)

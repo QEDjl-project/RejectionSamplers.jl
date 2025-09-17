@@ -30,7 +30,6 @@ backend_arg in BACKENDS || throw(ArgumentError("\"$backend_arg\" is not a valid 
 
 # benchmarks provided by command line argument
 other_args = ARGS[.!b_opt_idx]
-# other_args = ["accumulate_1"]
 
 bench_to_include = isempty(other_args) ? nothing : other_args
 
