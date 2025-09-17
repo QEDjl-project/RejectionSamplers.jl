@@ -41,7 +41,7 @@ for bench_file in bench_files
         nrows = cld(length(dtypes), ncols)
 
         # Size scales with number of rows/columns
-        f = Figure(size = (400 * ncols + 200, 350 * nrows + 100))
+        f = Figure(size = (400 * ncols + 200, 400 * nrows + 100))
 
         axes = Axis[]  # store all axes for global legend
 
@@ -77,7 +77,8 @@ for bench_file in bench_files
         end
 
         # Global legend (below all plots)
-        Legend(f[1:nrows, ncols + 1], axes[end], "batch_size"; orientation = :horizontal)
+        #Legend(f[1:nrows, ncols + 1], axes[end], "batch_size"; orientation = :horizontal)
+        Legend(f[nrows + 1, 1:ncols], axes[end], "batch_size"; orientation = :horizontal)
 
         filename = "$(bench)_$(backend_str).pdf"
         filepath = joinpath(plotpath, filename)

@@ -1,3 +1,5 @@
+bench_name = "hotloop"
+@info "Adding benchmark: $bench_name"
 mod = PerturbativeQED()
 @info "used model: $mod"
 psl = ComptonSphericalLayout(ComptonRestSystem())
@@ -8,7 +10,7 @@ nevent_vec = 2 .^ (5:6)
 batch_size_vec = 2 .^ (5:6)
 @info "used batch sizes: $batch_size_vec"
 
-group = addgroup!(SUITE, "hotloop")
+group = addgroup!(SUITE, bench_name)
 for dtype in DTYPES
 
     local _group = addgroup!(group, "$dtype")
