@@ -21,10 +21,6 @@ Base.minimum(p::UniformUnivariateProposal) = minimum(p.dist)
 Base.maximum(p::UniformUnivariateProposal) = maximum(p.dist)
 Base.eltype(::UniformUnivariateProposal{T}) where {T} = T
 
-# CPU only?
-# TODO: remove that, because it is not needed
-#Distributions.rand(rng::AbstractRNG, d::UniformUnivariateProposal) = rand(rng, d.dist)
-
 # TODO: implement Proposal interface, not Distributions._rand!
 # Random Interface (important for GPU)
 function _rand!(

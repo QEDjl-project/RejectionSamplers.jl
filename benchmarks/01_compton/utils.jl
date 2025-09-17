@@ -4,7 +4,7 @@ function build_backend_name(backend_arg::String)
     else
         throw(
             ArgumentError(
-                "Given string is not an command line argument!"
+                "Given string is not a command line argument!"
             )
         )
     end

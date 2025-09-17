@@ -3,9 +3,9 @@ mod = PerturbativeQED()
 psl = ComptonSphericalLayout(ComptonRestSystem())
 @info "used psl: $psl"
 
-nevent_vec = Int.(2.0 .^ (5:6))
+nevent_vec = 2 .^ (5:6)
 @info "used nevents: $nevent_vec"
-batch_size_vec = Int.(2.0 .^ (5:6))
+batch_size_vec = 2 .^ (5:6)
 @info "used batch sizes: $batch_size_vec"
 
 group = addgroup!(SUITE, "full_generation")
@@ -20,20 +20,21 @@ for dtype in DTYPES
     for N in nevent_vec
         _group[N] = BenchmarkGroup()
         for batch_size in batch_size_vec
-            bs = min(batch_size, N)
+            if batch_size <= N
 
-            _group[bs][N] = @benchmarkable begin
-                GPUEventGenerators.generate_events(
-                    $dist,
-                    $proposal,
-                    $max_value,
-                    $N,
-                    $bs,
-                    $BACKEND,
-                    $dtype,
-                    $arg_type,
-                )
-                KernelAbstractions.synchronize($BACKEND)
+                _group[batch_size][N] = @benchmarkable begin
+                    GPUEventGenerators.generate_events(
+                        $dist,
+                        $proposal,
+                        $max_value,
+                        $N,
+                        $batch_size,
+                        $BACKEND,
+                        $dtype,
+                        $arg_type,
+                    )
+                    KernelAbstractions.synchronize($BACKEND)
+                end
             end
         end
     end
