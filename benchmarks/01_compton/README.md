@@ -9,13 +9,14 @@ Clone the repository and instantiate the benchmark environment:
 
 ```bash
 git clone https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
-cd benchmarks
+cd benchmarks/01_Compton
 julia --project=. init.jl
 ```
 
 (Optional) Install the GPU backends you want to use, for example:
 
 ```bash
+cd benchmarks/01_Compton
 julia --project -e 'using Pkg; Pkg.add("CUDA")'       # NVIDIA GPUs
 julia --project -e 'using Pkg; Pkg.add("AMDGPU")'     # AMD GPUs
 julia --project -e 'using Pkg; Pkg.add("oneAPI")'     # Intel GPUs/CPUs
@@ -38,18 +39,21 @@ Use `run.jl` to run the benchmarks. The backend can be selected using one of the
 Example usage:
 
 ```bash
+# Go into the benchmark folder
+cd benchmarks/01_Compton
+
 # Run on CPU
-julia --project=benchmarks benchmarks/run.jl --CPU
+julia --project run.jl --CPU
 
 # Run on NVIDIA GPU
-julia --project=benchmarks benchmarks/run.jl --CUDA
+julia --project run.jl --CUDA
 ```
 
 You can also run a subset of benchmarks by passing their names as additional arguments.
 For example:
 
 ```bash
-julia --project=benchmarks benchmarks/run.jl --CUDA hotloop
+julia --project run.jl --CUDA hotloop
 ```
 
 This will run only benchmarks starting with `hotloop`.
@@ -71,14 +75,50 @@ To visualize benchmark results, use `plot.jl`:
 
 ```bash
 cd benchmarks
-julia --project=. plot.jl
+julia --project plot.jl
 ```
 
 This generates plots in the `benchmarks/plots/` directory, comparing the different benchmarks and backends.
 
-Benchmarks are located in the `benchmarks/` folder.
-To add a new benchmark:
+## Adding New Benchmarks
 
-1. Create a new `.jl` file in `benchmarks/`.
-2. Define a `BenchmarkGroup` entry for your test.
-3. Run `run.jl` again — the new benchmark will be automatically discovered and included.
+You can extend the benchmark suite by adding new tests. Follow these steps:
+
+### Create a new benchmark file
+
+Place a new `.jl` file in the `benchmarks/` directory. Name it descriptively, e.g., `my_new_benchmark.jl`.
+
+### Define a benchmark group
+
+Inside the file, define your benchmarks using `BenchmarkGroup`:
+
+```julia
+
+group = addgroup!(SUITE, "my_bench")
+
+group["my_bench_1"] = @benchmarkable begin
+    # Your benchmarked code here
+end
+```
+
+This ensures your benchmark integrates with the suite’s warmup, tuning, and result collection.
+
+### Optional: Specify supported backends
+
+If your benchmark only works on certain backends, you can check the `BACKEND` constant:
+
+```julia
+if BACKEND isa CUDABackend
+    # GPU-specific benchmark
+end
+```
+
+### Run the benchmark
+
+After adding your file, run `run.jl` as usual:
+
+```bash
+julia --project run.jl --CPU
+```
+
+The suite will automatically detect your new benchmark and include it.
