@@ -8,13 +8,13 @@ function generate_event_batch!(
 
     BACKEND = get_backend(batch.args)
 
-    generate_proposals!(proposal_dist, batch)
+    @inline generate_proposals!(proposal_dist, batch)
     KernelAbstractions.synchronize(BACKEND)
 
-    generate_probabilities!(batch)
+    @inline generate_probabilities!(batch)
     KernelAbstractions.synchronize(BACKEND)
 
-    evaluate_target!(target_dist, batch)
+    @inline evaluate_target!(target_dist, batch)
     KernelAbstractions.synchronize(BACKEND)
 
     rejection_filter!(batch, output, max_val)
