@@ -85,9 +85,10 @@ end
 
 ComptonDistribution(
     model::AbstractModelDefinition,
-    psl::AbstractOutPhaseSpaceLayout,
-    spin_pol::Tuple,
-) = ComptonDistribution{Float64}(model, psl, spin_pol)
+    psl::AbstractOutPhaseSpaceLayout;
+    spin_pol = (AllSpin(), AllPol(), AllSpin(), AllPol()),
+) = ComptonDistribution{Float64}(model, psl; spin_pol)
+
 
 function GPUEventGenerators._compute(
         dist::ComptonDistribution{T, DOF},

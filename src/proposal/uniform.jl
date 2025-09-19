@@ -21,10 +21,6 @@ Base.minimum(p::UniformUnivariateProposal) = minimum(p.dist)
 Base.maximum(p::UniformUnivariateProposal) = maximum(p.dist)
 Base.eltype(::UniformUnivariateProposal{T}) where {T} = T
 
-# CPU only?
-# TODO: remove that, because it is not needed
-#Distributions.rand(rng::AbstractRNG, d::UniformUnivariateProposal) = rand(rng, d.dist)
-
 # TODO: implement Proposal interface, not Distributions._rand!
 # Random Interface (important for GPU)
 function _rand!(
@@ -88,7 +84,8 @@ function _global_transform!(
         proposal::GlobalTransformUniformProposal{T, N},
         A::AbstractVector{TT},
     ) where {T, N, TT <: SVector{N, T}}
-    return A .= _transform_uniform_val.(A, Ref(proposal.lower), Ref(proposal.upper))
+    A .= _transform_uniform_val.(A, Ref(proposal.lower), Ref(proposal.upper))
+    return A
 end
 
 # local version
