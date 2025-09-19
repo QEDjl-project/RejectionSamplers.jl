@@ -66,7 +66,7 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
     end
 end
 
-function testsuite_buffer_allocation(backend, dtype, out_dtype, N, batch_size)
+function testsuite_buffer_allocation(backend, dtype, out_dtype, batch_size, res_size)
     @testset "batch buffer" begin
         buffer = GPUEventGenerators._allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
 
@@ -85,11 +85,11 @@ function testsuite_buffer_allocation(backend, dtype, out_dtype, N, batch_size)
     end
 
     return @testset "output buffer" begin
-        buffer = GPUEventGenerators._allocate_output_buffer(backend, dtype, out_dtype, batch_size, N)
+        buffer = GPUEventGenerators._allocate_output_buffer(backend, dtype, out_dtype, batch_size, res_size)
 
         @testset "sizes" begin
-            @test size(buffer.args) == (batch_size + N,)
-            @test size(buffer.vals) == (batch_size + N,)
+            @test size(buffer.args) == (batch_size + res_size,)
+            @test size(buffer.vals) == (batch_size + res_size,)
             @test size(buffer.current_size) == (1,)
         end
 
@@ -100,19 +100,32 @@ function testsuite_buffer_allocation(backend, dtype, out_dtype, N, batch_size)
         end
 
         @testset "Counter" begin
-            @test buffer.current_size[1] == 0
+            @test Vector(buffer.current_size)[1] == 0
         end
 
     end
 end
 
-function testsuite_proposal_stage(backend, dtype, out_dtype, batch_size)
-    # 1. build mock proposal based on dtype and some dimension (deterministic + simple)
-    # 2. init batch buffer
-    # 3. call generate_proposal!
-    # 4. check if buffer is updated accordingly (using reproducable proposal)
+function testsuite_proposal_stage(backend, vec_type, dtype, out_dtype, batch_size)
+
+    proposal = MockProposal(dtype)
+    buffer = GPUEventGenerators._allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+
+    GPUEventGenerators.generate_proposals!(proposal, buffer)
+
+    # building groundtruth
+    # NOTE: works, because the mock proposal is deterministic
+    h_groundtruth = Vector{dtype}(undef, batch_size)
+    d_groundtruth = vec_type(h_groundtruth)
+    rand!(proposal, d_groundtruth)
+
+    return @test _isapprox(
+        Vector(buffer.args),
+        Vector(d_groundtruth)
+    )
 end
 
+# TODO: implement this if the resp. interface is implemented
 function testsuite_probs_stage(backend, dtype, out_dtype, batch_size)
     # 1. build mock rng (deterministic and simple)
     # 2. init batch buffer
@@ -120,22 +133,67 @@ function testsuite_probs_stage(backend, dtype, out_dtype, batch_size)
     # 4. check if buffer is updated accordingly (using reproducable rng)
 end
 
-function testsuite_target_stage(backend, dtype, out_dtype, batch_size)
-    # 1. build mock target (deterministic and simple)
-    # 2. init batch buffer
-    # 3. call evaluate_target!
-    # 4. check if buffer is updated accordingly
+function testsuite_target_stage(backend, vec_type, dtype, out_dtype, batch_size)
+    target = MockTarget()
+    proposal = MockProposal(dtype)
+    buffer = GPUEventGenerators._allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+
+    GPUEventGenerators.generate_proposals!(proposal, buffer)
+
+    GPUEventGenerators.evaluate_target!(target, buffer)
+
+
+    h_groundtruth = Vector{out_dtype}(undef, batch_size)
+    d_groundtruth = vec_type(h_groundtruth)
+    GPUEventGenerators._compute!(target, d_groundtruth, buffer.args)
+
+    return @test isapprox(
+        Vector(buffer.vals),
+        Vector(d_groundtruth)
+    )
+
 end
 
-function testsuite_filterscan_stage(backend, dtype, out_dtype, batch_size, N)
-    # 1. build mock arrays for the buffer
-    # 2. build known pattern into vals and probs, so the rejection pattern is
-    # deterministic
-    # 3. init batch and output buffer
-    # 4. call filter_scan
-    # 5. check if output buffer is updated accordingly
+#TODO: move these function to mocks/utils.jl
+
+function mock_make_invalid!(buffer::GPUEventGenerators.EventOutputBuffers{T, U}) where {T, U}
+    return fill!(buffer.vals, -one(U))
 end
 
+function mock_generate_probabilities(buffer::GPUEventGenerators.EventBatchBuffers{T, U}) where {T, U}
+    return fill!(buffer.probs, U(0.5))
+end
+
+mock_max_value(::Type{T}) where {T <: Real} = one(T)
+mock_max_value(::Type{SVector{D, T}}) where {D, T <: Real} = T(D)
+mock_max_value(::Type{NTuple{D, T}}) where {D, T <: Real} = T(D)
+
+
+mock_no_accepted(batch_size::Int) = isodd(batch_size) ? (batch_size + 1) / 2 : batch_size / 2
+
+function testsuite_filterscan_stage(backend, vec_type, dtype, out_dtype, batch_size, res_size)
+    target = MockTarget()
+    proposal = MockProposal(dtype)
+    batch_buffer = GPUEventGenerators._allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+
+    GPUEventGenerators.generate_proposals!(proposal, batch_buffer)
+    GPUEventGenerators.evaluate_target!(target, batch_buffer)
+    mock_generate_probabilities(batch_buffer)
+
+    output_buffer = GPUEventGenerators._allocate_output_buffer(backend, dtype, out_dtype, batch_size, res_size)
+    mock_make_invalid!(output_buffer)
+    no_accepted_groundtruth = mock_no_accepted(batch_size)
+
+    GPUEventGenerators.rejection_filter!(batch_buffer, output_buffer, mock_max_value(dtype))
+
+
+    out_weights = Vector(output_buffer.vals)
+    no_accepted = count(x -> x == one(out_dtype), out_weights)
+    @test no_accepted == no_accepted_groundtruth
+    return @test Vector(output_buffer.current_size)[1] == no_accepted_groundtruth
+end
+
+# TODO: implement this if the probability interface is implemented
 function testsuite_generate_batch(backend, dtype, out_dtype, batch_size, N)
     # 1. build mocks for proposal, target, probs and filterscan
     # 2. init batch buffer
@@ -143,6 +201,7 @@ function testsuite_generate_batch(backend, dtype, out_dtype, batch_size, N)
     # 4. check if batch and output buffer are updated accordingly
 end
 
+# TODO: implement this if the probability interface is implemented
 function testsuite_generation(backend, dtype, out_dtype, batch_size, N)
     # 1. build mocks for proposal, target, probs and filterscan
     # 2. call hotloop only
@@ -150,7 +209,3 @@ function testsuite_generation(backend, dtype, out_dtype, batch_size, N)
     # 4. call generate_events
     # 5. check if output reproduces the known pattern
 end
-
-# TODO:
-# - fill the functions
-# - run the testsuite above for all el_types and dtype=(el_type,NTuple,SVector,PSP ?)

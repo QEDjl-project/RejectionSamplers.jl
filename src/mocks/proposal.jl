@@ -38,6 +38,6 @@ end
 function Random.rand!(::MockProposal{T, D, TT}, dest::AbstractVector{TT}) where {T, D, TT <: NTuple}
     n = length(dest)
     steps = T(2 / (n + 1))
-    map!(i -> ntuple(x -> -1 + i * steps, N), dest, 1:n)
+    map!(i -> ntuple(x -> -1 + i * steps, D), dest, 1:n)
     return dest
 end

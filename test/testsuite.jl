@@ -1,3 +1,4 @@
+include("testutils.jl")
 include("filter_scan.jl")
 include("proposal.jl")
 include("target.jl")
@@ -50,9 +51,27 @@ function testsuite_run(backend, vec_type, el_type)
         )
         @testset "buffer allocation" begin
             # TODO: consider testing buffer for PSPs
-            @testset "Scalar" testsuite_buffer_allocation(backend, el_type, el_type, 1024, 256)
-            @testset "SVector" testsuite_buffer_allocation(backend, SVector{3, el_type}, el_type, 1024, 256)
-            @testset "NTuple" testsuite_buffer_allocation(backend, NTuple{3, el_type}, el_type, 1024, 256)
+            @testset "Scalar" testsuite_buffer_allocation(backend, el_type, el_type, 256, 1024)
+            @testset "SVector" testsuite_buffer_allocation(backend, SVector{3, el_type}, el_type, 256, 1024)
+            @testset "NTuple" testsuite_buffer_allocation(backend, NTuple{3, el_type}, el_type, 256, 1024)
+        end
+
+        @testset "proposal generation" begin
+            @testset "Scalar" testsuite_proposal_stage(backend, vec_type, el_type, el_type, 256)
+            @testset "SVector" testsuite_proposal_stage(backend, vec_type, SVector{3, el_type}, el_type, 256)
+            @testset "NTuple" testsuite_proposal_stage(backend, vec_type, NTuple{3, el_type}, el_type, 256)
+        end
+
+        @testset "target evaluation" begin
+            @testset "Scalar" testsuite_target_stage(backend, vec_type, el_type, el_type, 256)
+            @testset "SVector" testsuite_target_stage(backend, vec_type, SVector{3, el_type}, el_type, 256)
+            @testset "NTuple" testsuite_target_stage(backend, vec_type, NTuple{3, el_type}, el_type, 256)
+        end
+
+        @testset "filter scan" begin
+            @testset "Scalar" testsuite_filterscan_stage(backend, vec_type, el_type, el_type, 256, 1024)
+            @testset "SVector" testsuite_filterscan_stage(backend, vec_type, SVector{3, el_type}, el_type, 256, 1024)
+            @testset "NTuple" testsuite_filterscan_stage(backend, vec_type, NTuple{3, el_type}, el_type, 256, 1024)
         end
     end
     return nothing
