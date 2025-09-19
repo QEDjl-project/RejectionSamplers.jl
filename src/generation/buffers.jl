@@ -1,7 +1,11 @@
-struct EventBatchBuffers{T, U}
-    args::AbstractVector{T}   # proposals
-    probs::AbstractVector{U}  # random numbers for rejection
-    vals::AbstractVector{U}   # target values
+struct EventBatchBuffers{T, U, A, V}
+    args::A   # proposals
+    probs::V  # random numbers for rejection
+    vals::V   # target values
+
+    function EventBatchBuffers(args::A, probs::V, vals::V) where {T, U, A <: AbstractVector{T}, V <: AbstractVector{U}}
+        return new{T, U, A, V}(args, probs, vals)
+    end
 end
 
 function _allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
@@ -12,10 +16,16 @@ function _allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
     )
 end
 
-struct EventOutputBuffers{T, U}
-    args::AbstractVector{T}   # accepted events
-    vals::AbstractVector{U}   # accepted weights
-    current_size::AbstractVector{UInt32} # size counter on device
+struct EventOutputBuffers{T, U, A, V, S}
+    args::A             # accepted events
+    vals::V             # accepted weights
+    current_size::S     # size counter on device
+
+    function EventOutputBuffers(args::A, vals::V, current_size::S) where {
+            T, U, A <: AbstractVector{T}, V <: AbstractVector{U}, S <: AbstractVector{UInt32},
+        }
+        return new{T, U, A, V, S}(args, vals, current_size)
+    end
 end
 
 function _allocate_output_buffer(backend, dtype, out_dtype, batch_size, res_size)
