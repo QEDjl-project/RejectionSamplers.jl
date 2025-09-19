@@ -54,4 +54,6 @@ include("testutils/TestUtils.jl")
 
 include("patches.jl")
 
+include("mocks/Mocks.jl")
+
 end

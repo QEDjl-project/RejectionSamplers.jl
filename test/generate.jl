@@ -65,3 +65,92 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
         end
     end
 end
+
+function testsuite_buffer_allocation(backend, dtype, out_dtype, N, batch_size)
+    @testset "batch buffer" begin
+        buffer = GPUEventGenerators._allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+
+        @testset "sizes" begin
+            @test size(buffer.args) == (batch_size,)
+            @test size(buffer.probs) == (batch_size,)
+            @test size(buffer.vals) == (batch_size,)
+        end
+
+        @testset "types" begin
+            @test eltype(buffer.args) == dtype
+            @test eltype(buffer.probs) == out_dtype
+            @test eltype(buffer.vals) == out_dtype
+        end
+
+    end
+
+    return @testset "output buffer" begin
+        buffer = GPUEventGenerators._allocate_output_buffer(backend, dtype, out_dtype, batch_size, N)
+
+        @testset "sizes" begin
+            @test size(buffer.args) == (batch_size + N,)
+            @test size(buffer.vals) == (batch_size + N,)
+            @test size(buffer.current_size) == (1,)
+        end
+
+        @testset "types" begin
+            @test eltype(buffer.args) == dtype
+            @test eltype(buffer.vals) == out_dtype
+            @test eltype(buffer.current_size) == UInt32 # fix for KA
+        end
+
+        @testset "Counter" begin
+            @test buffer.current_size[1] == 0
+        end
+
+    end
+end
+
+function testsuite_proposal_stage(backend, dtype, out_dtype, batch_size)
+    # 1. build mock proposal based on dtype and some dimension (deterministic + simple)
+    # 2. init batch buffer
+    # 3. call generate_proposal!
+    # 4. check if buffer is updated accordingly (using reproducable proposal)
+end
+
+function testsuite_probs_stage(backend, dtype, out_dtype, batch_size)
+    # 1. build mock rng (deterministic and simple)
+    # 2. init batch buffer
+    # 3. call generate_probability!
+    # 4. check if buffer is updated accordingly (using reproducable rng)
+end
+
+function testsuite_target_stage(backend, dtype, out_dtype, batch_size)
+    # 1. build mock target (deterministic and simple)
+    # 2. init batch buffer
+    # 3. call evaluate_target!
+    # 4. check if buffer is updated accordingly
+end
+
+function testsuite_filterscan_stage(backend, dtype, out_dtype, batch_size, N)
+    # 1. build mock arrays for the buffer
+    # 2. build known pattern into vals and probs, so the rejection pattern is
+    # deterministic
+    # 3. init batch and output buffer
+    # 4. call filter_scan
+    # 5. check if output buffer is updated accordingly
+end
+
+function testsuite_generate_batch(backend, dtype, out_dtype, batch_size, N)
+    # 1. build mocks for proposal, target, probs and filterscan
+    # 2. init batch buffer
+    # 3. call generate_event_batch!
+    # 4. check if batch and output buffer are updated accordingly
+end
+
+function testsuite_generation(backend, dtype, out_dtype, batch_size, N)
+    # 1. build mocks for proposal, target, probs and filterscan
+    # 2. call hotloop only
+    # 3. verify monotonic growth of the out_size
+    # 4. call generate_events
+    # 5. check if output reproduces the known pattern
+end
+
+# TODO:
+# - fill the functions
+# - run the testsuite above for all el_types and dtype=(el_type,NTuple,SVector,PSP ?)
