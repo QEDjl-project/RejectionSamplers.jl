@@ -8,11 +8,11 @@ struct EventBatchBuffers{T, U, A, V}
     end
 end
 
-function _allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+function _allocate_batch_buffer(backend, in_type, out_type, batch_size)
     return EventBatchBuffers(
-        allocate(backend, dtype, (batch_size,)),
-        allocate(backend, out_dtype, (batch_size,)),
-        allocate(backend, out_dtype, (batch_size,))
+        allocate(backend, in_type, (batch_size,)),
+        allocate(backend, out_type, (batch_size,)),
+        allocate(backend, out_type, (batch_size,))
     )
 end
 
@@ -28,11 +28,11 @@ struct EventOutputBuffers{T, U, A, V, S}
     end
 end
 
-function _allocate_output_buffer(backend, dtype, out_dtype, batch_size, res_size)
+function _allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
     out_size = res_size + batch_size
     return EventOutputBuffers(
-        allocate(backend, dtype, (out_size,)),
-        allocate(backend, out_dtype, (out_size,)),
+        allocate(backend, in_type, (out_size,)),
+        allocate(backend, out_type, (out_size,)),
         KernelAbstractions.zeros(backend, UInt32, 1)
     )
 end

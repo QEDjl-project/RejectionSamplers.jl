@@ -3,7 +3,8 @@ RNG = Xoshiro(137)
 function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
 
     if !(backend isa CPU)
-        @warn "max finding currently only supports CPU backend"
+        # max finding currently only supports CPU backend
+        @test_broken false
         return nothing
     end
 
