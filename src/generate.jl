@@ -98,6 +98,10 @@ function generate_events(
     #d_max_val = allocate(backend, dtype, (1,))
     #copyto!(d_max_val, [max_val])
 
+    @show res_size
+    @show batch_size
+    @show dtype
+
     running = true
     while running
         @inline _generate_events!(
@@ -112,7 +116,13 @@ function generate_events(
             current_out_size,
         )
 
+        KernelAbstractions.synchronize(backend)
+
         h_current_out_size = Vector(current_out_size)[1]
+
+        @show h_current_out_size
+        @show res_size
+
         if h_current_out_size >= res_size
             running = false
         end

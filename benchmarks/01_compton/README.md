@@ -122,3 +122,13 @@ julia --project run.jl --CPU
 ```
 
 The suite will automatically detect your new benchmark and include it.
+
+### Profiling
+
+To profile using ncu, use:
+
+```bash
+ncu -o cuda_profile --set full julia --project=. profile.jl --CUDA
+```
+
+`-o` sets the output file name, `--set full` turns on all the metrics. Then use the resulting file and open it in `ncu-ui` to inspect the kernel performance.
