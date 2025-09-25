@@ -22,18 +22,20 @@ function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_si
         el_type,
     )
 
-    return @testset "shape and type preservation" begin
+    @testset "shape and type preservation" begin
         @test size(data[1]) == (N,)
         @test size(data[2]) == (N,)
         @test eltype(data[1]) == el_type # for TruncatedGaussian1D
         @test eltype(data[2]) == el_type
     end
+
+    return nothing
 end
 
 function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_size)
 
     DIMS = (1, rand(RNG, 2:5))
-    return @testset "dim = $dim" for dim in DIMS
+    @testset "dim = $dim" for dim in DIMS
         mu = Tuple(5 .* rand(RNG, el_type, dim))                  # central value
         sig = Tuple(rand(RNG, el_type, dim))                     # variance
         low = mu .- el_type(0.5) .* sig
@@ -64,6 +66,8 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
             @test eltype(data[2]) == el_type
         end
     end
+
+    return nothing
 end
 
 function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res_size)
@@ -84,7 +88,7 @@ function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res
 
     end
 
-    return @testset "output buffer" begin
+    @testset "output buffer" begin
         buffer = GPUEventGenerators._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
 
         @testset "sizes" begin
@@ -104,6 +108,7 @@ function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res
         end
 
     end
+    return nothing
 end
 
 function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_size)
@@ -119,10 +124,11 @@ function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_si
     d_groundtruth = vec_type(h_groundtruth)
     rand!(proposal, d_groundtruth)
 
-    return @test _isapprox(
+    @test _isapprox(
         Vector(buffer.args),
         Vector(d_groundtruth)
     )
+    return nothing
 end
 
 # TODO: implement this if the resp. interface is implemented
@@ -147,11 +153,12 @@ function testsuite_target_stage(backend, vec_type, in_type, out_type, batch_size
     d_groundtruth = vec_type(h_groundtruth)
     GPUEventGenerators._compute!(target, d_groundtruth, buffer.args)
 
-    return @test isapprox(
+    @test isapprox(
         Vector(buffer.vals),
         Vector(d_groundtruth)
     )
 
+    return nothing
 end
 
 #TODO: move these function to mocks/utils.jl
@@ -190,7 +197,9 @@ function testsuite_filterscan_stage(backend, vec_type, in_type, out_type, batch_
     out_weights = Vector(output_buffer.vals)
     no_accepted = count(x -> x == one(out_type), out_weights)
     @test no_accepted == no_accepted_groundtruth
-    return @test Vector(output_buffer.current_size)[1] == no_accepted_groundtruth
+    @test Vector(output_buffer.current_size)[1] == no_accepted_groundtruth
+
+    return nothing
 end
 
 # TODO: implement this if the probability interface is implemented
@@ -208,4 +217,19 @@ function testsuite_generation(backend, in_type, out_type, batch_size, N)
     # 3. verify monotonic growth of the out_size
     # 4. call generate_events
     # 5. check if output reproduces the known pattern
+end
+
+function testsuite_sampler(backend, in_type, out_type)
+    target = MockTarget()
+    proposal = MockProposal(in_type)
+    max_val = rand(RNG, in_type)
+
+    EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
+
+    @test target_distribution(EG) == target
+    @test proposal_distribution(EG) == proposal
+    @test maximum_value(EG) == max_val
+    @test get_backend(EG) == backend
+    @test input_type(EG) == in_type
+    return @test output_type(EG) == out_type
 end

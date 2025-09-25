@@ -1,4 +1,4 @@
-struct MockTarget end
+struct MockTarget <: GPUEventGenerators.AbstractTargetDistribution end
 
 
 function _mock_target(x::Real)

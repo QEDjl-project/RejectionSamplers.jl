@@ -8,11 +8,12 @@ export UniformUnivariateProposal
 export UniformMultivariateProposal
 export GlobalTransformUniformProposal, LocalTransformUniformProposal
 
-# target
-export maximum_value
-
 # maximum finding
 export NaiveMaxFinder, QuantileReductionMethod
+
+# event generator
+export EventGenerator
+export input_type, output_type, proposal_distribution, target_distribution, maximum_value
 
 
 using Distributions
@@ -34,6 +35,7 @@ include("proposal/uniform.jl")
 
 include("target.jl")
 
+include("generation/sampler.jl")
 include("generation/buffers.jl")
 include("generation/stages.jl")
 include("generation/generate.jl")

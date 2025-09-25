@@ -35,6 +35,11 @@ function testsuite_run(backend, vec_type, el_type)
     @testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
 
     @testset "event generation" begin
+        @testset "sampler type" begin
+            @testset "Scalar" testsuite_sampler(backend, el_type, el_type)
+            @testset "Scalar" testsuite_sampler(backend, el_type, SVector{3, el_type})
+            @testset "Scalar" testsuite_sampler(backend, el_type, NTuple{3, el_type})
+        end
         @testset "univariate generation" testsuite_univariate_generation(
             backend,
             vec_type,

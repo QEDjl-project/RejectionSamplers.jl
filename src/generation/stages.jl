@@ -30,5 +30,6 @@ function rejection_filter!(
         output.current_size;
         ndrange = length(batch.args),
     )
-    return KernelAbstractions.synchronize(BACKEND)
+    KernelAbstractions.synchronize(BACKEND)
+    return nothing
 end
