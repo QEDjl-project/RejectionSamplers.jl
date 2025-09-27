@@ -37,8 +37,8 @@ function testsuite_run(backend, vec_type, el_type)
     @testset "event generation" begin
         @testset "sampler type" begin
             @testset "Scalar" testsuite_sampler(backend, el_type, el_type)
-            @testset "Scalar" testsuite_sampler(backend, el_type, SVector{3, el_type})
-            @testset "Scalar" testsuite_sampler(backend, el_type, NTuple{3, el_type})
+            @testset "Scalar" testsuite_sampler(backend, SVector{3, el_type}, el_type)
+            @testset "Scalar" testsuite_sampler(backend, NTuple{3, el_type}, el_type)
         end
         @testset "univariate generation" testsuite_univariate_generation(
             backend,

@@ -12,14 +12,12 @@ function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_si
     ## max value
     max_value = maximum_value(dist)
 
+    EG = EventGenerator(dist, proposal, max_value; backend, in_type = el_type, out_type = el_type)
+
     data = GPUEventGenerators.generate_events(
-        dist,
-        proposal,
-        max_value,
+        EG,
         N,
         batch_size,
-        backend,
-        el_type,
     )
 
     @testset "shape and type preservation" begin
@@ -48,15 +46,12 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
         ## max value
         max_value = maximum_value(dist)
 
+        EG = EventGenerator(dist, proposal, max_value; backend, in_type = SVector{dim, el_type}, out_type = el_type)
+
         data = GPUEventGenerators.generate_events(
-            dist,
-            proposal,
-            max_value,
+            EG,
             N,
             batch_size,
-            backend,
-            el_type,
-            SVector{dim, el_type},
         )
 
         @testset "shape and type preservation" begin
@@ -71,40 +66,57 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
 end
 
 function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res_size)
+    target = MockTarget()
+    proposal = MockProposal(in_type)
+    max_val = rand(RNG, out_type)
+    EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
+
     @testset "batch buffer" begin
-        buffer = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+        buffer_direct = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+        buffer_event_generator = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
 
-        @testset "sizes" begin
-            @test size(buffer.args) == (batch_size,)
-            @test size(buffer.probs) == (batch_size,)
-            @test size(buffer.vals) == (batch_size,)
-        end
+        @testset "$buffer_name" for (buffer_name, buffer) in (
+                ("direct", buffer_direct),
+                ("event_generator", buffer_event_generator),
+            )
+            @testset "sizes" begin
+                @test size(buffer.args) == (batch_size,)
+                @test size(buffer.probs) == (batch_size,)
+                @test size(buffer.vals) == (batch_size,)
+            end
 
-        @testset "types" begin
-            @test eltype(buffer.args) == in_type
-            @test eltype(buffer.probs) == out_type
-            @test eltype(buffer.vals) == out_type
+            @testset "types" begin
+                @test eltype(buffer.args) == in_type
+                @test eltype(buffer.probs) == out_type
+                @test eltype(buffer.vals) == out_type
+            end
         end
 
     end
 
     @testset "output buffer" begin
-        buffer = GPUEventGenerators._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
+        buffer_direct = GPUEventGenerators._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
+        buffer_event_generator = GPUEventGenerators._allocate_output_buffer(EG, batch_size, res_size)
 
-        @testset "sizes" begin
-            @test size(buffer.args) == (batch_size + res_size,)
-            @test size(buffer.vals) == (batch_size + res_size,)
-            @test size(buffer.current_size) == (1,)
-        end
+        @testset "$buffer_name" for (buffer_name, buffer) in (
+                ("direct", buffer_direct),
+                ("event_generator", buffer_event_generator),
+            )
+            @testset "sizes" begin
+                @test size(buffer.args) == (batch_size + res_size,)
+                @test size(buffer.vals) == (batch_size + res_size,)
+                @test size(buffer.current_size) == (1,)
+            end
 
-        @testset "types" begin
-            @test eltype(buffer.args) == in_type
-            @test eltype(buffer.vals) == out_type
-            @test eltype(buffer.current_size) == UInt32 # fix for KA
-        end
+            @testset "types" begin
+                @test eltype(buffer.args) == in_type
+                @test eltype(buffer.vals) == out_type
+                @test eltype(buffer.current_size) == UInt32 # fix for KA
+            end
 
-        @testset "Counter" begin
-            @test Vector(buffer.current_size)[1] == 0
+            @testset "Counter" begin
+                @test Vector(buffer.current_size)[1] == 0
+            end
         end
 
     end
@@ -113,10 +125,15 @@ end
 
 function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_size)
 
+    target = MockTarget()
     proposal = MockProposal(in_type)
-    buffer = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+    max_val = rand(RNG, out_type)
 
-    GPUEventGenerators.generate_proposals!(proposal, buffer)
+    EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
+
+    buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+
+    GPUEventGenerators.generate_proposals!(EG, buffer)
 
     # building groundtruth
     # NOTE: works, because the mock proposal is deterministic
@@ -142,11 +159,15 @@ end
 function testsuite_target_stage(backend, vec_type, in_type, out_type, batch_size)
     target = MockTarget()
     proposal = MockProposal(in_type)
-    buffer = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+    max_val = rand(RNG, out_type)
 
-    GPUEventGenerators.generate_proposals!(proposal, buffer)
+    EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 
-    GPUEventGenerators.evaluate_target!(target, buffer)
+    buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+
+    GPUEventGenerators.generate_proposals!(EG, buffer)
+
+    GPUEventGenerators.evaluate_target!(EG, buffer)
 
 
     h_groundtruth = Vector{out_type}(undef, batch_size)
@@ -181,17 +202,21 @@ mock_no_accepted(batch_size::Int) = isodd(batch_size) ? (batch_size + 1) / 2 : b
 function testsuite_filterscan_stage(backend, vec_type, in_type, out_type, batch_size, res_size)
     target = MockTarget()
     proposal = MockProposal(in_type)
-    batch_buffer = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+    max_val = mock_max_value(in_type)
 
-    GPUEventGenerators.generate_proposals!(proposal, batch_buffer)
-    GPUEventGenerators.evaluate_target!(target, batch_buffer)
+    EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
+
+    batch_buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+
+    GPUEventGenerators.generate_proposals!(EG, batch_buffer)
+    GPUEventGenerators.evaluate_target!(EG, batch_buffer)
     mock_generate_probabilities(batch_buffer)
 
-    output_buffer = GPUEventGenerators._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
+    output_buffer = GPUEventGenerators._allocate_output_buffer(EG, batch_size, res_size)
     mock_make_invalid!(output_buffer)
     no_accepted_groundtruth = mock_no_accepted(batch_size)
 
-    GPUEventGenerators.rejection_filter!(batch_buffer, output_buffer, mock_max_value(in_type))
+    GPUEventGenerators.rejection_filter!(EG, batch_buffer, output_buffer)
 
 
     out_weights = Vector(output_buffer.vals)
@@ -202,7 +227,7 @@ function testsuite_filterscan_stage(backend, vec_type, in_type, out_type, batch_
     return nothing
 end
 
-# TODO: implement this if the probability interface is implemented
+# TODO: implement this if the probability generator is implemented
 function testsuite_generate_batch(backend, in_type, out_type, batch_size, N)
     # 1. build mocks for proposal, target, probs and filterscan
     # 2. init batch buffer
@@ -210,7 +235,7 @@ function testsuite_generate_batch(backend, in_type, out_type, batch_size, N)
     # 4. check if batch and output buffer are updated accordingly
 end
 
-# TODO: implement this if the probability interface is implemented
+# TODO: implement this if the probability generator is implemented
 function testsuite_generation(backend, in_type, out_type, batch_size, N)
     # 1. build mocks for proposal, target, probs and filterscan
     # 2. call hotloop only
@@ -222,7 +247,7 @@ end
 function testsuite_sampler(backend, in_type, out_type)
     target = MockTarget()
     proposal = MockProposal(in_type)
-    max_val = rand(RNG, in_type)
+    max_val = rand(RNG, out_type)
 
     EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 

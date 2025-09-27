@@ -8,6 +8,15 @@ struct EventBatchBuffers{T, U, A, V}
     end
 end
 
+function _allocate_batch_buffer(eg::EventGenerator, batch_size)
+    return _allocate_batch_buffer(
+        get_backend(eg),
+        input_type(eg),
+        output_type(eg),
+        batch_size
+    )
+end
+
 function _allocate_batch_buffer(backend, in_type, out_type, batch_size)
     return EventBatchBuffers(
         allocate(backend, in_type, (batch_size,)),
@@ -26,6 +35,16 @@ struct EventOutputBuffers{T, U, A, V, S}
         }
         return new{T, U, A, V, S}(args, vals, current_size)
     end
+end
+
+function _allocate_output_buffer(eg::EventGenerator, batch_size, res_size)
+    return _allocate_output_buffer(
+        get_backend(eg),
+        input_type(eg),
+        output_type(eg),
+        batch_size,
+        res_size
+    )
 end
 
 function _allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)

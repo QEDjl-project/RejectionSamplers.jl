@@ -1,11 +1,16 @@
+# FIXME: swap in_type with out_type
+# - in_type is the type of input of targets (e.g. SVector of coordinates)
+# - out_type is the type of the output of the target evaluation
+
 # TODO: rename this file
 
 # TODO: move this to separate file
-SUPPORTED_IN_TYPES = Union{Float16, Float32, Float64}
-OUT_TYPES_F64 = Union{Float64, SVector{N, Float64}, NTuple{N, Float64}} where {N}
-OUT_TYPES_F32 = Union{Float32, SVector{N, Float32}, NTuple{N, Float32}} where {N}
-OUT_TYPES_F16 = Union{Float16, SVector{N, Float16}, NTuple{N, Float16}} where {N}
-SUPPORTED_OUT_TYPES = Union{OUT_TYPES_F16, OUT_TYPES_F32, OUT_TYPES_F64}
+
+SUPPORTED_OUT_TYPES = Union{Float16, Float32, Float64}
+IN_TYPES_F64 = Union{Float64, SVector{N, Float64}, NTuple{N, Float64}} where {N}
+IN_TYPES_F32 = Union{Float32, SVector{N, Float32}, NTuple{N, Float32}} where {N}
+IN_TYPES_F16 = Union{Float16, SVector{N, Float16}, NTuple{N, Float16}} where {N}
+SUPPORTED_IN_TYPES = Union{IN_TYPES_F16, IN_TYPES_F32, IN_TYPES_F64}
 
 function _assert_compat_io_types(::Type{IN_T}, ::Type{OUT_T}) where {IN_T, OUT_T}
     throw(
@@ -14,13 +19,20 @@ function _assert_compat_io_types(::Type{IN_T}, ::Type{OUT_T}) where {IN_T, OUT_T
         )
     )
 end
-_assert_compat_io_types(::Type{IN_T}, ::Type{OUT_T}) where {N, IN_T <: SUPPORTED_IN_TYPES, OUT_T <: Union{IN_T, SVector{N, IN_T}, NTuple{N, IN_T}}} = nothing
+_assert_compat_io_types(
+    ::Type{IN_T},
+    ::Type{OUT_T}
+) where {
+    N,
+    OUT_T <: SUPPORTED_OUT_TYPES,
+    IN_T <: Union{OUT_T, SVector{N, OUT_T}, NTuple{N, OUT_T}},
+} = nothing
 
 # TODO: implement proper compat assert
 function _assert_compat_target(target, proposal, in_type, out_type) end
 
 _assert_compat_backend(backend::Backend, ::Type{IN_T}, ::Type{OUT_T}) where {IN_T <: SUPPORTED_IN_TYPES, OUT_T <: SUPPORTED_OUT_TYPES} = nothing
-function _assert_compat_backend(backend::Backend, ::Type{Float64}, ::Type{OUT_T}) where {OUT_T <: OUT_TYPES_F64}
+function _assert_compat_backend(backend::Backend, ::Type{IN_T}, ::Type{Float64}) where {IN_T <: IN_TYPES_F64}
     return KernelAbstractions.supports_float64(backend)
 end
 
@@ -30,13 +42,13 @@ abstract type AbstractRejectionSampler end
 struct EventGenerator{IN_T, OUT_T, TARGET, PROPOSAL, BACKEND} <: AbstractRejectionSampler
     target::TARGET
     proposal::PROPOSAL
-    max_value::IN_T
+    max_value::OUT_T
     backend::BACKEND
 
     function EventGenerator(
             target::TARGET,
             proposal::PROPOSAL,
-            max_val::IN_T;
+            max_val::OUT_T;
             backend::BACKEND = CPU(), # default backend
             in_type::Type{IN_T},
             out_type::Type{OUT_T}

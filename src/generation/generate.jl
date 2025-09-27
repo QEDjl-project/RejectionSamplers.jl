@@ -1,45 +1,38 @@
 function generate_event_batch!(
-        target_dist,
-        proposal_dist,
-        max_val,
+        eg::EventGenerator,
         batch::EventBatchBuffers,
         output::EventOutputBuffers,
     )
 
-    BACKEND = get_backend(batch.args)
+    backend = get_backend(eg)
 
-    @inline generate_proposals!(proposal_dist, batch)
-    KernelAbstractions.synchronize(BACKEND)
+    @inline generate_proposals!(eg, batch)
+    KernelAbstractions.synchronize(backend)
 
-    @inline generate_probabilities!(batch)
-    KernelAbstractions.synchronize(BACKEND)
+    @inline generate_probabilities!(eg, batch)
+    KernelAbstractions.synchronize(backend)
 
-    @inline evaluate_target!(target_dist, batch)
-    KernelAbstractions.synchronize(BACKEND)
+    @inline evaluate_target!(eg, batch)
+    KernelAbstractions.synchronize(backend)
 
-    rejection_filter!(batch, output, max_val)
+    rejection_filter!(eg, batch, output)
     return nothing
 end
 
 function generate_events(
-        dist,
-        proposal,
-        max_val,
+        eg::EventGenerator,
         res_size,
         batch_size,
-        backend,
-        out_dtype,
-        dtype = out_dtype,
     )
     # Allocate batch buffers
-    batch = _allocate_batch_buffer(backend, dtype, out_dtype, batch_size)
+    batch = _allocate_batch_buffer(eg, batch_size)
 
     # Allocate output buffers
-    output = _allocate_output_buffer(backend, dtype, out_dtype, batch_size, res_size)
+    output = _allocate_output_buffer(eg, batch_size, res_size)
 
     # Main loop
     while true
-        generate_event_batch!(dist, proposal, max_val, batch, output)
+        generate_event_batch!(eg, batch, output)
 
         if Vector(output.current_size)[1] >= res_size
             break

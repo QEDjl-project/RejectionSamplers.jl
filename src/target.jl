@@ -29,6 +29,20 @@ Interface function: return the (approximate) maximum_value of a given target dis
 """
 function maximum_value end
 
+# TODO: call this in `evaluate_target!` like
+#
+# _compute_kernel(backend, 32)(
+#   dest,
+#   Base.Fix1(_compute,target_distribution(eg)),
+#   batch.args,
+#   ndrange=size(dest)
+#   )
+@kernel inbounds = true function _compute_kernel(dest, @Const(f), @Const(x))
+    I = @index(Global)
+    @inbounds dest[I] = f(x[I])
+
+end
+
 @inline function _compute!(
         dist::D,
         dest::A,
