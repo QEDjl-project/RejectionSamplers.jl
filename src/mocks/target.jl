@@ -5,6 +5,8 @@ function _mock_target(x::Real)
     return x < 0 ? zero(x) : one(x)
 end
 
+GPUEventGenerators._compute(::MockTarget, x::T) where {T <: Real} = _mock_target(x)
+
 # scalar
 function GPUEventGenerators._compute!(
         ::MockTarget,
@@ -22,6 +24,8 @@ end
 function _mock_target(x::SVector{N, T}) where {N, T <: Real}
     return mapreduce(_mock_target, +, x)
 end
+
+GPUEventGenerators._compute(::MockTarget, x::SVector{N, T}) where {N, T <: Real} = _mock_target(x)
 
 # NOTE: even if trivially the same as for scalars, this will stay to be optimized later
 function GPUEventGenerators._compute!(
@@ -42,6 +46,8 @@ end
 function _mock_target(x::NTuple{N, T}) where {N, T <: Real}
     return mapreduce(_mock_target, +, x)
 end
+
+GPUEventGenerators._compute(::MockTarget, x::NTuple{N, T}) where {N, T <: Real} = _mock_target(x)
 
 function GPUEventGenerators._compute!(
         ::MockTarget,

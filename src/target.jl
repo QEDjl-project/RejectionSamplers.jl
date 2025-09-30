@@ -1,15 +1,7 @@
+# TODO: put these functions in logically distinct files
+
 abstract type AbstractTargetDistribution end
 Base.broadcastable(dist::AbstractTargetDistribution) = Ref(dist)
-
-"""
-
-    _compute!(dist,dest,x)
-
-Computes the target distribution `dist` on `x` and stores the result in `dest`.
-"""
-function _compute! end
-
-abstract type AbstractUnivariatTargetDistribution <: AbstractTargetDistribution end
 
 """
 
@@ -20,6 +12,7 @@ Return value of `dist` computed at `x`.
 """
 function _compute end
 
+# TODO: move this to the abstract event generators
 """
 
     maximum_value(dist::AbstractTargetDistribution)
@@ -29,51 +22,70 @@ Interface function: return the (approximate) maximum_value of a given target dis
 """
 function maximum_value end
 
-# TODO: call this in `evaluate_target!` like
-#
 # _compute_kernel(backend, 32)(
 #   dest,
 #   Base.Fix1(_compute,target_distribution(eg)),
 #   batch.args,
 #   ndrange=size(dest)
 #   )
-@kernel inbounds = true function _compute_kernel(dest, @Const(f), @Const(x))
+@kernel inbounds = true function _compute_kernel(dest, @Const(dist), @Const(x))
     I = @index(Global)
-    @inbounds dest[I] = f(x[I])
-
+    @inbounds dest[I] = _compute(dist, x[I])
 end
 
+# TODO: test these function
+function compute!(dist::D, dest::AbstractArray, x::AbstractArray) where {D <: AbstractTargetDistribution}
+    length(dest) == length(x) || throw(
+        ArgumentError(
+            "Argument `x` and destination `dest` must have the same length"
+        )
+    )
+
+    _compute!(dist, dest, x)
+    return nothing
+end
+
+# TODO: test these function
+function compute(dist::AbstractTargetDistribution, x::AbstractVector)
+    dist = _allocate_destination(dist, x)
+    _compute(dist, dest, x)
+    return dist
+end
+
+# univariate distribution
+
+abstract type AbstractUnivariatTargetDistribution <: AbstractTargetDistribution end
+@inline function _allocate_destination(dist::AbstractUnivariatTargetDistribution, x::AbstractArray{T}) where {T <: Real}
+    return similar(x)
+end
 @inline function _compute!(
         dist::D,
         dest::A,
-        x::A,
-    ) where {D <: AbstractUnivariatTargetDistribution, T <: Real, A <: AbstractArray{T}}
+        x::I,
+    ) where {
+        D <: AbstractUnivariatTargetDistribution,
+        T <: Real,
+        A <: AbstractVector{T},
+        I <: AbstractVector{T},
+    }
 
-    broadcast!(Base.Fix1(_compute, dist), dest, x)
+    backend = get_backend(dest)
+    _compute_kernel(backend, 32)(
+        dest,
+        dist,
+        x,
+        ndrange = size(dest)
+    )
 
     return nothing
 end
 
-# TODO: see if this is necessary
-# generic fallback - calculates on host and copies to device
-#
-# note:
-# - this allocates on host
-#
-function _compute!(
-        dist::D,
-        dest::AbstractArray{T},
-        x::AbstractArray{T},
-    ) where {D <: AbstractUnivariatTargetDistribution, T <: Real}
-
-    return copyto!(dest, broadcast(Base.Fix1(_compute, dist), x))
-end
-
-# bivariate distributions
+# multivariate distributions
 
 abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
-
-
+@inline function _allocate_destination(dist::AbstractMultivariateTarget, x::AbstractArray{TT}) where {N, T <: Real, TT <: SVector{N, T}}
+    return allocate(get_backend(x), T, (length(x),))
+end
 @inline function _compute!(
         dist::D,
         dest::A,
@@ -87,7 +99,13 @@ abstract type AbstractMultivariateTarget{N} <: AbstractTargetDistribution end
         I <: AbstractVector{TT},
     }
 
-    broadcast!(Base.Fix1(_compute, dist), dest, x)
+    backend = get_backend(dest)
+    _compute_kernel(backend, 32)(
+        dest,
+        dist,
+        x,
+        ndrange = size(dest)
+    )
 
     return nothing
 end

@@ -12,10 +12,17 @@ function generate_probabilities!(eg::EventGenerator, batch::EventBatchBuffers)
 end
 
 function evaluate_target!(eg::EventGenerator, batch::EventBatchBuffers)
-    dist = target_distribution(eg)
+    target_dist = target_distribution(eg)
+    backend = get_backend(eg)
 
     # TODO: update by using eg directly
-    _compute!(dist, batch.vals, batch.args)
+    #    _compute!(dist, batch.vals, batch.args)
+    _compute_kernel(backend, 32)(
+        batch.vals,
+        target_dist,
+        batch.args,
+        ndrange = size(batch.vals)
+    )
     return nothing
 end
 
