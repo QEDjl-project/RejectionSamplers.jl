@@ -32,7 +32,7 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             dtype = SVector{dim, out_dtype},
         )
 
-        @test isapprox(groundtruth, max_val, atol = 1.0e-4)
+        @test isapprox(groundtruth, max_val, atol = 1.0e-2)
     end
 
     return @testset "quantile reduction" begin

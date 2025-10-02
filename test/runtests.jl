@@ -123,8 +123,7 @@ end
 include("testsuite.jl")
 
 for stp in SETUPS
-    backend = stp.backend
-    @testset "$backend $vec_type $el_type" for (vec_type, el_type) in combinations(stp)
+    @testset "$backend $vec_type $el_type" for (backend, vec_type, el_type) in combinations(stp)
         testsuite_run(backend, vec_type, el_type)
     end
 end
