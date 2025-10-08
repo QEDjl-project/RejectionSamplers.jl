@@ -168,6 +168,8 @@ reclaim_mem()
 @info "Running benchmarks"
 results = run(SUITE, verbose = true)
 
+@show SUITE
+
 data_filepath = joinpath("data", "bench_$(build_backend_name(backend_arg)).json")
 BenchmarkTools.save(data_filepath, median(results))
 @info "Save results to $data_filepath"
