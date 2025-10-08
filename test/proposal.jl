@@ -18,11 +18,11 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
         @testset "reproducibility" begin
             d_payload1 = vec_type(zeros(el_type, N))
             d_payload2 = vec_type(zeros(el_type, N))
-            RNG = GPUEventGenerators.default_rng(typeof(d_payload1))
+            RNG = RejectionSamplers.default_rng(typeof(d_payload1))
             RNG2 = deepcopy(RNG)
 
-            GPUEventGenerators._rand!(RNG, u, d_payload1)
-            GPUEventGenerators._rand!(RNG, u, d_payload2)
+            RejectionSamplers._rand!(RNG, u, d_payload1)
+            RejectionSamplers._rand!(RNG, u, d_payload2)
 
             # FIXME: fix reproducibility for event generation
             @test_broken isapprox(Array(d_payload1), Array(d_payload2))

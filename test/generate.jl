@@ -14,7 +14,7 @@ function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_si
 
     EG = EventGenerator(dist, proposal, max_value; backend, in_type = el_type, out_type = el_type)
 
-    data = GPUEventGenerators.generate_events(
+    data = RejectionSamplers.generate_events(
         EG,
         N,
         batch_size,
@@ -48,7 +48,7 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
 
         EG = EventGenerator(dist, proposal, max_value; backend, in_type = SVector{dim, el_type}, out_type = el_type)
 
-        data = GPUEventGenerators.generate_events(
+        data = RejectionSamplers.generate_events(
             EG,
             N,
             batch_size,
@@ -72,8 +72,8 @@ function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res
     EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 
     @testset "batch buffer" begin
-        buffer_direct = GPUEventGenerators._allocate_batch_buffer(backend, in_type, out_type, batch_size)
-        buffer_event_generator = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+        buffer_direct = RejectionSamplers._allocate_batch_buffer(backend, in_type, out_type, batch_size)
+        buffer_event_generator = RejectionSamplers._allocate_batch_buffer(EG, batch_size)
 
         @testset "$buffer_name" for (buffer_name, buffer) in (
                 ("direct", buffer_direct),
@@ -95,8 +95,8 @@ function testsuite_buffer_allocation(backend, in_type, out_type, batch_size, res
     end
 
     @testset "output buffer" begin
-        buffer_direct = GPUEventGenerators._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
-        buffer_event_generator = GPUEventGenerators._allocate_output_buffer(EG, batch_size, res_size)
+        buffer_direct = RejectionSamplers._allocate_output_buffer(backend, in_type, out_type, batch_size, res_size)
+        buffer_event_generator = RejectionSamplers._allocate_output_buffer(EG, batch_size, res_size)
 
         @testset "$buffer_name" for (buffer_name, buffer) in (
                 ("direct", buffer_direct),
@@ -131,9 +131,9 @@ function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_si
 
     EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 
-    buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+    buffer = RejectionSamplers._allocate_batch_buffer(EG, batch_size)
 
-    GPUEventGenerators.generate_proposals!(EG, buffer)
+    RejectionSamplers.generate_proposals!(EG, buffer)
 
     # building groundtruth
     # NOTE: works, because the mock proposal is deterministic
@@ -163,16 +163,16 @@ function testsuite_target_stage(backend, vec_type, in_type, out_type, batch_size
 
     EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 
-    buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+    buffer = RejectionSamplers._allocate_batch_buffer(EG, batch_size)
 
-    GPUEventGenerators.generate_proposals!(EG, buffer)
+    RejectionSamplers.generate_proposals!(EG, buffer)
 
-    GPUEventGenerators.evaluate_target!(EG, buffer)
+    RejectionSamplers.evaluate_target!(EG, buffer)
 
 
     h_groundtruth = Vector{out_type}(undef, batch_size)
     d_groundtruth = vec_type(h_groundtruth)
-    GPUEventGenerators._compute!(target, d_groundtruth, buffer.args)
+    RejectionSamplers._compute!(target, d_groundtruth, buffer.args)
 
     @test isapprox(
         Vector(buffer.vals),
@@ -184,11 +184,11 @@ end
 
 #TODO: move these function to mocks/utils.jl
 
-function mock_make_invalid!(buffer::GPUEventGenerators.EventOutputBuffers{T, U}) where {T, U}
+function mock_make_invalid!(buffer::RejectionSamplers.EventOutputBuffers{T, U}) where {T, U}
     return fill!(buffer.vals, -one(U))
 end
 
-function mock_generate_probabilities(buffer::GPUEventGenerators.EventBatchBuffers{T, U}) where {T, U}
+function mock_generate_probabilities(buffer::RejectionSamplers.EventBatchBuffers{T, U}) where {T, U}
     return fill!(buffer.probs, U(0.5))
 end
 
@@ -206,17 +206,17 @@ function testsuite_filterscan_stage(backend, vec_type, in_type, out_type, batch_
 
     EG = EventGenerator(target, proposal, max_val; backend, in_type, out_type)
 
-    batch_buffer = GPUEventGenerators._allocate_batch_buffer(EG, batch_size)
+    batch_buffer = RejectionSamplers._allocate_batch_buffer(EG, batch_size)
 
-    GPUEventGenerators.generate_proposals!(EG, batch_buffer)
-    GPUEventGenerators.evaluate_target!(EG, batch_buffer)
+    RejectionSamplers.generate_proposals!(EG, batch_buffer)
+    RejectionSamplers.evaluate_target!(EG, batch_buffer)
     mock_generate_probabilities(batch_buffer)
 
-    output_buffer = GPUEventGenerators._allocate_output_buffer(EG, batch_size, res_size)
+    output_buffer = RejectionSamplers._allocate_output_buffer(EG, batch_size, res_size)
     mock_make_invalid!(output_buffer)
     no_accepted_groundtruth = mock_no_accepted(batch_size)
 
-    GPUEventGenerators.rejection_filter!(EG, batch_buffer, output_buffer)
+    RejectionSamplers.rejection_filter!(EG, batch_buffer, output_buffer)
 
 
     out_weights = Vector(output_buffer.vals)

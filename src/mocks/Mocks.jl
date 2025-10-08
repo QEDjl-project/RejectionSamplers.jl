@@ -6,7 +6,7 @@ export MockTarget
 using Distributions
 using Random
 using StaticArrays
-using GPUEventGenerators
+using RejectionSamplers
 
 include("proposal.jl")
 include("target.jl")

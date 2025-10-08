@@ -7,11 +7,11 @@ using GPUArrays
 using KernelAbstractions
 using StaticArrays
 
-using GPUEventGenerators
-using GPUEventGenerators.TruncatedGaussians
-using GPUEventGenerators.PerturbativeCompton
-using GPUEventGenerators.TestUtils
-using GPUEventGenerators.Mocks
+using RejectionSamplers
+using RejectionSamplers.TruncatedGaussians
+using RejectionSamplers.PerturbativeCompton
+using RejectionSamplers.TestUtils
+using RejectionSamplers.Mocks
 
 SETUPS = TestSetup[]
 

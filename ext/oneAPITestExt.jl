@@ -1,10 +1,10 @@
 module oneAPITestExt
 
-using GPUEventGenerators
-using GPUEventGenerators.TestUtils
+using RejectionSamplers
+using RejectionSamplers.TestUtils
 using oneAPI
 
-@inline function GPUEventGenerators.TestUtils.get_test_setup(backend::oneAPIBackend)
+@inline function RejectionSamplers.TestUtils.get_test_setup(backend::oneAPIBackend)
 
     # check if f64 is supported
     if oneL0.module_properties(oneAPI.device()).fp64flags &

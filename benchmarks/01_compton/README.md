@@ -1,6 +1,6 @@
-# GPUEventGenerators Benchmarks
+# RejectionSamplers Benchmarks
 
-This directory contains a benchmark suite for **[GPUEventGenerators.jl](https://github.com/...)**, designed to measure the performance of event generation on multiple compute backends.
+This directory contains a benchmark suite for **[RejectionSamplers.jl](https://github.com/qedjl-project/RejectionSamplers.jl)**, designed to measure the performance of event generation on multiple compute backends.
 Supported backends include **CUDA, oneAPI, AMDGPU, Metal, and CPU** (OpenCL may be added in the future).
 
 ## Installation
@@ -8,7 +8,7 @@ Supported backends include **CUDA, oneAPI, AMDGPU, Metal, and CPU** (OpenCL may 
 Clone the repository and instantiate the benchmark environment:
 
 ```bash
-git clone https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
+git clone https://github.com/qedjl-project/RejectionSamplers.jl.git
 cd benchmarks/01_Compton
 julia --project=. init.jl
 ```

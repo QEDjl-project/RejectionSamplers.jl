@@ -1,11 +1,11 @@
-using GPUEventGenerators
-using GPUEventGenerators.TestUtils
+using RejectionSamplers
+using RejectionSamplers.TestUtils
 using Documenter
 
 DocMeta.setdocmeta!(
-    GPUEventGenerators,
+    RejectionSamplers,
     :DocTestSetup,
-    :(using GPUEventGenerators);
+    :(using RejectionSamplers);
     recursive = true,
 )
 
@@ -16,17 +16,17 @@ const numbered_pages = [
 ]
 
 makedocs(;
-    modules = [GPUEventGenerators],
+    modules = [RejectionSamplers],
     authors = "Uwe Hernandez Acosta <u.hernandez@hzdr.de>, Simeon Ehrig, Anton Reinhard, René Widera",
-    repo = "https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/blob/{commit}{path}#{line}",
-    sitename = "GPUEventGenerators.jl",
+    repo = Documenter.Remotes.GitHub("QEDjl-project", "RejectionSamplers.jl"),
+    sitename = "RejectionSamplers.jl",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
-        repolink = "https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/blob/{commit}{path}#{line}",
-        canonical = "https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl",
+        #repolink = "https://github.com/qedjl-project/RejectionSamplers.jl/blob/{commit}{path}#{line}",
+        canonical = "https://qedjl-project.github.io/RejectionSamplers.jl",
         assets = String[],
     ),
     pages = ["index.md"; numbered_pages],
 )
 
-deploydocs(; repo = "github.com/QEDjl-project/GPUEventGenerators.jl")
+deploydocs(; repo = "github.com/qedjl-project/RejectionSamplers.jl")

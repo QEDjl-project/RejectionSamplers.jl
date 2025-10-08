@@ -1,7 +1,7 @@
 RNG = Xoshiro(137137)
 
-struct TestUnivariateTarget <: GPUEventGenerators.AbstractUnivariatTargetDistribution end
-GPUEventGenerators._compute(::TestUnivariateTarget, x) = cos(x)
+struct TestUnivariateTarget <: RejectionSamplers.AbstractUnivariatTargetDistribution end
+RejectionSamplers._compute(::TestUnivariateTarget, x) = cos(x)
 
 const UNI_DIST = TestUnivariateTarget()
 
@@ -9,15 +9,15 @@ function testsuite_univariate_target(backend, vec_type, el_type, N)
     d_input = vec_type(rand(RNG, el_type, N))
     d_vals = similar(d_input)
 
-    h_groundtruth = GPUEventGenerators._compute.(UNI_DIST, Vector(d_input))
+    h_groundtruth = RejectionSamplers._compute.(UNI_DIST, Vector(d_input))
 
-    GPUEventGenerators._compute!(UNI_DIST, d_vals, d_input)
+    RejectionSamplers._compute!(UNI_DIST, d_vals, d_input)
 
     return @test isapprox(Vector(d_vals), h_groundtruth)
 end
 
-struct TestMultivariateTarget{S} <: GPUEventGenerators.AbstractMultivariateTarget{S} end
-GPUEventGenerators._compute(::TestMultivariateTarget, x) = cos(prod(x))
+struct TestMultivariateTarget{S} <: RejectionSamplers.AbstractMultivariateTarget{S} end
+RejectionSamplers._compute(::TestMultivariateTarget, x) = cos(prod(x))
 
 
 function testsuite_multivariate_target(backend, vec_type, el_type, N)
@@ -28,9 +28,9 @@ function testsuite_multivariate_target(backend, vec_type, el_type, N)
         d_input = vec_type(rand(RNG, SVector{dim, el_type}, N))
         d_vals = vec_type(rand(RNG, el_type, N))
 
-        h_groundtruth = GPUEventGenerators._compute.(MULT_DIST, Vector(d_input))
+        h_groundtruth = RejectionSamplers._compute.(MULT_DIST, Vector(d_input))
 
-        GPUEventGenerators._compute!(MULT_DIST, d_vals, d_input)
+        RejectionSamplers._compute!(MULT_DIST, d_vals, d_input)
 
         @test isapprox(Vector(d_vals), h_groundtruth)
     end
@@ -63,9 +63,9 @@ function testsuite_Compton_target(backend, vec_type, el_type, N)
 
         d_vals = vec_type(rand(RNG, el_type, N))
 
-        h_groundtruth = GPUEventGenerators._compute.(COMPTON_DIST, h_coords)
+        h_groundtruth = RejectionSamplers._compute.(COMPTON_DIST, h_coords)
 
-        GPUEventGenerators._compute!(COMPTON_DIST, d_vals, d_coords)
+        RejectionSamplers._compute!(COMPTON_DIST, d_vals, d_coords)
 
         @test isapprox(Vector(d_vals), h_groundtruth)
     end

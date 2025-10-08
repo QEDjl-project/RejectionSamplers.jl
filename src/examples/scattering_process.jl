@@ -2,7 +2,7 @@ module HardScattering
 
 export HardScatteringDistribution
 
-using GPUEventGenerators
+using RejectionSamplers
 using QEDbase
 
 struct HardScatteringDistribution{
@@ -10,7 +10,7 @@ struct HardScatteringDistribution{
         P <: AbstractProcessDefinition,
         M <: AbstractModelDefinition,
         PSL <: AbstractOutPhaseSpaceLayout,
-    } <: GPUEventGenerators.AbstractMultivariateTarget{DOF}
+    } <: RejectionSamplers.AbstractMultivariateTarget{DOF}
 
     proc::P
     model::M
@@ -35,9 +35,9 @@ struct HardScatteringDistribution{
 end
 
 # TODO: insert max-finder functionality instead (e.g. from QEDprobing.jl)
-function GPUEventGenerators.maximum_value(d::HardScatteringDistribution) end
+function RejectionSamplers.maximum_value(d::HardScatteringDistribution) end
 
-function GPUEventGenerators._compute(
+function RejectionSamplers._compute(
         dist::HardScatteringDistribution{DOF},
         coords::NTuple{DOF, T},
     ) where {DOF, T <: Real}

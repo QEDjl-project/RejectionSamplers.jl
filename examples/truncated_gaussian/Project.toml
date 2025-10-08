@@ -2,7 +2,7 @@
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-GPUEventGenerators = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
+RejectionSamplers = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
 PairPlots = "43a3c2be-4208-490b-832a-a21dcd55d7da"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"

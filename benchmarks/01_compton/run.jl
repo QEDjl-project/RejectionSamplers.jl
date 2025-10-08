@@ -1,7 +1,7 @@
 # main structure adopted from AcceleratedKernels.jl/benchmark/runbenchmarks.jl
 
-using GPUEventGenerators
-using GPUEventGenerators.PerturbativeCompton
+using RejectionSamplers
+using RejectionSamplers.PerturbativeCompton
 using QEDcore
 using QEDprocesses
 

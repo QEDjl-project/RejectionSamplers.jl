@@ -1,16 +1,16 @@
-struct MockProposal{T, D, TT, V} <: GPUEventGenerators.AbstractProposal{TT, V}
+struct MockProposal{T, D, TT, V} <: RejectionSamplers.AbstractProposal{TT, V}
 
     # scalar proposal
     MockProposal(::Type{T}) where {T <: Real} = new{T, 1, T, Distributions.Univariate}()
 
     # SVector proposal
-    MockProposal(::Type{TT}) where {N, T <: Real, TT <: SVector{N, T}} = new{T, N, TT, GPUEventGenerators.CoordinateVariate}()
+    MockProposal(::Type{TT}) where {N, T <: Real, TT <: SVector{N, T}} = new{T, N, TT, RejectionSamplers.CoordinateVariate}()
 
     # NTuple proposal
-    MockProposal(::Type{TT}) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT, GPUEventGenerators.CoordinateVariate}()
+    MockProposal(::Type{TT}) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT, RejectionSamplers.CoordinateVariate}()
 end
 
-GPUEventGenerators.degrees_of_freedom(::MockProposal{T, D, TT}) where {T, D, TT} = D
+RejectionSamplers.degrees_of_freedom(::MockProposal{T, D, TT}) where {T, D, TT} = D
 
 ### overwriting the generic because MockProposal is not random
 # TODO: adjust proposal interface, maybe use `generate_proposal!` as the interface

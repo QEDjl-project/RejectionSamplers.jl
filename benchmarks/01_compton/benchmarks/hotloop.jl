@@ -26,7 +26,7 @@ for dtype in DTYPES
                 _group[batch_size][N] = @benchmarkable @sb(
                     begin
                         while running
-                            @inline GPUEventGenerators._generate_events!(
+                            @inline RejectionSamplers._generate_events!(
                                 $dist,
                                 $proposal,
                                 $max_value,

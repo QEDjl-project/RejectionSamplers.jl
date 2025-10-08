@@ -2,11 +2,11 @@ module PlotEx
 
 using StatsPlots
 using QuadGK
-using GPUEventGenerators
+using RejectionSamplers
 
-function GPUEventGenerators.plot_compare(
+function RejectionSamplers.plot_compare(
         samples::AbstractVector,
-        dist::GPUEventGenerators.AbstractUnivariatTargetDistribution;
+        dist::RejectionSamplers.AbstractUnivariatTargetDistribution;
         kwargs...,
     )
     P = histogram(
@@ -20,11 +20,11 @@ function GPUEventGenerators.plot_compare(
         kwargs...,
     )
 
-    tot_weight, _ = quadgk(x -> GPUEventGenerators._compute(dist, x), extrema(dist)...)
+    tot_weight, _ = quadgk(x -> RejectionSamplers._compute(dist, x), extrema(dist)...)
     plot!(
         P,
         range(extrema(dist)...; length = 100),
-        x -> GPUEventGenerators._compute(dist, x) / tot_weight;
+        x -> RejectionSamplers._compute(dist, x) / tot_weight;
         label = "normalized target dist.",
         line = (2, :black, :dash),
         alpha = 0.5,
