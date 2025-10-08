@@ -1,6 +1,11 @@
 name = "GPUEventGenerators"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
+authors = [
+  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
+  "Simeon Ehrig",
+  "Anton Reinhard",
+  "René Widera",
+]
 version = "0.1.0"
 
 [deps]
@@ -19,9 +24,9 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 [weakdeps]
 AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 
 [extensions]
 AMDGPUTestExt = "AMDGPU"
@@ -37,7 +42,7 @@ CUDA = "5.8.1"
 Distributions = "0.25.119"
 GPUArrays = "11.2.2"
 KernelAbstractions = "0.9.34"
-Metal = "1.5.1"
+Metal = "1.6.4"
 QEDbase = "0.4.0"
 QEDcore = "0.3.0"
 QEDprocesses = "0.4.0"
