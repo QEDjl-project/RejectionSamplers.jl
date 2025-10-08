@@ -11,12 +11,12 @@ batch_size_vec = 2 .^ (5:6)
 @info "used batch sizes: $batch_size_vec"
 
 group = addgroup!(SUITE, bench_name)
-for dtype in DTYPES
+for out_type in DTYPES
 
-    local _group = addgroup!(group, "$dtype")
-    arg_type = SVector{3, dtype}
+    local _group = addgroup!(group, "$out_type")
+    in_type = SVector{3, out_type}
 
-    dist, proposal, max_value = generation_setup(RNG, arg_type, dtype, mod, psl)
+    dist, proposal, max_value = generation_setup(RNG, in_type, out_type, mod, psl)
 
     @info "Adding benchmark problems"
     for N in nevent_vec
@@ -24,19 +24,20 @@ for dtype in DTYPES
         for batch_size in batch_size_vec
             if batch_size <= N
 
-                _group[batch_size][N] = @benchmarkable begin
-                    GPUEventGenerators.generate_events(
-                        $dist,
-                        $proposal,
-                        $max_value,
-                        $N,
-                        $batch_size,
-                        $BACKEND,
-                        $dtype,
-                        $arg_type,
-                    )
-                    KernelAbstractions.synchronize($BACKEND)
-                end
+                _group[batch_size][N] = @benchmarkable @sb(
+                    begin
+                        GPUEventGenerators.generate_events(
+                            $dist,
+                            $proposal,
+                            $max_value,
+                            $N,
+                            $batch_size,
+                            $BACKEND,
+                            $out_type,
+                            $in_type,
+                        )
+                    end
+                )
             end
         end
     end

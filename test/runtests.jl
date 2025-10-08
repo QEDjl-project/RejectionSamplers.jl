@@ -11,6 +11,7 @@ using GPUEventGenerators
 using GPUEventGenerators.TruncatedGaussians
 using GPUEventGenerators.PerturbativeCompton
 using GPUEventGenerators.TestUtils
+using GPUEventGenerators.Mocks
 
 SETUPS = TestSetup[]
 
@@ -122,16 +123,7 @@ end
 include("testsuite.jl")
 
 for stp in SETUPS
-    backend = stp.backend
-    @testset "$backend $vec_type $el_type" for (vec_type, el_type) in combinations(stp)
+    @testset "$backend $vec_type $el_type" for (backend, vec_type, el_type) in combinations(stp)
         testsuite_run(backend, vec_type, el_type)
     end
 end
-
-#=
-include("filter_scan.jl")
-include("proposal.jl")
-include("target.jl")
-include("generate.jl")
-
-=#

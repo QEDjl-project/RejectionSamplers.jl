@@ -78,7 +78,7 @@ for bench_file in bench_files
 
         # Global legend (below all plots)
         #Legend(f[1:nrows, ncols + 1], axes[end], "batch_size"; orientation = :horizontal)
-        Legend(f[nrows + 1, 1:ncols], axes[end], "batch_size"; orientation = :horizontal)
+        Legend(f[nrows + 1, 1:ncols], axes[end], "batch_size")
 
         filename = "$(bench)_$(backend_str).pdf"
         filepath = joinpath(plotpath, filename)
