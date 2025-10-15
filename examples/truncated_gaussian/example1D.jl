@@ -7,8 +7,8 @@ using QuadGK
 
 const RNG = MersenneTwister(1234)
 
-using GPUEventGenerators
-using GPUEventGenerators.TruncatedGaussians
+using RejectionSamplers
+using RejectionSamplers.TruncatedGaussians
 
 using CairoMakie
 
@@ -40,9 +40,9 @@ function plot_samples(
     ax = Axis(f[1, 1], xlabel = "x", ylabel = "normalized event count")
     hist!(ax, samples, normalization = :pdf, bins = 100, color = :orange)
 
-    tot_weight, _ = quadgk(x -> GPUEventGenerators._compute(dist, x), extrema(dist)...)
+    tot_weight, _ = quadgk(x -> RejectionSamplers._compute(dist, x), extrema(dist)...)
     x = range(extrema(dist)..., 100)
-    vals = @. GPUEventGenerators._compute(dist, x) / tot_weight
+    vals = @. RejectionSamplers._compute(dist, x) / tot_weight
 
     lines!(ax, x, vals, linestyle = :dash, color = :black)
 
@@ -90,7 +90,7 @@ function run_example(
 
     ## number of samples to be generated
     @info "generate events"
-    data = GPUEventGenerators.generate_events(
+    data = RejectionSamplers.generate_events(
         dist,
         proposal,
         max_value,

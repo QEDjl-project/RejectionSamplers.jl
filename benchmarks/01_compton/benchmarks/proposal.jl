@@ -21,11 +21,11 @@ for out_type in DTYPES
 
         _group[batch_size] = @benchmarkable @sb(
             begin
-                GPUEventGenerators.generate_proposals!($proposal, batch_buffer)
+                RejectionSamplers.generate_proposals!($proposal, batch_buffer)
             end
         ) setup = begin
             reclaim_mem()
-            batch_buffer = GPUEventGenerators._allocate_batch_buffer($BACKEND, $in_type, $out_type, $batch_size)
+            batch_buffer = RejectionSamplers._allocate_batch_buffer($BACKEND, $in_type, $out_type, $batch_size)
         end
     end
 end

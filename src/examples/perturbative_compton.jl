@@ -1,7 +1,7 @@
 module PerturbativeCompton
 
 
-using GPUEventGenerators
+using RejectionSamplers
 using QEDprocesses
 using QEDcore
 using StaticArrays
@@ -19,7 +19,7 @@ get_alpha(::Type{Float32}) = ALPHA32
 
 ### Klein-Nishina
 
-struct KleinNishinaDistribution{T} <: GPUEventGenerators.AbstractMultivariateTarget{2}
+struct KleinNishinaDistribution{T} <: RejectionSamplers.AbstractMultivariateTarget{2}
     omega::T
 
     function KleinNishinaDistribution(omega::T) where {T <: Real}
@@ -41,11 +41,11 @@ function _klein_nishina_formula(omega::T, cos_theta::T, phi::T) where {T <: Real
         (omp_over_om + inv(omp_over_om) - one(omega) + cos_theta^2)
 end
 
-function GPUEventGenerators.maximum_value(d::KleinNishinaDistribution{T}) where {T <: Real}
+function RejectionSamplers.maximum_value(d::KleinNishinaDistribution{T}) where {T <: Real}
     return _klein_nishina_formula(d.omega, one(T), zero(T))
 end
 
-function GPUEventGenerators._compute(
+function RejectionSamplers._compute(
         dist::KleinNishinaDistribution{T},
         cth_phi::SVector{2, T},
     ) where {T <: Real}
@@ -64,7 +64,7 @@ struct ComptonDistribution{
         C <: Compton,
         M <: AbstractModelDefinition,
         PSL <: AbstractOutPhaseSpaceLayout,
-    } <: GPUEventGenerators.AbstractMultivariateTarget{N}
+    } <: RejectionSamplers.AbstractMultivariateTarget{N}
     proc::C
     model::M
     psl::PSL
@@ -90,7 +90,7 @@ ComptonDistribution(
 ) = ComptonDistribution{Float64}(model, psl; spin_pol)
 
 
-function GPUEventGenerators._compute(
+function RejectionSamplers._compute(
         dist::ComptonDistribution{T, DOF},
         coords::SVector{DOF, T},
     ) where {DOF, T <: Real}

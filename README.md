@@ -1,9 +1,9 @@
-# GPUEventGenerators.jl
+# RejectionSamplers.jl
 
-[![Main](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-applications.pages.hzdr.de/GPUEventGenerators.jl)
-[![pipeline status](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/badges/main/pipeline.svg)](https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl/-/commits/main)
+[![Main](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl)
+[![pipeline status](https://codebase.helmholtz.cloud/qedjl-applications/RejectionSamplers.jl/badges/main/pipeline.svg)](https://codebase.helmholtz.cloud/qedjl-applications/RejectionSamplers.jl/-/commits/main)
 
-`GPUEventGenerators.jl` is a showcase project for Monte-Carlo Event Generation
+`RejectionSamplers.jl` is a showcase project for Monte-Carlo Event Generation
 on GPU. Its main goal is the investigation of end-to-end workflows to generate events for
 scattering processes.
 
@@ -11,19 +11,19 @@ scattering processes.
 
 ## Installation
 
-Since `GPUEventGenerators.jl` is not registered (and probably never will), you need to
+Since `RejectionSamplers.jl` is not registered (and probably never will), you need to
 clone the repository by youself:
 
 ### Clone with ssh (recommended)
 
 ```bash
-git clone git@codebase.helmholtz.cloud:qedjl-applications/GPUEventGenerators.jl.git
+git clone git@github.com:QEDjl-project/RejectionSamplers.jl.git
 ```
 
 ### Clone with https
 
 ```bash
-git clone https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
+git clone https://github.com/qedjl-project/RejectionSamplers.jl.git
 ```
 
 Within the root directory of the project, you can instantiate the project by entering the
@@ -39,7 +39,7 @@ pkg> instantiate
 To use the package in your Julia code, simply import it:
 
 ```julia-repl
-using GPUEventGenerators
+using RejectionSamplers
 ```
 
 For detailed documentation on available functions and examples, please refer to the

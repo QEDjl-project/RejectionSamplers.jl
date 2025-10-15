@@ -22,7 +22,7 @@ clone the repository.
 3. Add this repo as a remote:
 
 ```bash
-git remote add upstream https://codebase.helmholtz.cloud/qedjl-applications/GPUEventGenerators.jl.git
+git remote add upstream https://github.com/qedjl-project/RejectionSamplers.jl.git
 ```
 
 This will ensure that you have two remotes in your git: `origin` and `upstream`. You will

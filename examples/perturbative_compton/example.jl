@@ -1,8 +1,8 @@
 using KernelAbstractions
 using BenchmarkTools
 using Random
-using GPUEventGenerators
-using GPUEventGenerators.PerturbativeCompton
+using RejectionSamplers
+using RejectionSamplers.PerturbativeCompton
 
 using CairoMakie
 using PairPlots
@@ -71,7 +71,7 @@ function run_example(
 
     # Generate events
     @info "Generate N = $N events with batch_size=$batch_size"
-    data = GPUEventGenerators.generate_events(
+    data = RejectionSamplers.generate_events(
         dist,
         proposal,
         max_value,

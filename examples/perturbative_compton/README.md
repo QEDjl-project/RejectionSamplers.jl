@@ -17,13 +17,13 @@ the solid angle distribution of the scattering of a single photon off an electro
 Ensure you have cloned the repository containing this example.
 
 ```bash
-git clone git@codebase.helmholtz.cloud:qedjl-applications/GPUEventGenerators.jl.git
+git clone git@github.com/qedjl-project/RejectionSamplers.jl.git
 cd <repository-directory>/examples/perturbative_compton
 ```
 
 ### 2. Initialize the Example Environment
 
-Since `GPUEventGenerators.jl` is not registered Julia packages,
+Since `RejectionSamplers.jl` is not registered Julia packages,
 you need to initialize the environment manually. Run the following command inside the `examples/perturbative_compton` directory:
 
 ```bash
@@ -32,7 +32,7 @@ julia --project=. init.jl
 
 This script will:
 
-- Activate `GPUEventGenerators.jl` in the example environment.
+- Activate `RejectionSamplers.jl` in the example environment.
 - Install all other necessary dependencies.
 - Instantiate the example environment
 

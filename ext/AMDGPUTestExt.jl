@@ -1,10 +1,10 @@
 module AMDGPUTestExt
 
-using GPUEventGenerators
-using GPUEventGenerators.TestUtils
+using RejectionSamplers
+using RejectionSamplers.TestUtils
 using AMDGPU
 
-@inline function GPUEventGenerators.TestUtils.get_test_setup(backend::ROCBackend)
+@inline function RejectionSamplers.TestUtils.get_test_setup(backend::ROCBackend)
     return TestSetup(backend, (ROCVector,), (Float32, Float64))
 end
 

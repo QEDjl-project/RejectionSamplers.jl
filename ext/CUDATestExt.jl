@@ -1,10 +1,10 @@
 module CUDATestExt
 
-using GPUEventGenerators
-using GPUEventGenerators.TestUtils
+using RejectionSamplers
+using RejectionSamplers.TestUtils
 using CUDA
 
-@inline function GPUEventGenerators.TestUtils.get_test_setup(backend::CUDABackend)
+@inline function RejectionSamplers.TestUtils.get_test_setup(backend::CUDABackend)
     backends = (
         CUDABackend(),
         CUDABackend(prefer_blocks = true),

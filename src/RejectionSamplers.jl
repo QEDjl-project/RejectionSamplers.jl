@@ -1,4 +1,4 @@
-module GPUEventGenerators
+module RejectionSamplers
 
 # utils
 export filter_scan

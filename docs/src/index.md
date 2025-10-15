@@ -1,7 +1,7 @@
 ```@meta
-CurrentModule = GPUEventGenerators
+CurrentModule = RejectionSamplers
 ```
 
-# GPUEventGenerators
+# RejectionSamplers
 
-Documentation for [GPUEventGenerators](https://github.com/QEDjl-project/GPUEventGenerators.jl).
+Documentation for [RejectionSamplers](https://github.com/qedjl-project/RejectionSamplers.jl).

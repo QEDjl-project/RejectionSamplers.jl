@@ -26,7 +26,7 @@ for out_type in DTYPES
 
                 _group[batch_size][N] = @benchmarkable @sb(
                     begin
-                        GPUEventGenerators.generate_events(
+                        RejectionSamplers.generate_events(
                             $dist,
                             $proposal,
                             $max_value,

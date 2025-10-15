@@ -6,7 +6,7 @@ using Random
 using QuadGK
 using StaticArrays
 
-using GPUEventGenerators
+using RejectionSamplers
 
 export TruncatedGaussian1D
 export TruncatedGaussian
@@ -14,7 +14,7 @@ export TruncatedGaussian
 # test target distribution
 
 struct TruncatedGaussian1D{T <: Real} <:
-    GPUEventGenerators.AbstractUnivariatTargetDistribution
+    RejectionSamplers.AbstractUnivariatTargetDistribution
     mu::T
     sig::T
     lower::T
@@ -38,13 +38,13 @@ Base.minimum(d::TruncatedGaussian1D) = d.lower
 Base.maximum(d::TruncatedGaussian1D) = d.upper
 is_in_domain(d::TruncatedGaussian1D, x) = d.lower <= x <= d.upper
 
-function GPUEventGenerators.maximum_value(d::TruncatedGaussian1D{T}) where {T}
+function RejectionSamplers.maximum_value(d::TruncatedGaussian1D{T}) where {T}
     crit_pt = min(max(d.mu, d.lower), d.upper)
     return _unsafe_compute(d, crit_pt)
 end
 
 _unsafe_compute(d::TruncatedGaussian1D, x) = normpdf(d.mu, d.sig, x)
-GPUEventGenerators._compute(d::TruncatedGaussian1D{T}, x) where {T} =
+RejectionSamplers._compute(d::TruncatedGaussian1D{T}, x) where {T} =
     is_in_domain(d, x) ? _unsafe_compute(d, x) : zero(T)
 
 
@@ -69,7 +69,7 @@ function _assert_correct_boundaries(
     return nothing
 end
 
-struct TruncatedGaussian{T <: Real, N} <: GPUEventGenerators.AbstractMultivariateTarget{N}
+struct TruncatedGaussian{T <: Real, N} <: RejectionSamplers.AbstractMultivariateTarget{N}
 
     mu::NTuple{N, T}
     sig::NTuple{N, T}
@@ -96,7 +96,7 @@ function is_in_domain(d::TruncatedGaussian{T, N}, x::SVector{N, T}) where {N, T}
 end
 
 
-function GPUEventGenerators.maximum_value(d::TruncatedGaussian{T, N}) where {T, N}
+function RejectionSamplers.maximum_value(d::TruncatedGaussian{T, N}) where {T, N}
     crit_pt = @. min(max(d.mu, d.lower), d.upper)
 
     return _unsafe_compute(d, crit_pt)
@@ -104,7 +104,7 @@ end
 
 _unsafe_compute(d::TruncatedGaussian{T, N}, x) where {N, T} =
     prod(ntuple(i -> normpdf(d.mu[i], d.sig[i], x[i]), N))
-GPUEventGenerators._compute(d::TruncatedGaussian{T}, x) where {T} =
+RejectionSamplers._compute(d::TruncatedGaussian{T}, x) where {T} =
     is_in_domain(d, x) ? _unsafe_compute(d, x) : zero(T)
 
 
