@@ -29,4 +29,4 @@ makedocs(;
     pages = ["index.md"; numbered_pages],
 )
 
-deploydocs(; repo = "github.com/qedjl-project/RejectionSamplers.jl")
+deploydocs(; repo = "github.com/QEDjl-project/RejectionSamplers.jl", push_preview = false)
