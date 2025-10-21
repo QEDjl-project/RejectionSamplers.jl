@@ -6,16 +6,8 @@ using QEDprocesses
 using QEDcore
 using StaticArrays
 
-
 export KleinNishinaDistribution
 export ComptonDistribution
-
-const ALPHA = inv(137.035999074)
-const ALPHA32 = inv(137.035999074f0)
-
-get_alpha(::Type{Float64}) = ALPHA
-get_alpha(::Type{Float32}) = ALPHA32
-
 
 ### Klein-Nishina
 
@@ -35,7 +27,7 @@ end
 function _klein_nishina_formula(omega::T, cos_theta::T, phi::T) where {T <: Real}
     om_prime = _omega_prime(omega, cos_theta)
     omp_over_om = om_prime / omega
-    prefac = pi * get_alpha(T)^2
+    prefac = pi * T(ALPHA)^2
     return prefac *
         omp_over_om^2 *
         (omp_over_om + inv(omp_over_om) - one(omega) + cos_theta^2)

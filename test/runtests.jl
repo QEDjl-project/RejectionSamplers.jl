@@ -7,9 +7,16 @@ using GPUArrays
 using KernelAbstractions
 using StaticArrays
 
+
 using RejectionSamplers
-using RejectionSamplers.TruncatedGaussians
-using RejectionSamplers.PerturbativeCompton
+
+include("patches.jl")
+
+include("../src/examples/truncated_gaussian.jl")
+include("../src/examples/perturbative_compton.jl")
+
+using .TruncatedGaussians
+using .PerturbativeCompton
 using RejectionSamplers.TestUtils
 using RejectionSamplers.Mocks
 
