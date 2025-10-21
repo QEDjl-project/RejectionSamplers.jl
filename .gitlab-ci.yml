@@ -1,158 +1,59 @@
-#
-# credits: https://gitlab.com/tkpapp/GitlabJuliaDemo.jl
-#
-
-image: julia:latest # image comes from Docker hub
-
 stages:
-  - linter
-  - test
-  - deploy
+- generate
+- run
 
-before_script:
-  # workaround for https://github.com/JuliaDocs/Documenter.jl/issues/686
-  - apt-get -qq update; apt-get -y install git
-  - julia --project=@. -e "import Pkg; Pkg.build()"
-  - julia --project=@. add_dev.jl
-
-runic:
-  stage: linter
-  script:
-    - julia --project=@runic -e 'using Pkg; Pkg.add("Runic")'
-    - julia --startup-file=no --project=@runic -e 'using Runic; exit(Runic.main(ARGS))' -- --check --diff --verbose .
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-
-unit_test_cpu:
-  stage: test
+generate_pipeline:
+  image: julia:1.10
+  stage: generate
   variables:
-    TEST_AMDGPU: "0"
-    TEST_CUDA: "0"
-    TEST_METAL: "0"
-    TEST_CPU: "1"
-    TEST_ONEAPI: "0"
-  image: "julia:1.11"
+    CI_QED_GIT_CI_TOOLS_URL: https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git
+    CI_QED_GIT_CI_TOOLS_BRANCH: dev
+    CI_QED_ENABLE_CUDA_TESTS: "ON"
+    CI_QED_ENABLE_AMDGPU_TESTS: "ON"
+    CI_QED_ENABLE_INTEG_TESTS: "OFF"
   script:
-    - julia --project=@. add_dev.jl
-    - |
-      julia --project=@. -e '
-        using Pkg
-        Pkg.build()
-        Pkg.test(coverage=true)'
-  coverage: /Test coverage (\d+\.\d+%)/
-  after_script:
-    - |
-      julia -e '
-        using Pkg
-        Pkg.add("Coverage")
-        using Coverage
-        c, t = get_summary(process_folder())
-        using Printf
-        @printf "Test coverage %.2f%%\n" 100c / t'
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
-
-unit_test_cuda:
-  stage: test
-  tags:
-    - "cuda"
-    - "x86_64"
-  interruptible: true
-  variables:
-    TEST_AMDGPU: "0"
-    TEST_CUDA: "1"
-    TEST_METAL: "0"
-    TEST_CPU: "0"
-    TEST_ONEAPI: "0"
-  image: "julia:1.11"
-  script:
-    - julia --project=@. add_dev.jl
-    - |
-      julia --project=@. -e '
-        using Pkg
-        Pkg.build()
-        Pkg.test(coverage=true)'
-  coverage: /Test coverage (\d+\.\d+%)/
-  after_script:
-    - |
-      julia -e '
-        using Pkg
-        Pkg.add("Coverage")
-        using Coverage
-        c, t = get_summary(process_folder())
-        using Printf
-        @printf "Test coverage %.2f%%\n" 100c / t'
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
-
-unit_test_amdgpu:
-  stage: test
-  tags:
-    - "rocm"
-    - "x86_64"
-  interruptible: true
-  variables:
-    TEST_AMDGPU: "1"
-    TEST_CUDA: "0"
-    TEST_METAL: "0"
-    TEST_CPU: "0"
-    TEST_ONEAPI: "0"
-  image: "rocm/dev-ubuntu-24.04:6.2.4-complete"
-  script:
-    - julia --project=@. add_dev.jl
-    - |
-      julia --project=@. -e '
-        using Pkg
-        Pkg.build()
-        Pkg.test(coverage=true)'
-  coverage: /Test coverage (\d+\.\d+%)/
-  before_script:
-    - "curl -fsSL https://install.julialang.org | sh -s -- -y -p /julia"
-    - "export PATH=/julia/bin:$PATH"
-    - "echo $PATH"
-    - "juliaup add 1.11"
-    - "juliaup default 1.11"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
-
-unit_test_metal:
-  stage: test
-  tags:
-    - "macos-medium-m1"
-  interruptible: true
-  variables:
-    TEST_AMDGPU: "0"
-    TEST_CUDA: "0"
-    TEST_METAL: "1"
-    TEST_CPU: "0"
-    TEST_ONEAPI: "0"
-  image: "ghcr.io/cirruslabs/macos-sequoia-xcode:16"
-  script:
-    - julia --project=@. add_dev.jl
-    - |
-      julia --project=@. -e '
-        using Pkg
-        Pkg.build()
-        Pkg.test(coverage=true)'
-  coverage: /Test coverage (\d+\.\d+%)/
-  before_script:
-    - brew install --cask julia
-    - julia --version
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'dev' || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
-
-pages:
-  stage: deploy
-  script:
-    - julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
-    - julia --project=docs add_dev.jl
-    - julia --project=docs --color=yes docs/make.jl
-    - mv docs/build public # move to the directory picked up by Gitlab pages
+    - apt update && apt install -y git
+    - git clone --depth 1 -b $CI_QED_GIT_CI_TOOLS_BRANCH $CI_QED_GIT_CI_TOOLS_URL /generator
+    - julia --project=/generator/.ci/CI -e 'import Pkg; Pkg.instantiate()'
+    - $(julia --project=/generator/.ci/CI /generator/.ci/CI/script/get_gitlab_ci_conf.jl)
+    - env | grep CI_QED_
+    - julia --project=/generator/.ci/CI /generator/.ci/CI/script/bootloader.jl
+      --output-cpu=cpu_pipeline.yaml
+      --output-gpu=gpu_pipeline.yaml
+      --output-verify=verify.yaml
+    - cat $CI_PROJECT_DIR/cpu_pipeline.yaml
+    - cat $CI_PROJECT_DIR/gpu_pipeline.yaml
+    - cat $CI_PROJECT_DIR/verify.yaml
   artifacts:
     paths:
-      - public
-  only:
-    - main
+      - cpu_pipeline.yaml
+      - gpu_pipeline.yaml
+      - verify.yaml
+    expire_in: 1 week
+  interruptible: true
+  tags:
+    - cpuonly
+
+cpu_tests:
+  stage: run
+  trigger:
+    include:
+      - artifact: cpu_pipeline.yaml
+        job: generate_pipeline
+    strategy: depend
+
+gpu_tests:
+  stage: run
+  trigger:
+    include:
+      - artifact: gpu_pipeline.yaml
+        job: generate_pipeline
+    strategy: depend
+
+verify_test_environment:
+  stage: run
+  trigger:
+    include:
+      - artifact: verify.yaml
+        job: generate_pipeline
+    strategy: depend

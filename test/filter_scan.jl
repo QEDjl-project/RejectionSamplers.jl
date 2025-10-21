@@ -2,6 +2,12 @@ RNG = Xoshiro(628)
 
 N = 256
 
+if VERSION < v"1.11"
+    # yarr harr
+    Random.rand(r::AbstractRNG, ::Type{X}) where {N, T, X <: NTuple{N, T}} = ntuple(_ -> rand(r, T), N)
+    Random.rand(r::AbstractRNG, ::Type{X}, n::Int) where {N, T, X <: NTuple{N, T}} = [ntuple(_ -> rand(r, T), N) for _ in 1:n]
+end
+
 # FIXME: avoid piracy
 @inline Base.zero(::Type{Tuple{}}) = ()
 @inline Base.zero(::Type{Tuple{Vararg{T, N}}}) where {T, N} =
