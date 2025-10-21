@@ -1,6 +1,5 @@
 module PerturbativeCompton
 
-
 using RejectionSamplers
 using QEDprocesses
 using QEDcore
