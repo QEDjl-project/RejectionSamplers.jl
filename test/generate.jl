@@ -43,7 +43,7 @@ function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_
 
         ## example distribution to be sampled
         dist = TruncatedGaussian(mu, sig, low, up)
-        proposal = UniformMultivariateProposal(low, up)
+        proposal = UniformProposal(low, up)
 
         ## max value
         max_value = maximum_value(dist)
