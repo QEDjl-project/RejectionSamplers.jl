@@ -1,90 +1,86 @@
 # RejectionSamplers.jl
 
-[![Main](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl)
-[![pipeline status](https://codebase.helmholtz.cloud/qedjl-applications/RejectionSamplers.jl/badges/main/pipeline.svg)](https://codebase.helmholtz.cloud/qedjl-applications/RejectionSamplers.jl/-/commits/main)
+[![Main Docs](https://img.shields.io/badge/docs-main-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/stable)
+[![Dev Docs](https://img.shields.io/badge/docs-dev-purple.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/dev)
+[![pipeline status](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/badges/dev/pipeline.svg)](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/-/commits/dev)
 
-`RejectionSamplers.jl` is a showcase project for Monte-Carlo Event Generation
-on GPU. Its main goal is the investigation of end-to-end workflows to generate events for
-scattering processes.
+**RejectionSamplers.jl** provides a flexible, hardware-agnostic framework for implementing
+and executing rejection sampling algorithms in Julia. The package separates the core
+stages of the rejection sampling process into independent, extensible interfaces, making
+it suitable for a wide range of applications, This includes simple numerical sampling, but
+also full-scale Monte-Carlo event generation.
 
-> 🚧 **Warning**: This package is under rapid development. Expect **breaking changes without notice**.
+## Key Features
+
+- **Hardware-agnostic design:** runs on both CPU and GPU backends via [KernelAbstractions.jl](https://github.com/JuliaGPU/KernelAbstractions.jl).
+- **Composable interfaces:** each stage of the rejection algorithm has its own abstract interface:
+
+  - **Proposal generation:** defines how candidate samples are drawn.
+  - **Target evaluation:** specifies the target distribution.
+  - **Probability generation:** computes acceptance probabilities.
+  - **Rejection filtering:** performs the acceptance/rejection step.
+
+- **Modular and extensible:** each stage can be specialized for specific domains, data types, or hardware architectures.
+- **Efficient parallel execution:** suitable for large-scale Monte-Carlo workloads or GPU-accelerated applications.
 
 ## Installation
 
-Since `RejectionSamplers.jl` is not registered (and probably never will), you need to
-clone the repository by youself:
+Since `RejectionSamplers.jl` is not yet registered in the General Julia registry, you can
+install it directly from GitHub.
 
-### Clone with ssh (recommended)
+### Clone with SSH (recommended)
 
 ```bash
 git clone git@github.com:QEDjl-project/RejectionSamplers.jl.git
 ```
 
-### Clone with https
+### Clone with HTTPS
 
 ```bash
-git clone https://github.com/qedjl-project/RejectionSamplers.jl.git
+git clone https://github.com/QEDjl-project/RejectionSamplers.jl.git
 ```
 
-Within the root directory of the project, you can instantiate the project by entering the
-Julia REPL with `julia --project=@.` and using `Pkg`:
-
-```julia-repl
-julia> # press ]
-pkg> instantiate
-```
-
-## Usage
-
-To use the package in your Julia code, simply import it:
-
-```julia-repl
-using RejectionSamplers
-```
-
-For detailed documentation on available functions and examples, please refer to the
-package documentation or source code.
-
-## Running Tests
-
-You can run the provided test suite to ensure that the package is functioning correctly.
-You need to open your julia REPL within the project's directory
+Then instantiate the environment:
 
 ```bash
 julia --project=@.
+julia> ] instantiate
 ```
 
-In the Julia REPL, you need to enter the pkg mode and run the tests:
+## Contributing
 
-```julia-repl
-julia> # press ]
-pkg> activate .
-pkg> test
-```
+Contributions are welcome! If you'd like to report a bug, suggest an enhancement, or contribute
+code, please feel free to open an issue or submit a pull request.
 
-This will execute the test suite and display the results, indicating whether the package functions as expected.
+To ensure consistency across the `QuantumElectrodynamics.jl` ecosystem, we encourage all contributors
+to review the [QuantumElectrodynamics.jl contribution guide](https://qedjl-project.github.io/QuantumElectrodynamics.jl/stable/dev_guide/#Development-Guide).
 
-## Formatting
+## Credits and contributors
 
-We use [JuliaFormatter.jl](https://domluna.github.io/JuliaFormatter.jl/dev/) and the [Blue
-style](https://github.com/invenia/BlueStyle) to format our code. The correct form of the
-code is checked by a CI job. To format the code manually, run the following commands:
+This work was partly funded by the Center for Advanced Systems Understanding (CASUS) that
+is financed by Germany’s Federal Ministry of Education and Research (BMBF) and by the Saxon
+Ministry for Science, Culture and Tourism (SMWK) with tax funds on the basis of the budget
+approved by the Saxon State Parliament.
 
-```bash
-# install dependencies
-julia --project=.formatting -e 'import Pkg; Pkg.instantiate()'
-# format all documents
-julia --project=.formatting .formatting/format_all.jl
-```
+The core code of the package `RejectionSamplers.jl` is developed by a small team at the Center for
+Advanced Systems Understanding ([CASUS](https://www.casus.science)) and the
+Helmholtz-Zentrum Dresden Rossendorf ([HZDR](http://www.hzdr.de)), namely
 
-## Building Docs Locally
+### Contributors
 
-Building the docs locally involves the following steps:
+- **Uwe Hernandez Acosta** (CASUS/HZDR, [u.hernandez@hzdr.de](mailto:u.hernandez@hzdr.de))
+- **Anton Reinhard** (CASUS/HZDR)
+- **Simeon Ehrig** (CASUS/HZDR)
+- **Klaus Steiniger** (CASUS/HZDR)
+- **Rene Widera** (HZDR)
 
-```bash
-julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
-julia --project=docs --color=yes docs/make.jl
-```
+### Acknowledgements
 
-The website with the documentation can then be accessed using the browser of your choice
-by opening the file `docs/build/index.html`.
+We extend our gratitude for the support received through direct and indirect funding for this project, especially
+
+- **Michael Bussmann**
+- **Tobias Dornheim**
+
+## License
+
+[MIT](LICENSE) © Uwe Hernandez Acosta
