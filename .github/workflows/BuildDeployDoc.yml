@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-    tags: '*'
+    tags: "*"
   pull_request:
 
 jobs:
