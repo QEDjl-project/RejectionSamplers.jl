@@ -4,9 +4,9 @@ module RejectionSamplers
 export filter_scan
 
 # proposal
+export propose!
 export UniformUnivariateProposal
-export UniformMultivariateProposal
-export GlobalTransformUniformProposal, LocalTransformUniformProposal
+export UniformProposal
 
 # maximum finding
 export NaiveMaxFinder, QuantileReductionMethod

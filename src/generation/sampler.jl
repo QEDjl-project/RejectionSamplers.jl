@@ -57,7 +57,7 @@ struct EventGenerator{IN_T, OUT_T, TARGET, PROPOSAL, BACKEND} <: AbstractRejecti
             OUT_T <: SUPPORTED_OUT_TYPES,
             # change to AbstractScatteringProcessDistribution if available
             TARGET <: AbstractTargetDistribution,
-            PROPOSAL <: AbstractProposal, #AbstractCoordinateProposal{OUT_T},
+            PROPOSAL <: AbstractProposalDistribution, #AbstractCoordinateProposal{OUT_T},
             BACKEND <: KernelAbstractions.Backend,
         }
 

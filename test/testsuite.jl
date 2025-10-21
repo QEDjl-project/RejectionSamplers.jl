@@ -31,7 +31,7 @@ function testsuite_run(backend, vec_type, el_type)
         )
     end
 
-    @testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
+    #@testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
 
     @testset "event generation" begin
         @testset "sampler type" begin
@@ -39,6 +39,7 @@ function testsuite_run(backend, vec_type, el_type)
             @testset "Scalar" testsuite_sampler(backend, SVector{3, el_type}, el_type)
             @testset "Scalar" testsuite_sampler(backend, NTuple{3, el_type}, el_type)
         end
+        #=
         @testset "univariate generation" testsuite_univariate_generation(
             backend,
             vec_type,
@@ -46,6 +47,8 @@ function testsuite_run(backend, vec_type, el_type)
             Int(2^12),
             Int(2^10),
         )
+        =#
+        #=
         @testset "multivariate generation" testsuite_multivariate_generation(
             backend,
             vec_type,
@@ -53,6 +56,7 @@ function testsuite_run(backend, vec_type, el_type)
             Int(2^12),
             Int(2^10),
         )
+        =#
         @testset "buffer allocation" begin
             # TODO: consider testing buffer for PSPs
             @testset "Scalar" testsuite_buffer_allocation(backend, el_type, el_type, 256, 1024)

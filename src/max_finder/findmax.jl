@@ -2,7 +2,7 @@ function Base.findmax(
         rng::AbstractRNG,
         out_dtype::Type{T},
         target::AbstractTargetDistribution,
-        proposal::AbstractProposal,
+        proposal::AbstractProposalDistribution,
         method::AbstractSampleBasedMaxFinder;
         dtype = out_dtype,
     ) where {T <: Real}

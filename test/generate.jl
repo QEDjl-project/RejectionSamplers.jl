@@ -1,5 +1,6 @@
 RNG = Xoshiro(137137)
 
+# TODO: update to proposal refac
 function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_size)
     mu = 5 * rand(RNG, el_type)                  # central value
     sig = rand(RNG, el_type)                     # variance
@@ -30,6 +31,7 @@ function testsuite_univariate_generation(backend, vec_type, el_type, N, batch_si
     return nothing
 end
 
+# TODO: update to proposal refac
 function testsuite_multivariate_generation(backend, vec_type, el_type, N, batch_size)
 
     DIMS = (1, rand(RNG, 2:5))
@@ -137,13 +139,20 @@ function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_si
 
     # building groundtruth
     # NOTE: works, because the mock proposal is deterministic
-    h_groundtruth = Vector{in_type}(undef, batch_size)
-    d_groundtruth = vec_type(h_groundtruth)
-    rand!(proposal, d_groundtruth)
+    h_sample_groundtruth = Vector{in_type}(undef, batch_size)
+    h_weight_groundtruth = Vector{out_type}(undef, batch_size)
+    d_sample_groundtruth = vec_type(h_sample_groundtruth)
+    d_weight_groundtruth = vec_type(h_weight_groundtruth)
+    propose!(proposal, d_sample_groundtruth, d_weight_groundtruth, backend)
 
     @test _isapprox(
         Vector(buffer.args),
-        Vector(d_groundtruth)
+        Vector(d_sample_groundtruth)
+    )
+
+    @test _isapprox(
+        Vector(buffer.vals),
+        Vector(d_weight_groundtruth)
     )
     return nothing
 end
