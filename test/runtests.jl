@@ -10,8 +10,6 @@ using StaticArrays
 
 using RejectionSamplers
 
-include("patches.jl")
-
 include("../src/examples/truncated_gaussian.jl")
 include("../src/examples/perturbative_compton.jl")
 
