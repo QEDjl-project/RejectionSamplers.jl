@@ -24,10 +24,6 @@ function _rand!(
     return A
 end
 
-# TODO:
-# - implement own instance of default_rng
-
-
 """
 
     default_rng(v::AbstractVector)

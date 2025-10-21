@@ -143,7 +143,7 @@ function testsuite_proposal_stage(backend, vec_type, in_type, out_type, batch_si
     h_weight_groundtruth = Vector{out_type}(undef, batch_size)
     d_sample_groundtruth = vec_type(h_sample_groundtruth)
     d_weight_groundtruth = vec_type(h_weight_groundtruth)
-    propose!(proposal, d_sample_groundtruth, d_weight_groundtruth, backend)
+    propose!(proposal, d_sample_groundtruth, d_weight_groundtruth; backend)
 
     @test _isapprox(
         Vector(buffer.args),

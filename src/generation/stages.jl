@@ -6,7 +6,7 @@ function generate_proposals!(eg::EventGenerator, batch::EventBatchBuffers)
     propose!(
         proposal,
         batch.args,
-        batch.vals,
+        batch.vals;
         backend
     )
 

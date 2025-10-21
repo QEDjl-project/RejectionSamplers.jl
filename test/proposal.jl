@@ -22,8 +22,8 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
             RNG = RejectionSamplers.default_rng(typeof(d_samples1))
             RNG2 = deepcopy(RNG)
 
-            RejectionSamplers.propose!(RNG, u, d_samples1, d_weights1)
-            RejectionSamplers.propose!(RNG2, u, d_samples2, d_weights2)
+            propose!(RNG, u, d_samples1, d_weights1; backend)
+            propose!(RNG2, u, d_samples2, d_weights2; backend)
 
             # FIXME: fix reproducibility for event generation
             @test_broken isapprox(Array(d_samples1), Array(d_samples2))
@@ -37,7 +37,7 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
 
             # FIXME: rand(RNG,Float16) could return Float16(0.0)
             # see https://discourse.julialang.org/t/output-distribution-of-rand-float32-and-rand-float64-thread-2/105184
-            RejectionSamplers.propose!(RNG, u, d_samples, d_weights)
+            propose!(RNG, u, d_samples, d_weights; backend)
 
             el_type != Float16 ? (@test !any(iszero.(Array(d_samples)))) : nothing
             @test eltype(Array(d_samples)) == el_type
@@ -80,7 +80,7 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
                 d_weights = vec_type(Vector{el_type}(undef, N))
 
                 RNG = RejectionSamplers.default_rng(vec_type)
-                RejectionSamplers.propose!(RNG, u, d_samples, d_weights)
+                propose!(RNG, u, d_samples, d_weights; backend)
 
                 @test eltype(Array(d_samples)) == SVector{dim, el_type}
                 @test all(isone.(Array(d_weights)))
