@@ -2,7 +2,9 @@ using KernelAbstractions
 using BenchmarkTools
 using Random
 using RejectionSamplers
-using RejectionSamplers.TruncatedGaussians
+
+include("truncated_gaussian.jl")
+using .TruncatedGaussians
 
 using CairoMakie
 using PairPlots

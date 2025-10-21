@@ -1,20 +1,15 @@
 using Pkg
 using Test
 using Random
-using QEDprocesses
-using QEDcore
 using GPUArrays
 using KernelAbstractions
 using StaticArrays
 
-
 using RejectionSamplers
 
-include("../src/examples/truncated_gaussian.jl")
-include("../src/examples/perturbative_compton.jl")
+include("../examples/truncated_gaussian/truncated_gaussian.jl")
 
 using .TruncatedGaussians
-using .PerturbativeCompton
 using RejectionSamplers.TestUtils
 using RejectionSamplers.Mocks
 

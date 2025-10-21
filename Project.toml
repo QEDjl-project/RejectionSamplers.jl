@@ -45,10 +45,8 @@ oneAPI = "2.0.3"
 
 [extras]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-QEDcore = "35dc0263-cb5f-4c33-a114-1d7f54ab753e"
-QEDprocesses = "46de9c38-1bb3-4547-a1ec-da24d767fdad"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Pkg", "Random", "QEDcore", "QEDprocesses"]
+test = ["Test", "Pkg", "Random"]

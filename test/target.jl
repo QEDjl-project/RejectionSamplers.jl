@@ -36,6 +36,9 @@ function testsuite_multivariate_target(backend, vec_type, el_type, N)
     end
 end
 
+#=
+TODO: Move to QEDevents.jl
+
 function _rand_compton_coords(ELTYPE, RNG, om, N)
     return [
         SVector(om, rand(RNG, ELTYPE) * 2 - one(ELTYPE), rand(RNG, ELTYPE) * 2 * pi) for
@@ -70,3 +73,4 @@ function testsuite_Compton_target(backend, vec_type, el_type, N)
         @test isapprox(Vector(d_vals), h_groundtruth)
     end
 end
+=#
