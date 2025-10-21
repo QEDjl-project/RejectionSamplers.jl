@@ -20,8 +20,6 @@ using Distributions
 using KernelAbstractions
 using Atomix
 using Random
-using QEDbase
-using QEDcore
 using GPUArrays
 using StaticArrays
 using StaticArrays: sacollect
@@ -49,12 +47,7 @@ include("max_finder/quantile_reduction.jl")
 
 include("plotting.jl")
 
-include("examples/truncated_gaussian.jl")
-include("examples/perturbative_compton.jl")
-
 include("testutils/TestUtils.jl")
-
-include("patches.jl")
 
 include("mocks/Mocks.jl")
 
