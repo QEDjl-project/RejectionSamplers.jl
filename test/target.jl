@@ -38,6 +38,7 @@ end
 
 #=
 TODO: Move to QEDevents.jl
+See issue https://github.com/QEDjl-project/QEDevents.jl/issues/68
 
 function _rand_compton_coords(ELTYPE, RNG, om, N)
     return [
