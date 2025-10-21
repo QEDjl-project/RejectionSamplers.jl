@@ -31,7 +31,7 @@ function testsuite_run(backend, vec_type, el_type)
         )
     end
 
-    #@testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
+    @testset "max finder" testsuite_max_finder_gaussian(backend, vec_type, el_type, 4)
 
     @testset "event generation" begin
         @testset "sampler type" begin
