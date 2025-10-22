@@ -94,16 +94,20 @@ end
 
 ### GPU stub (for explicit specialization)
 
-function _propose_on_device!(
+
+"""
+
+_propose_on_device!(
         rng::GPUArrays.RNG,
         proposal::AbstractProposalDistribution,
         samples::AbstractVector,
         weights::AbstractVector,
-        backend::KernelAbstractions.GPU,
+        backend::KernelAbstractions.Backend,
     )
-    throw(MethodError("_propose_on_device! not implemented for GPU backend"))
-end
 
+The on-device version of `_propose!`. This should be extended, if device specific implementations for `_propose!` are needed.
+"""
+function _propose_on_device end
 
 ### Specializations
 
