@@ -1,60 +1,33 @@
 stages:
-- generate
-- run
+- test
 
-generate_pipeline:
-  image: julia:1.10
-  stage: generate
+unit_test_julia_cpu_1_12:
   variables:
-    CI_QED_GIT_CI_TOOLS_URL: https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git
-    CI_QED_GIT_CI_TOOLS_BRANCH: dev
-    CI_QED_ENABLE_CUDA_TESTS: "ON"
-    CI_QED_ENABLE_AMDGPU_TESTS: "ON"
-    CI_QED_ENABLE_INTEG_TESTS: "OFF"
+    CI_QED_TEST_METAL: "0"
+    CI_QED_DEV_PKG_VERSION: "0.1.0"
+    CI_QED_TEST_CPU: "1"
+    CI_QED_DEV_PKG_NAME: "RejectionSamplers"
+    CI_QED_DEV_PKG_PATH: "/builds/hzdr/qedjl-project/RejectionSamplers-jl"
+    CI_QED_TEST_TYPE: "unit"
+    CI_QED_TEST_CUDA: "0"
+    CI_QED_TEST_ONEAPI: "0"
+    CI_QED_TEST_AMDGPU: "0"
+  image: "julia:1.12"
   script:
-    - apt update && apt install -y git
-    - git clone --depth 1 -b $CI_QED_GIT_CI_TOOLS_BRANCH $CI_QED_GIT_CI_TOOLS_URL /generator
-    - julia --project=/generator/.ci/CI -e 'import Pkg; Pkg.instantiate()'
-    - $(julia --project=/generator/.ci/CI /generator/.ci/CI/script/get_gitlab_ci_conf.jl)
-    - env | grep CI_QED_
-    - julia --project=/generator/.ci/CI /generator/.ci/CI/script/bootloader.jl
-      --output-cpu=cpu_pipeline.yaml
-      --output-gpu=gpu_pipeline.yaml
-      --output-verify=verify.yaml
-    - cat $CI_PROJECT_DIR/cpu_pipeline.yaml
-    - cat $CI_PROJECT_DIR/gpu_pipeline.yaml
-    - cat $CI_PROJECT_DIR/verify.yaml
-  artifacts:
-    paths:
-      - cpu_pipeline.yaml
-      - gpu_pipeline.yaml
-      - verify.yaml
-    expire_in: 1 week
-  interruptible: true
+    - "env | grep CI_QED_"
+    - "apt update && apt install -y git"
+    - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
+    - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
+    - "julia --project=/tmp/integration_test_tools/.ci/CI/ /tmp/integration_test_tools/.ci/CI/script/setup_dev_env.jl ${CI_PROJECT_DIR}"
+    - "julia --project=. -e 'import Pkg; Pkg.instantiate()'"
+    - "julia --project=. -e 'import Pkg; Pkg.test(; coverage = true)'"
+    - julia --project=@coverage -e 'import Pkg; Pkg.add("Coverage"); using Coverage; LCOV.writefile("coverage-lcov.info", process_folder())'
+    - curl -Os https://cli.codecov.io/latest/linux/codecov
+    - chmod +x codecov
+    - julia create_codecov_job.jl
+    - $(julia create_codecov_job.jl)
+  stage: "unit-test"
   tags:
-    - cpuonly
-    - x86_64
-
-cpu_tests:
-  stage: run
-  trigger:
-    include:
-      - artifact: cpu_pipeline.yaml
-        job: generate_pipeline
-    strategy: depend
-
-gpu_tests:
-  stage: run
-  trigger:
-    include:
-      - artifact: gpu_pipeline.yaml
-        job: generate_pipeline
-    strategy: depend
-
-verify_test_environment:
-  stage: run
-  trigger:
-    include:
-      - artifact: verify.yaml
-        job: generate_pipeline
-    strategy: depend
+    - "cpuonly"
+    - "x86_64"
+  interruptible: true
