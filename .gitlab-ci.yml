@@ -25,6 +25,8 @@ unit_test_julia_cpu_1_12:
     - curl -Os https://cli.codecov.io/latest/linux/codecov
     - chmod +x codecov
     - julia create_codecov_job.jl
+    - unset CI
+    - unset GITLAB_CI
     - $(julia create_codecov_job.jl)
   stage: "test"
   tags:
