@@ -1,22 +1,23 @@
 using Pkg
 using Test
 using Random
-using QEDprocesses
-using QEDcore
 using GPUArrays
 using KernelAbstractions
 using StaticArrays
 
 using RejectionSamplers
-using RejectionSamplers.TruncatedGaussians
-using RejectionSamplers.PerturbativeCompton
+
+include("../examples/truncated_gaussian/truncated_gaussian.jl")
+include("utils.jl")
+
+using .TruncatedGaussians
 using RejectionSamplers.TestUtils
 using RejectionSamplers.Mocks
 
 SETUPS = TestSetup[]
 
 # check if we test with CPU
-cpu_tests = tryparse(Bool, get(ENV, "TEST_CPU", "1"))
+cpu_tests = _is_test_platform_active(["CI_QED_TEST_CPU", "TEST_CPU"], true)
 if cpu_tests
     push!(SETUPS, get_test_setup(CPU()))
     @info "Testing with CPU backend"
@@ -25,7 +26,7 @@ else
 end
 
 # check if we test with Metal
-metal_tests = tryparse(Bool, get(ENV, "TEST_METAL", "0"))
+metal_tests = _is_test_platform_active(["CI_QED_TEST_METAL", "TEST_METAL"], false)
 metal_installed = "Metal" in keys(Pkg.project().dependencies)
 if metal_tests
 
@@ -47,7 +48,7 @@ else
 end
 
 # check if we test with CUDA
-cuda_tests = tryparse(Bool, get(ENV, "TEST_CUDA", "0"))
+cuda_tests = _is_test_platform_active(["CI_QED_TEST_CUDA", "TEST_CUDA"], false)
 cuda_installed = "CUDA" in keys(Pkg.project().dependencies)
 if cuda_tests
 
@@ -69,7 +70,7 @@ else
 end
 
 # check if we test with oneAPI
-oneapi_tests = tryparse(Bool, get(ENV, "TEST_ONEAPI", "0"))
+oneapi_tests = _is_test_platform_active(["CI_QED_TEST_ONEAPI", "TEST_ONEAPI"], false)
 oneapi_installed = "oneAPI" in keys(Pkg.project().dependencies)
 if oneapi_tests
 
@@ -91,7 +92,7 @@ else
 end
 
 # check if we test with AMDGPU
-amdgpu_tests = tryparse(Bool, get(ENV, "TEST_AMDGPU", "0"))
+amdgpu_tests = _is_test_platform_active(["CI_QED_TEST_AMDGPU", "TEST_AMDGPU"], false)
 amdgpu_installed = "AMDGPU" in keys(Pkg.project().dependencies)
 if amdgpu_tests
 

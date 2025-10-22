@@ -8,7 +8,9 @@ using QuadGK
 const RNG = MersenneTwister(1234)
 
 using RejectionSamplers
-using RejectionSamplers.TruncatedGaussians
+
+include("truncated_gaussian.jl")
+using .TruncatedGaussians
 
 using CairoMakie
 
@@ -114,7 +116,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
     #run_example(CPU(), Float32)
     run_example(CPU(), Float64)
 
-    # coment this out, if you would like to run the example on different backends
+    # comment this out, if you would like to run the example on different backends
 
     #using Metal
     #run_example(MetalBackend(), Float16; N = Int(2^22), partial_unweighting = false)

@@ -2,7 +2,9 @@ using KernelAbstractions
 using BenchmarkTools
 using Random
 using RejectionSamplers
-using RejectionSamplers.PerturbativeCompton
+
+include("perturbative_compton.jl")
+using .PerturbativeCompton
 
 using CairoMakie
 using PairPlots

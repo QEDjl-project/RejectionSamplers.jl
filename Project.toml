@@ -1,21 +1,13 @@
 name = "RejectionSamplers"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-authors = [
-  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
-  "Simeon Ehrig",
-  "Anton Reinhard",
-  "René Widera",
-]
 version = "0.1.0"
+authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
 
 [deps]
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
-QEDbase = "10e22c08-3ccb-4172-bfcf-7d7aa3d04d93"
-QEDcore = "35dc0263-cb5f-4c33-a114-1d7f54ab753e"
-QEDprocesses = "46de9c38-1bb3-4547-a1ec-da24d767fdad"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
@@ -24,9 +16,9 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 [weakdeps]
 AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
-Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
 
 [extensions]
 AMDGPUTestExt = "AMDGPU"
@@ -43,9 +35,6 @@ Distributions = "0.25.119"
 GPUArrays = "11.2.2"
 KernelAbstractions = "0.9.34"
 Metal = "1.6.4"
-QEDbase = "0.5.0"
-QEDcore = "0.4.0"
-QEDprocesses = "0.5.0"
 QuadGK = "2.11.2"
 Random = "1.10"
 StaticArrays = "1.9.14"
