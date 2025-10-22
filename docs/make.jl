@@ -43,7 +43,6 @@ try
         sitename = "RejectionSamplers.jl",
         format = Documenter.HTML(;
             prettyurls = get(ENV, "CI", "false") == "true",
-            #repolink = "https://github.com/qedjl-project/RejectionSamplers.jl/blob/{commit}{path}#{line}",
             canonical = "https://qedjl-project.github.io/RejectionSamplers.jl",
             assets = String[],
         ),
