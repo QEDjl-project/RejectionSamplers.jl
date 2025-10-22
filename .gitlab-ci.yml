@@ -15,6 +15,9 @@ unit_test_julia_cpu_1_12:
   image: "julia:1.12"
   script:
     - "env | grep CI_QED_"
+    - env | grep CI_ | grep -v CI_QED_
+    - env | GITLAB_
+    - exit 0
     - "apt update && apt install -y git"
     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
     - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
