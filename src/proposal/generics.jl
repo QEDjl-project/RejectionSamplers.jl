@@ -68,5 +68,6 @@ function propose!(
         rng = default_rng(SV),
         backend = get_backend(samples),
     ) where {Ts, Tw, SV <: AbstractVector{Ts}}
-    return propose!(rng, proposal, samples, weights; backend)
+    propose!(rng, proposal, samples, weights; backend)
+    return nothing
 end
