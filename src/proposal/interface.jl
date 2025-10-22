@@ -71,7 +71,8 @@ function _propose!(
         samples::AbstractVector, weights::AbstractVector,
         backend::KernelAbstractions.Backend
     )
-    return _propose_on_device!(rng, proposal, samples, weights, backend)
+    _propose_on_device!(rng, proposal, samples, weights, backend)
+    return nothing
 end
 
 

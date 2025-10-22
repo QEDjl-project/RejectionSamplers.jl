@@ -27,7 +27,8 @@ function _propose!(
 
     # fallback on Distributions.Uniform (which works on GPU)
     rand!(rng, proposal.dist, sample_dest)
-    return fill!(weight_dest, one(T))
+    fill!(weight_dest, one(T))
+    return nothing
 end
 
 ### uniform multivariate proposal

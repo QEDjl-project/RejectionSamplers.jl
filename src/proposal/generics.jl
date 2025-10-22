@@ -45,7 +45,8 @@ function propose!(
         )
     )
 
-    return _propose!(rng, proposal, samples, weights, backend)
+    _propose!(rng, proposal, samples, weights, backend)
+    return nothing
 end
 
 
