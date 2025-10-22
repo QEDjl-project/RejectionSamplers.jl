@@ -62,5 +62,6 @@ function RejectionSamplers._propose!(
     n = length(sample_dest)
     steps = T(2 / (n + 1))
     map!(i -> ntuple(x -> -1 + i * steps, D), sample_dest, 1:n)
-    return weight_dest .= KernelAbstractions.ones(backend, T, n)
+    weight_dest .= KernelAbstractions.ones(backend, T, n)
+    return nothing
 end
