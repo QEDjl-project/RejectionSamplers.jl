@@ -33,6 +33,7 @@ generate_pipeline:
   interruptible: true
   tags:
     - cpuonly
+    - x86_64
 
 cpu_tests:
   stage: run
