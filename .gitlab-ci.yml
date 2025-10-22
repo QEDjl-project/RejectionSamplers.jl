@@ -14,9 +14,8 @@ unit_test_julia_cpu_1_12:
     CI_QED_TEST_AMDGPU: "0"
   image: "julia:1.12"
   script:
+    - export WURST=$CI_COMMIT_REF_NAME
     - "env | grep CI_QED_"
-    - env | grep CI_ | grep -v CI_QED_
-    - env | GITLAB_
     - exit 0
     - "apt update && apt install -y git"
     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
@@ -27,6 +26,10 @@ unit_test_julia_cpu_1_12:
     - julia --project=@coverage -e 'import Pkg; Pkg.add("Coverage"); using Coverage; LCOV.writefile("coverage-lcov.info", process_folder())'
     - curl -Os https://cli.codecov.io/latest/linux/codecov
     - chmod +x codecov
+    - for v in $(env | grep CI_ | grep -v CI_QED_); do unset $v; done
+    - for v in $(env | grep GITLAB_); do unset $v; done
+    - env | grep CI_ | grep -v CI_QED_
+    - env | grep GITLAB_
     - julia create_codecov_job.jl
     - $(julia create_codecov_job.jl)
     - julia create_codecov_job2.jl

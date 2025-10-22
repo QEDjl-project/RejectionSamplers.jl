@@ -1,10 +1,10 @@
 if abspath(PROGRAM_FILE) == @__FILE__
-    if !haskey(ENV, "CI_COMMIT_REF_NAME")
-        @error "Environment variable CI_COMMIT_REF_NAME is not set."
+    if !haskey(ENV, "WURST")
+        @error "Environment variable WURST is not set."
         exit(1)
     end
 
-    ci_commit_ref_name = ENV["CI_COMMIT_REF_NAME"]
+    ci_commit_ref_name = ENV["WURST"]
 
     user = ""
     branch = ""
