@@ -51,8 +51,6 @@ if abspath(PROGRAM_FILE) == @__FILE__
 
     commit_sha=strip(read(`git rev-parse HEAD`, String))
 
-    for action in ["create-commit", "create-report", "do-upload"]
-        codecov_cmd = "./codecov -v $(action) --git-service github --branch $(user):$(branch) --sha $commit_sha $pr_str"
-        println(codecov_cmd)
-    end
+    codecov_cmd = "./codecov -v --git-service github --branch $(user):$(branch) --sha $commit_sha $pr_str"
+    println(codecov_cmd)
 end
