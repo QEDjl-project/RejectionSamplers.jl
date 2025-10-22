@@ -6,7 +6,7 @@
 Variate form where arguments are `SVector`s of scalars representing coordinates.
 
 !!! note
-    For univariate proposals, use [`Distributions.Univariate`](@ref).
+    For univariate proposals, use `Distributions.Univariate`
 """
 abstract type CoordinateVariate <: Distributions.VariateForm end
 
