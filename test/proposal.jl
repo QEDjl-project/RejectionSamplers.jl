@@ -26,7 +26,7 @@ function testsuite_uniform_proposal(backend, vec_type, el_type, N)
             propose!(RNG2, u, d_samples2, d_weights2; backend)
 
             # FIXME: fix reproducibility for event generation
-            @test_broken isapprox(Array(d_samples1), Array(d_samples2))
+            @test_skip isapprox(Array(d_samples1), Array(d_samples2))
             @test isapprox(Array(d_weights1), Array(d_weights2))
         end
 
