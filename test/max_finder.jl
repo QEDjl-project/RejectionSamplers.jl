@@ -18,7 +18,7 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
 
 
     dist = TruncatedGaussian(mu, sig, dom...)
-    proposal = UniformMultivariateProposal(dom...)
+    proposal = UniformProposal(dom...)
     groundtruth = maximum_value(dist)
 
     @testset "Naive max finder" begin
@@ -56,7 +56,8 @@ function testsuite_max_finder_gaussian(backend, vec_type, out_dtype, dim)
             if !(out_dtype == Float16)
                 # groundtruth
                 samples = Vector{SVector{dim, out_dtype}}(undef, n)
-                RejectionSamplers._rand!(RNG, proposal, samples)
+                weights = Vector{out_dtype}(undef, n)
+                propose!(RNG, proposal, samples, weights; backend)
                 weights = sort(RejectionSamplers._compute.(dist, samples))
                 residual_weights = @. max(1, weights / max_val)
                 idx_last_unit_weight =

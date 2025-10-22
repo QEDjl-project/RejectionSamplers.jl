@@ -1,7 +1,15 @@
 function generate_proposals!(eg::EventGenerator, batch::EventBatchBuffers)
     proposal = proposal_distribution(eg)
-    # TODO: update by using eg directly
-    rand!(proposal, batch.args)
+    backend = get_backend(eg)
+
+    # propagate rng from top
+    propose!(
+        proposal,
+        batch.args,
+        batch.vals;
+        backend
+    )
+
     return nothing
 end
 
@@ -16,13 +24,14 @@ function evaluate_target!(eg::EventGenerator, batch::EventBatchBuffers)
     backend = get_backend(eg)
 
     # TODO: update by using eg directly
-    #    _compute!(dist, batch.vals, batch.args)
+    #    _compute!(dist, batch.vals, batch.args, backend)
     _compute_kernel(backend, 32)(
         batch.vals,
         target_dist,
         batch.args,
         ndrange = size(batch.vals)
     )
+
     return nothing
 end
 

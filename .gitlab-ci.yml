@@ -1,6 +1,6 @@
 stages:
-- generate
-- run
+  - generate
+  - run
 
 generate_pipeline:
   image: julia:1.10

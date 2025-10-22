@@ -10,6 +10,7 @@ function gpu_rand(
     return TT(ntuple(x -> GPUArrays.gpu_rand(T, threadid, randstate), N))
 end
 
+# TODO: is this necessary
 function _rand!(
         rng::GPUArrays.RNG,
         A::GPUArrays.AnyGPUArray{TT},
@@ -22,10 +23,6 @@ function _rand!(
     rand!(get_backend(A))(A, rng.state; ndrange = size(A))
     return A
 end
-
-# TODO:
-# - implement own instance of default_rng
-
 
 """
 
