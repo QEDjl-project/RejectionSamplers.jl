@@ -45,3 +45,7 @@ function generate_events(
 
     return out_args, out_vals
 end
+
+function generate_the_answer()
+    return 42
+end
