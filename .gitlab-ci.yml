@@ -26,7 +26,7 @@ unit_test_julia_cpu_1_12:
     - chmod +x codecov
     - julia create_codecov_job.jl
     - $(julia create_codecov_job.jl)
-  stage: "unit-test"
+  stage: "test"
   tags:
     - "cpuonly"
     - "x86_64"
