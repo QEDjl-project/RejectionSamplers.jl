@@ -16,7 +16,6 @@ unit_test_julia_cpu_1_12:
   script:
     - export WURST=$CI_COMMIT_REF_NAME
     - "env | grep CI_QED_"
-    - exit 0
     - "apt update && apt install -y git"
     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
     - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
