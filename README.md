@@ -26,27 +26,34 @@ also full-scale Monte-Carlo event generation.
 
 ## Installation
 
-Since `RejectionSamplers.jl` is not yet registered in the General Julia registry, you can
-install it directly from GitHub.
+`RejectionSamplers.jl` can be installed via Julia’s package manager:
 
-### Clone with SSH (recommended)
-
-```bash
-git clone git@github.com:QEDjl-project/RejectionSamplers.jl.git
+```julia
+julia> import Pkg
+julia> Pkg.add("RejectionSamplers")
 ```
 
-### Clone with HTTPS
+You can also use the Pkg REPL mode by pressing `]` and then running:
+
+```
+pkg> add RejectionSamplers
+```
+
+If you'd like to use the development version instead:
+
+```julia
+pkg> add RejectionSamplers#dev
+```
+
+Or clone manually and instantiate:
 
 ```bash
 git clone https://github.com/QEDjl-project/RejectionSamplers.jl.git
-```
-
-Then instantiate the environment:
-
-```bash
+cd RejectionSamplers.jl
 julia --project=@.
 julia> ] instantiate
 ```
+
 
 ## Contributing
 
