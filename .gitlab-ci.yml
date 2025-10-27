@@ -14,6 +14,8 @@ unit_test_julia_cpu_1_12:
     CI_QED_TEST_AMDGPU: "0"
   image: "julia:1.12"
   script:
+    - which julia
+    - exit 0
     - "apt update && apt install -y git"
     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
     - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
