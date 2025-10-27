@@ -1,42 +1,53 @@
 stages:
 - test
 
-unit_test_julia_cpu_1_12:
-  variables:
-    CI_QED_TEST_METAL: "0"
-    CI_QED_DEV_PKG_VERSION: "0.1.0"
-    CI_QED_TEST_CPU: "1"
-    CI_QED_DEV_PKG_NAME: "RejectionSamplers"
-    CI_QED_DEV_PKG_PATH: "/builds/hzdr/qedjl-project/RejectionSamplers-jl"
-    CI_QED_TEST_TYPE: "unit"
-    CI_QED_TEST_CUDA: "0"
-    CI_QED_TEST_ONEAPI: "0"
-    CI_QED_TEST_AMDGPU: "0"
+unset_vars:
   image: "julia:1.12"
   script:
     - export WURST=$CI_COMMIT_REF_NAME
     - "env | grep CI_QED_"
-    - "apt update && apt install -y git"
-    - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
-    - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
-    - "julia --project=/tmp/integration_test_tools/.ci/CI/ /tmp/integration_test_tools/.ci/CI/script/setup_dev_env.jl ${CI_PROJECT_DIR}"
-    - "julia --project=. -e 'import Pkg; Pkg.instantiate()'"
-    - "julia --project=. -e 'import Pkg; Pkg.test(; coverage = true)'"
-    - julia --project=@coverage -e 'import Pkg; Pkg.add("Coverage"); using Coverage; LCOV.writefile("coverage-lcov.info", process_folder())'
-    - curl -Os https://cli.codecov.io/latest/linux/codecov
-    - chmod +x codecov
-    - for v in $(env | grep CI_ | grep -v CI_QED_); do unset $v; done
-    - for v in $(env | grep GITLAB_); do unset $v; done
+    - for v in $(env | grep CI_ | grep -v CI_QED_); echo $v; do unset $v; done
+    - for v in $(env | grep GITLAB_); do echo $v; unset $v; done
     - env | grep CI_ | grep -v CI_QED_
     - env | grep GITLAB_
-    - julia create_codecov_job.jl
-    - $(julia create_codecov_job.jl)
-    - julia create_codecov_job2.jl
-    - $(julia create_codecov_job2.jl)
-    - julia create_codecov_job3.jl
-    - $(julia create_codecov_job3.jl)
   stage: "test"
-  tags:
-    - "cpuonly"
-    - "x86_64"
-  interruptible: true
+
+# unit_test_julia_cpu_1_12:
+#   variables:
+#     CI_QED_TEST_METAL: "0"
+#     CI_QED_DEV_PKG_VERSION: "0.1.0"
+#     CI_QED_TEST_CPU: "1"
+#     CI_QED_DEV_PKG_NAME: "RejectionSamplers"
+#     CI_QED_DEV_PKG_PATH: "/builds/hzdr/qedjl-project/RejectionSamplers-jl"
+#     CI_QED_TEST_TYPE: "unit"
+#     CI_QED_TEST_CUDA: "0"
+#     CI_QED_TEST_ONEAPI: "0"
+#     CI_QED_TEST_AMDGPU: "0"
+#   image: "julia:1.12"
+#   script:
+#     - export WURST=$CI_COMMIT_REF_NAME
+#     - "env | grep CI_QED_"
+#     - "apt update && apt install -y git"
+#     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
+#     - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
+#     - "julia --project=/tmp/integration_test_tools/.ci/CI/ /tmp/integration_test_tools/.ci/CI/script/setup_dev_env.jl ${CI_PROJECT_DIR}"
+#     - "julia --project=. -e 'import Pkg; Pkg.instantiate()'"
+#     - "julia --project=. -e 'import Pkg; Pkg.test(; coverage = true)'"
+#     - julia --project=@coverage -e 'import Pkg; Pkg.add("Coverage"); using Coverage; LCOV.writefile("coverage-lcov.info", process_folder())'
+#     - curl -Os https://cli.codecov.io/latest/linux/codecov
+#     - chmod +x codecov
+#     - for v in $(env | grep CI_ | grep -v CI_QED_); do unset $v; done
+#     - for v in $(env | grep GITLAB_); do unset $v; done
+#     - env | grep CI_ | grep -v CI_QED_
+#     - env | grep GITLAB_
+#     - julia create_codecov_job.jl
+#     - $(julia create_codecov_job.jl)
+#     - julia create_codecov_job2.jl
+#     - $(julia create_codecov_job2.jl)
+#     - julia create_codecov_job3.jl
+#     - $(julia create_codecov_job3.jl)
+#   stage: "test"
+#   tags:
+#     - "cpuonly"
+#     - "x86_64"
+#   interruptible: true
