@@ -14,12 +14,6 @@ unit_test_julia_cpu_1_12:
     CI_QED_TEST_AMDGPU: "0"
   image: "julia:1.12"
   script:
-    - pwd
-    - "apt update && apt install -y git"
-    - export GIT_COMMIT_SHA=$(git rev-parse HEAD)
-    - env -i GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash -c "pwd"
-    - env -i GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash -c "cd $CI_PROJECT_PATH; pwd"
-    - exit 0
     - "apt update && apt install -y git"
     - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
     - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
@@ -31,10 +25,10 @@ unit_test_julia_cpu_1_12:
     - chmod +x codecov
     - export GIT_COMMIT_SHA=$(git rev-parse HEAD)
     - ./codecov --version
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov --version"
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v create-commit --git-service github --sha $GIT_COMMIT_SHA --pr 14"
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA"
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov --version"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v create-commit --git-service github --sha $GIT_COMMIT_SHA --pr 14 --slug SimeonEhrig/RejectionSamplers.jl"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14"
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job.jl
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc $(julia create_codecov_job.jl)
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job2.jl
