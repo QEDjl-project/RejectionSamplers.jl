@@ -27,8 +27,8 @@ unit_test_julia_cpu_1_12:
     - ./codecov --version
     - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov --version"
     - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v create-commit --git-service github --sha $GIT_COMMIT_SHA --pr 14 --slug SimeonEhrig/RejectionSamplers.jl"
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA"
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA --pr 14 --slug SimeonEhrig/RejectionSamplers.jl"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14 --slug SimeonEhrig/RejectionSamplers.jl"
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job.jl
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc $(julia create_codecov_job.jl)
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job2.jl
