@@ -11,6 +11,10 @@ unset_vars:
     - env | grep CI_ | grep -v CI_QED_
     - env | grep GITLAB_
   stage: "test"
+  tags:
+    - "cpuonly"
+    - "x86_64"
+  interruptible: true
 
 # unit_test_julia_cpu_1_12:
 #   variables:
