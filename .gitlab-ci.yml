@@ -16,7 +16,7 @@ unset_vars:
   script:
     - export WURST=$CI_COMMIT_REF_NAME
     - env | grep CI_QED_
-    - for v in $(env | grep CI_ | grep -v CI_QED_); echo $v; do unset $v; done
+    - for v in $(env | grep CI_ | grep -v CI_QED_); do echo $v; unset $v; done
     - for v in $(env | grep GITLAB_); do echo $v; unset $v; done
     - env | grep CI_ | grep -v CI_QED_
     - env | grep GITLAB_
