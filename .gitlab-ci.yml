@@ -25,10 +25,10 @@ unit_test_julia_cpu_1_12:
     - chmod +x codecov
     - export GIT_COMMIT_SHA=$(git rev-parse HEAD)
     - ./codecov --version
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c ./codecov --version
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c ./codecov -v create-commit --git-service github --sha $GIT_COMMIT_SHA --pr 14
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c ./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA
-    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c ./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov --version"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v create-commit --git-service github --sha $GIT_COMMIT_SHA --pr 14"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v create-report --git-service github --sha $GIT_COMMIT_SHA"
+    - env -i CODECOV_TOKEN=$CODECOV_TOKEN GIT_COMMIT_SHA=$GIT_COMMIT_SHA bash --noprofile --norc -c "./codecov -v do-upload  --git-service github --sha $GIT_COMMIT_SHA --pr 14"
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job.jl
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc $(julia create_codecov_job.jl)
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job2.jl
