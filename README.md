@@ -3,6 +3,7 @@
 [![Doc Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/stable)
 [![Doc Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/dev)
 [![pipeline status](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/badges/dev/pipeline.svg)](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/-/commits/dev)
+[![codecov](https://codecov.io/gh/QEDjl-project/RejectionSamplers.jl/graph/badge.svg?token=46ATK29J1F)](https://codecov.io/gh/QEDjl-project/RejectionSamplers.jl)
 [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
 
 **RejectionSamplers.jl** provides a flexible, hardware-agnostic framework for implementing
