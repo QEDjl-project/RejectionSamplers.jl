@@ -1,7 +1,7 @@
 stages:
-- test
+- unit-test
 
-unit_test_julia_cpu_1_12:
+hand_written_unit_test_julia_cpu_1_12:
   variables:
     CI_QED_TEST_METAL: "0"
     CI_QED_DEV_PKG_VERSION: "0.1.0"
@@ -35,7 +35,66 @@ unit_test_julia_cpu_1_12:
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc $(julia create_codecov_job2.jl)
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc julia create_codecov_job3.jl
     # - env -i WURST=$CI_COMMIT_REF_NAME bash --noprofile --norc $(julia create_codecov_job3.jl)
-  stage: "test"
+  stage: "unit-test"
+  tags:
+    - "cpuonly"
+    - "x86_64"
+  interruptible: true
+
+unit_test_julia_cpu_1_12:
+  variables:
+    CI_QED_TEST_METAL: "0"
+    CI_QED_DEV_PKG_VERSION: "0.1.0"
+    CI_QED_TEST_CPU: "1"
+    CI_QED_DEV_PKG_NAME: "RejectionSamplers"
+    CI_QED_DEV_PKG_PATH: "/builds/hzdr/qedjl-project/RejectionSamplers-jl"
+    CI_QED_TEST_TYPE: "unit"
+    CI_QED_TEST_CUDA: "0"
+    CI_QED_TEST_ONEAPI: "0"
+    CI_QED_TEST_AMDGPU: "0"
+  image: "julia:1.12"
+  script:
+    - "env | grep CI_QED_"
+    - "apt update && apt install -y git"
+    - "git clone --depth 1 -b dev https://github.com/QEDjl-project/QuantumElectrodynamics.jl.git /tmp/integration_test_tools/"
+    - "julia --project=/tmp/integration_test_tools/.ci/CI/ -e 'import Pkg; Pkg.instantiate()'"
+    - "julia --project=/tmp/integration_test_tools/.ci/CI/ /tmp/integration_test_tools/.ci/CI/script/setup_dev_env.jl ${CI_PROJECT_DIR}"
+    - "julia --project=. -e 'import Pkg; Pkg.instantiate()'"
+    - "julia --project=. -e 'import Pkg; Pkg.test(; coverage = true)'"
+    - |-
+      julia --project=@coverage -e 'import Pkg; Pkg.add("Coverage"); using Coverage; LCOV.writefile("coverage-lcov.info", process_folder())'
+    - |-
+      if [[ $CI_RUNNER_EXECUTABLE_ARCH == "linux/amd64" ]]; then
+        curl -Os https://cli.codecov.io/latest/linux/codecov
+        chmod +x codecov
+        mv ./codecov /usr/local/bin/
+      else
+        apt update && apt install -y python3-pip
+        pip3 install --break-system-packages codecov-cli
+      fi
+    - "codecov --version"
+    - export GIT_COMMIT_SHA=$(git rev-parse HEAD)
+    - |-
+      env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "codecov -v
+                  create-commit
+                  --git-service github
+                  --branch testCodeCove2
+                  --sha $GIT_COMMIT_SHA --pr 26
+                  --slug QEDjl-project/RejectionSamplers"
+    - |-
+      env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "codecov -v
+                  create-report
+                  --git-service github
+                  --sha $GIT_COMMIT_SHA --pr 26
+                  --slug QEDjl-project/RejectionSamplers"
+    - |-
+      env -i CODECOV_TOKEN=$CODECOV_TOKEN bash -c "codecov -v
+                  do-upload
+                  --git-service github
+                  --branch testCodeCove2
+                  --sha $GIT_COMMIT_SHA --pr 26
+                  --slug QEDjl-project/RejectionSamplers"
+  stage: "unit-test"
   tags:
     - "cpuonly"
     - "x86_64"
