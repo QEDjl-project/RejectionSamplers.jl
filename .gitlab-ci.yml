@@ -11,6 +11,7 @@ generate_pipeline:
     CI_QED_ENABLE_CUDA_TESTS: "ON"
     CI_QED_ENABLE_AMDGPU_TESTS: "ON"
     CI_QED_ENABLE_INTEG_TESTS: "OFF"
+    CI_QED_IS_CODE_COVERAGE: "ON"
   script:
     - apt update && apt install -y git
     - git clone --depth 1 -b $CI_QED_GIT_CI_TOOLS_BRANCH $CI_QED_GIT_CI_TOOLS_URL /generator
