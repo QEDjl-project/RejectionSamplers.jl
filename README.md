@@ -3,6 +3,7 @@
 [![Doc Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/stable)
 [![Doc Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://qedjl-project.github.io/RejectionSamplers.jl/dev)
 [![pipeline status](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/badges/dev/pipeline.svg)](https://gitlab.com/hzdr/qedjl-project/RejectionSamplers-jl/-/commits/dev)
+[![codecov](https://codecov.io/gh/QEDjl-project/RejectionSamplers.jl/graph/badge.svg?token=46ATK29J1F)](https://codecov.io/gh/QEDjl-project/RejectionSamplers.jl)
 [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
 
 **RejectionSamplers.jl** provides a flexible, hardware-agnostic framework for implementing
@@ -26,27 +27,34 @@ also full-scale Monte-Carlo event generation.
 
 ## Installation
 
-Since `RejectionSamplers.jl` is not yet registered in the General Julia registry, you can
-install it directly from GitHub.
+`RejectionSamplers.jl` can be installed via Julia’s package manager:
 
-### Clone with SSH (recommended)
-
-```bash
-git clone git@github.com:QEDjl-project/RejectionSamplers.jl.git
+```julia
+julia> import Pkg
+julia> Pkg.add("RejectionSamplers")
 ```
 
-### Clone with HTTPS
+You can also use the Pkg REPL mode by pressing `]` and then running:
+
+```
+pkg> add RejectionSamplers
+```
+
+If you'd like to use the development version instead:
+
+```julia
+pkg> add RejectionSamplers#dev
+```
+
+Or clone manually and instantiate:
 
 ```bash
 git clone https://github.com/QEDjl-project/RejectionSamplers.jl.git
-```
-
-Then instantiate the environment:
-
-```bash
+cd RejectionSamplers.jl
 julia --project=@.
 julia> ] instantiate
 ```
+
 
 ## Contributing
 
