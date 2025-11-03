@@ -1,6 +1,6 @@
 name = "RejectionSamplers"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
 
 [deps]
