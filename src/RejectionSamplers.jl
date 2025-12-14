@@ -1,5 +1,9 @@
 module RejectionSamplers
 
+# samples
+export Sample
+export allocate_samples
+
 # utils
 export filter_scan
 
@@ -23,6 +27,12 @@ using Random
 using GPUArrays
 using StaticArrays
 using StaticArrays: sacollect
+using StructArrays
+
+
+include("samples/interface.jl")
+include("samples/generic.jl")
+include("samples/impl.jl")
 
 include("filter_scan.jl")
 
