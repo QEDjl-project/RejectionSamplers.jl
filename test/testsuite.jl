@@ -1,4 +1,5 @@
 include("testutils.jl")
+include("samples.jl")
 include("filter_scan.jl")
 include("proposal.jl")
 include("target.jl")
@@ -6,6 +7,12 @@ include("generate.jl")
 include("max_finder.jl")
 
 function testsuite_run(backend, vec_type, el_type)
+    @testset "samples" testsuite_samples(
+        backend,
+        SVector{4, el_type},
+        el_type,
+        256
+    )
     @testset "filter scan" testsuite_filter_scan(
         backend,
         vec_type,
