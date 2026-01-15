@@ -1,7 +1,7 @@
 module RejectionSamplers
 
 # samples
-export Sample, SampleVector
+export Sample, SampleVector, value_type, weight_type
 export allocate_samples
 
 # buffers
