@@ -54,7 +54,7 @@ rand_single(sampler::AbstractSampler) = rand_single(Random.default_rng(), sample
 # - add input checks via more specialized types
 """
     Random.rand!(
-        rng::AbstractRNG,
+[rng::AbstractRNG = default_rng()],
         sampler::AbstractProposalDistribution,
         samples::AbstractVector,
         backend = get_backend(samples.value)
@@ -69,32 +69,36 @@ but can be overridden via the `backend` keyword.
 function Random.rand!(
         rng::AbstractRNG,
         sampler::AbstractSampler{Ts, Tw},
-        samples::SampleVector{Ts, Tw};
-        backend = get_backend(samples.value),
+        samples::SampleVector{Ts, Tw},
+        backend::KernelAbstractions.Backend
     ) where {Ts, Tw}
 
     _rand!(rng, sampler, samples, backend)
     return nothing
 end
 
-
-"""
-    Random.rand!(
-        sampler::AbstractSampler,
-        samples::AbstractVector,
-        rng = default_rng(typeof(samples.value)),
-        backend = get_backend(samples.value)
-    ) -> Nothing
-
-Convenience wrapper that infers both the RNG and backend from the destination arrays.
-"""
-function Random.rand!(
+@inline function Random.rand!(
         sampler::AbstractSampler{Ts, Tw},
         samples::SampleVector{Ts, Tw},
-        rng = default_rng(typeof(samples.value)),
-        backend = get_backend(samples.value),
+        backend::KernelAbstractions.Backend
     ) where {Ts, Tw}
-    rand!(rng, sampler, samples; backend)
+    rand!(default_rng(typeof(samples.value)), sampler, samples; backend)
     return nothing
+end
 
+@inline function Random.rand!(
+        rng::AbstractRNG,
+        sampler::AbstractSampler{Ts, Tw},
+        samples::SampleVector{Ts, Tw},
+    ) where {Ts, Tw}
+    rand!(rng, sampler, samples, get_backend(samples.value))
+    return nothing
+end
+
+@inline function Random.rand!(
+        sampler::AbstractSampler{Ts, Tw},
+        samples::SampleVector{Ts, Tw},
+    ) where {Ts, Tw}
+    rand!(default_rng(typeof(samples.value)), sampler, samples, get_backend(samples.value))
+    return nothing
 end
