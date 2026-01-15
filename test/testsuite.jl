@@ -39,7 +39,21 @@ function testsuite_run(backend, vec_type, el_type)
             256
         )
 
+        @testset "sample buffer interface" testsuite_sample_buffer_interface(
+            backend,
+            val_type,
+            el_type,
+            256
+        )
+
         @testset "sample buffer" testsuite_sample_buffer(
+            backend,
+            val_type,
+            el_type,
+            256
+        )
+
+        @testset "sampler" testsuite_abstract_sampler(
             backend,
             val_type,
             el_type,
@@ -47,13 +61,13 @@ function testsuite_run(backend, vec_type, el_type)
         )
     end
 
-
     @testset "filter scan" testsuite_filter_scan(
         backend,
         vec_type,
         el_type,
         NTuple{4, el_type},
     )
+
     @testset "proposal generation" begin
         testsuite_uniform_proposal(backend, vec_type, el_type, 256)
     end
