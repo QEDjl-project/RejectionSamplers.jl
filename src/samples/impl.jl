@@ -20,6 +20,8 @@ struct Sample{Ts, Tw} <: AbstractSample{Tw, Ts}
     weight::Tw
 end
 
+const SampleVector{Ts, Tw} = StructVector{Sample{Ts, Tw}}
+
 @inline value(s::Sample) = s.value
 @inline weight(s::Sample) = s.weight
 
