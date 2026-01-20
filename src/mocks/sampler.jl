@@ -4,21 +4,20 @@
 struct MockSampler{T, D, TT} <: RejectionSamplers.AbstractSampler{TT, T}
     weight::T
 
-    # scalar proposal
+    # scalar sample
     MockSampler(::Type{T}, w::T) where {T <: Real} = new{T, 1, T}(w)
 
-    # SVector proposal
+    # SVector sample
     MockSampler(::Type{TT}, w::T) where {N, T <: Real, TT <: SVector{N, T}} = new{T, N, TT}(w)
 
-    # NTuple proposal
+    # NTuple sample
     MockSampler(::Type{TT}, w::T) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT}(w)
 end
 
 RejectionSamplers.degrees_of_freedom(::MockSampler{T, D, TT}) where {T, D, TT} = D
 
 ### overwriting the generic because MockSampler is not random
-# TODO: adjust proposal interface, maybe use `generate_proposal!` as the interface
-# function and call `Random.rand!` or `_rand!` per default.
+
 
 # scalar
 function RejectionSamplers._rand!(
@@ -66,4 +65,38 @@ function RejectionSamplers._rand!(
     map!(i -> ntuple(x -> -1 + i * steps, D), samples.value, 1:n)
     samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
     return nothing
+end
+
+# implements only `_rand_single`
+struct MockSamplerSingle{T, N, TT} <: RejectionSamplers.AbstractSampler{TT, T}
+    weight::T
+
+    # scalar sample
+    MockSamplerSingle(::Type{T}, w::T) where {T <: Real} = new{T, 1, T}(w)
+
+    # SVector sample
+    MockSamplerSingle(::Type{TT}, w::T) where {N, T <: Real, TT <: SVector{N, T}} = new{T, N, TT}(w)
+
+    # NTuple sample
+    MockSamplerSingle(::Type{TT}, w::T) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT}(w)
+end
+
+function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSingle{T, 1}) where {T <: Real}
+    return Sample(-one(T), sampler.weight)
+end
+
+function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSingle{T, N, TT}) where {N, T <: Real, TT <: SVector{N, T}}
+    s = @SVector fill(-one(T), N)
+
+    return Sample(
+        s,
+        sampler.weight
+    )
+end
+
+function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSingle{T, N, TT}) where {N, T <: Real, TT <: NTuple{N, T}}
+    return Sample(
+        ntuple(x -> -one(T), N),
+        sampler.weight
+    )
 end

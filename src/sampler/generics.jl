@@ -6,36 +6,14 @@
     return allocate_samples(backend, Ts, Tw, batch_size)
 end
 
-# additional layer for multiple dispatch, especially for different backends
-function _rand!(
-        rng::Random.AbstractRNG,
-        sampler::AbstractSampler,
-        samples::AbstractVector,
-        backend::KernelAbstractions.Backend
-    )
-    _rand_on_device!(rng, sampler, samples, backend)
-    return nothing
-end
-
-# CPU version: fallback on _rand_single
-function _rand_on_device!(
-        rng::Random.AbstractRNG,
-        sampler::AbstractSampler,
-        samples::AbstractVector,
-        ::KernelAbstractions.CPU,
-    )
-    @inbounds for i in eachindex(samples)
-        single_sample = _rand_single(rng, sampler)
-        samples.value[i], samples.weight[i] = single_sample.value, single_sample.weight
-    end
-    return nothing
-end
-
-
 ### User-facing sampler API
 
+
+# TODO:
+# - update docs
+# - add unit testsj
 """
-    rand_single(Sampler::AbstractSampler)::Sample
+rand_single([rng::AbstractRNG = default_rng()], Sampler::AbstractSampler)::Sample
 
 Draw a single `Sample` from `sampler` using the global default RNG.
 
@@ -45,13 +23,14 @@ Draw a single `Sample` from `sampler` using the global default RNG.
 
 """
 function rand_single(rng::AbstractRNG, sampler::AbstractSampler)
-    return _rand_single(rng, proposal)
+    return _rand_single(rng, sampler)
 end
-rand_single(sampler::AbstractSampler) = rand_single(Random.default_rng(), sampler)
+# TODO: find out how rand() finds the correct default_rng if called in a KA kernel
+#rand_single(sampler::AbstractSampler) = rand_single(Random.default_rng(), sampler)
 
 
 # TODO:
-# - add input checks via more specialized types
+# - write unit tests checking different versions of this
 """
     Random.rand!(
 [rng::AbstractRNG = default_rng()],
