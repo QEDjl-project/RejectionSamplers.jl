@@ -4,6 +4,13 @@ module RejectionSamplers
 export Sample
 export allocate_samples
 
+# buffers
+export AbstractBuffer
+export AbstractSampleBuffer
+export getsample, getsamples, setsample!, setsamples!
+export getvalue, getvalues, setsample!, setvalues!
+export getweight, getweights, setweight!, setweights!
+
 # utils
 export filter_scan
 
@@ -33,6 +40,8 @@ using StructArrays
 include("samples/interface.jl")
 include("samples/generic.jl")
 include("samples/impl.jl")
+
+include("buffers/interface.jl")
 
 include("filter_scan.jl")
 

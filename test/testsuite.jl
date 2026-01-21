@@ -1,5 +1,6 @@
 include("testutils.jl")
 include("samples.jl")
+include("buffers.jl")
 include("filter_scan.jl")
 include("proposal.jl")
 include("target.jl")
@@ -13,6 +14,13 @@ function testsuite_run(backend, vec_type, el_type)
         el_type,
         256
     )
+
+    @testset "buffer" testsuite_buffer_interface(
+        backend,
+        SVector{4, el_type},
+        256
+    )
+
     @testset "filter scan" testsuite_filter_scan(
         backend,
         vec_type,
