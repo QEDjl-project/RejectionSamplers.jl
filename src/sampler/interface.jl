@@ -5,10 +5,67 @@ abstract type AbstractSampler{Ts, Tw} end
 function degree_of_freedom end
 
 """
-    _rand_single(rng::AbstactRNG, sampler::AbstractSampler)::Sample
+    _rand_from_host!(
+        host_side_rng,
+        sampler,
+        backend,
+        dest,
+        u_buffer = nothing
+    )
+"""
+function _rand_from_host! end
+
+
+"""
+    _rand_from_device!(
+        device_side_rng,
+        sampler,
+        backend,
+        dest
+    )
+"""
+function _rand_from_device! end
+
+"""
+    _rand_single(
+        device_side_rng,
+        sampler
+)
 
 """
 function _rand_single end
+
+### RNG strategies
+
+@traitdef IsHostRNG{X}
+@traitimpl IsHostRNG{GPUArrays.RNG}
+
+
+@traitfn function _rand_backend!(
+        rng::R,
+        sampler::AbstractSampler{Ts, Tw},
+        samples::AbstractVector,
+        backend::KernelAbstractions.Backend;
+        u_buf = nothing
+    ) where {Ts, Tw, R <: AbstractRNG; IsHostRNG{R}}
+
+    _rand_from_host!(rng, sampler, backend, samples, u_buf)
+
+    return nothing
+end
+
+@traitfn function _rand_backend!(
+        rng::R,
+        sampler::AbstractSampler,
+        samples::AbstractVector,
+        backend::KernelAbstractions.Backend,
+        u_buf = nothing
+    ) where {{R <: AbstractRNG; !IsHostRNG{R}}}
+
+    _rand_from_device!(rng, sampler, backend, samples)
+
+    return nothing
+end
 
 
 ## generics
@@ -21,18 +78,20 @@ function _rand!(
         rng::Random.AbstractRNG,
         sampler::AbstractSampler,
         samples::AbstractVector,
-        backend::KernelAbstractions.Backend
+        backend::KernelAbstractions.Backend,
+        u_buf = nothing
     )
-    _rand_on_device!(rng, sampler, samples, backend)
+    _rand_backend(rng, sampler, samples, backend, u_buf)
     return nothing
 end
 
-# CPU version:
-function _rand_on_device!(
+# CPU version: needs _rand_single to be implemented
+function _rand_backend!(
         rng::Random.AbstractRNG,
         sampler::AbstractSampler,
         samples::AbstractVector,
         ::KernelAbstractions.CPU,
+        u_buf = nothing
     )
     @inbounds for i in eachindex(samples)
         single_sample = _rand_single(rng, sampler)
@@ -42,8 +101,6 @@ function _rand_on_device!(
 end
 
 # NOTE:
-# - this might only work for device rng, but not for counter based rng, because the latter
-# need a thread-aware state/counter, e.g. the thread index.
 # -
 @kernel function _rand_gpu_kernel(rng, samples, sampler::AbstractSampler)
     idx = @index(Global, Linear)
@@ -52,30 +109,12 @@ end
     @inbounds samples.weight[idx] = sample.weight
 end
 
-@kernel function _rand_gpu_kernel(samples, sampler::AbstractSampler)
-    idx = @index(Global, Linear)
-    sample = _rand_single(Random.default_rng(), sampler)
-    @inbounds samples.value[idx] = sample.value
-    @inbounds samples.weight[idx] = sample.weight
-end
-
-function _rand_on_device!(
-        sampler::AbstractSampler,
-        samples::AbstractVector,
-        backend::KernelAbstractions.GPU,
-    )
-    _rand_gpu_kernel(backend, 32)(
-        samples, sampler;
-        ndrange = size(samples)
-    )
-    return nothing
-end
-
-function _rand_on_device!(
+# generic implementation which falls back to _rand_single
+function _rand_from_device!(
         rng::AbstactRNG,
         sampler::AbstractSampler,
+        backend::KernelAbstractions.Backend,
         samples::AbstractVector,
-        backend::KernelAbstractions.GPU,
     )
     _rand_gpu_kernel(backend, 32)(
         rng, samples, sampler;

@@ -59,8 +59,8 @@ include("proposal/interface.jl")
 include("proposal/generics.jl")
 include("proposal/uniform.jl")
 
-include("sampler/interface.jl")
-include("sampler/generics.jl")
+#include("sampler/interface.jl")
+#include("sampler/generics.jl")
 
 include("target.jl")
 
@@ -80,6 +80,6 @@ include("plotting.jl")
 
 include("testutils/TestUtils.jl")
 
-include("mocks/Mocks.jl")
+#include("mocks/Mocks.jl")
 
 end
