@@ -1,5 +1,6 @@
 using RejectionSamplers
 using RejectionSamplers.TestUtils
+using RejectionSamplers.Mocks
 using Documenter
 
 project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path()), "..")

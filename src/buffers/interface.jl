@@ -1,67 +1,108 @@
 """
-AbstractBuffer
+    AbstractBuffer
 
-Interface functions (maybe the array interface?)
+Abstract supertype for array-like buffers that can be used as targets for
+CPU- or GPU-based kernels.
+
+An `AbstractBuffer` represents a one-dimensional, indexable container with
+a well-defined execution backend. Concrete implementations are expected
+to behave similarly to arrays, but may wrap backend-specific storage
+(e.g. GPU memory).
+
+### Required interface
+
 - `KernelAbstractions.get_backend(buf)`
-    - `Base.length(buf)`
-    - `Base.eltype(buf)`
-    - `getindex(buf,idx)`
-    - `setindex!(buf,idx,x)`
+- `Base.length(buf)`
+- `Base.eltype(buf)`
+- `Base.getindex(buf, idx)`
+- `Base.setindex!(buf, x, idx)`
 """
 abstract type AbstractBuffer end
 
 """
-AbstractSampleBuffer
+    AbstractSampleBuffer <: AbstractBuffer
 
-Interface functions
+Abstract buffer type specialized for storing `Sample` objects consisting
+of a value and an associated weight.
 
-from AbstractBuffer:
+An `AbstractSampleBuffer` extends `AbstractBuffer` by providing accessors
+and mutators at the level of whole samples, as well as at the level of
+values and weights individually.
+
+### Required interface
+
+From `AbstractBuffer`:
 - `KernelAbstractions.get_backend(buf)`
-    - `Base.length(buf)`
-    - `Base.eltype(buf)` -> Sample{value_type(buf),weight_type(buf)}
-    - `Base.getindex(buf,idx)`
-    - `Bsae.setindex!(buf,x,idx)`
+- `Base.length(buf)`
+- `Base.eltype(buf)`
+  Must return `Sample{value_type(buf), weight_type(buf)}`
+- `Base.getindex(buf, idx)`
+- `Base.setindex!(buf, x, idx)`
 
-    additionally:
-    - `value_type(buf)`
-    - `weight_type(buf)`
-    - `getsample(buf,idx)`
-    - `setsample!(buf,sample, idx)`
+Additional sample-specific interface:
+- `value_type(buf)`
+- `weight_type(buf)`
+- `getsample(buf, idx)`
+- `setsample!(buf, sample, idx)` (optional but recommended)
 """
 abstract type AbstractSampleBuffer <: AbstractBuffer end
 
 """
     value_type(buf)
+
+Return the element type of the `value` field stored in the samples
+contained in `buf`.
 """
 function value_type end
 
 """
     weight_type(buf)
+
+Return the element type of the `weight` field stored in the samples
+contained in `buf`.
 """
 function weight_type end
 
 """
-    getsample(buf,idx)
+    getsample(buf, idx)
+
+Return the `Sample` stored at index `idx` in `buf`.
 """
 function getsample end
 
 """
     setsample!(buf, sample, idx)
 
-Optional
+Store `sample` at index `idx` in `buf`.
+
+This method is optional; bulk setters such as `setsamples!` may be
+implemented instead. If both are provided, `setsample!` should represent
+the canonical element-wise operation.
 """
 function setsample! end
 
 """
     setsamples!(buf, samples)
 
-Optional, bulk alternative for setsample!
+Store all elements from `samples` into `buf`.
+
+This is an optional bulk alternative to repeated calls to `setsample!`.
+Implementations may override this method to provide a more efficient
+backend-specific implementation.
 """
 function setsamples! end
 
 
-### getter
+### getter api
 
+"""
+    getsamples!(buf, out)
+
+Copy all samples stored in `buf` into the preallocated vector `out`.
+
+The buffer and output vector must have the same length, element type,
+and compatible execution backends.
+"""
 function getsamples!(buf::AbstractSampleBuffer, out::AbstractVector)
     length(buf) == length(out) || throw(
         ArgumentError(
@@ -87,18 +128,47 @@ function _getsamples!(buf::AbstractSampleBuffer, out::AbstractVector)
     return out
 end
 
+"""
+    getsamples(buf)
+
+Return a newly allocated vector containing all samples stored in `buf`.
+
+The returned vector is allocated on the same backend as `buf`.
+"""
 function getsamples(buf::AbstractSampleBuffer)
     out = allocate(get_backend(buf), eltype(buf), length(buf))
     _getsamples!(buf, out)
     return out
 end
 
+"""
+    getvalue(buf, idx)
+
+Return the `value` field of the sample stored at index `idx`.
+"""
 getvalue(buf::AbstractSampleBuffer, idx) = getsample(buf, idx).value
+
+"""
+    getvalues(buf)
+
+Return a vector containing the `value` field of all samples stored in `buf`.
+"""
 function getvalues(buf::AbstractSampleBuffer)
     return getfield.(getsamples(buf), :value)
 end
 
+"""
+    getweight(buf, idx)
+
+Return the `weight` field of the sample stored at index `idx`.
+"""
 getweight(buf::AbstractSampleBuffer, idx) = getsample(buf, idx).weight
+
+"""
+    getweights(buf)
+
+Return a vector containing the `weight` field of all samples stored in `buf`.
+"""
 function getweights(buf::AbstractSampleBuffer)
     return getfield.(getsamples(buf), :weight)
 end
@@ -111,6 +181,14 @@ function _setsamples!(buf, samples)
     return setsample!.(buf, samples, 1:length(buf))
 end
 
+"""
+    setsamples!(buf, samples)
+
+Store all samples from `samples` into `buf`.
+
+The buffer and input vector must have the same length, element type,
+and compatible execution backends.
+"""
 function setsamples!(buf, samples)
     length(buf) == length(samples) || throw(
         ArgumentError(
@@ -131,6 +209,12 @@ function setsamples!(buf, samples)
     return _setsamples!(buf, samples)
 end
 
+"""
+    setvalue!(buf, value, idx)
+
+Update only the `value` field of the sample at index `idx`, leaving the
+associated weight unchanged.
+"""
 @inline function setvalue!(buf, value, idx)
     return setsample!(
         buf,
@@ -146,6 +230,15 @@ function _setvalues!(buf, values)
     return setvalue!.(buf, values, 1:length(buf))
 end
 
+"""
+    setvalues!(buf, values)
+
+Update the `value` field of all samples stored in `buf`, leaving all
+weights unchanged.
+
+The buffer and input vector must have the same length, value type,
+and compatible execution backends.
+"""
 function setvalues!(buf, values)
     length(buf) == length(values) || throw(
         ArgumentError(
@@ -166,6 +259,12 @@ function setvalues!(buf, values)
     return _setvalues!(buf, values)
 end
 
+"""
+    setweight!(buf, weight, idx)
+
+Update only the `weight` field of the sample at index `idx`, leaving the
+associated value unchanged.
+"""
 @inline function setweight!(buf, weight, idx)
     return setsample!(
         buf,
@@ -182,6 +281,15 @@ function _setweights!(buf, weights)
     return setweight!.(buf, weights, 1:length(buf))
 end
 
+"""
+    setweights!(buf, weights)
+
+Update the `weight` field of all samples stored in `buf`, leaving all
+values unchanged.
+
+The buffer and input vector must have the same length, weight type,
+and compatible execution backends.
+"""
 function setweights!(buf, weights)
     length(buf) == length(weights) || throw(
         ArgumentError(

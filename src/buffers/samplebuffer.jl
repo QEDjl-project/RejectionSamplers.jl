@@ -5,6 +5,11 @@ struct SampleBuffer{Tv, Tw, S} <: AbstractSampleBuffer
         return new{Tv, Tw, S}(samples)
     end
 
+    function SampleBuffer(vals::V, ws::W) where {Tv, Tw, V <: AbstractVector{Tv}, W <: AbstractVector{Tw}}
+        S = StructArray{Sample{Tv, Tw}}((vals, ws))
+        return new{Tv, Tw, typeof(S)}(S)
+    end
+
     function SampleBuffer(backend, valuetype, weighttype, size)
         struct_arr = allocate_samples(backend, valuetype, weighttype, size)
         return new{valuetype, weighttype, typeof(struct_arr)}(struct_arr)

@@ -7,10 +7,12 @@ export allocate_samples
 # buffers
 export AbstractBuffer
 export AbstractSampleBuffer
+export SampleBuffer
 export value_type, weight_type
 export getsample, getsamples, setsample!, setsamples!
 export getvalue, getvalues, setvalue!, setvalues!
 export getweight, getweights, setweight!, setweights!
+
 
 # utils
 export filter_scan
@@ -31,6 +33,7 @@ export input_type, output_type, proposal_distribution, target_distribution, maxi
 using Distributions
 using KernelAbstractions
 using Atomix
+using Adapt
 using Random
 using GPUArrays
 using StaticArrays
@@ -43,6 +46,7 @@ include("samples/generic.jl")
 include("samples/impl.jl")
 
 include("buffers/interface.jl")
+include("buffers/samplebuffer.jl")
 
 include("filter_scan.jl")
 

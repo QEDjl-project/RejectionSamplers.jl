@@ -149,3 +149,72 @@ function testsuite_sample_buffer_interface(backend, val_type, w_type, size)
 
     return nothing
 end
+
+function testsuite_sample_buffer(backend, val_type, w_type, size)
+
+    @testset "properties" begin
+        buf = Mocks.SampleBuffer(backend, val_type, w_type, size)
+
+        @test get_backend(buf) isa typeof(backend)
+        @test length(buf) == size
+        @test eltype(buf) == Sample{val_type, w_type}
+        @test value_type(buf) == val_type
+        @test weight_type(buf) == w_type
+    end
+
+    @testset "getter" begin
+
+        # we generate randoms on CPU to be more stable across backends
+        h_values = allocate(CPU(), val_type, (size,))
+        rand!(CPU_RNG, h_values)
+
+        h_weights = allocate(CPU(), w_type, (size,))
+        rand!(CPU_RNG, h_weights)
+
+        d_values = allocate(backend, val_type, (size,))
+        copyto!(d_values, h_values)
+
+        d_weights = allocate(backend, w_type, (size,))
+        copyto!(d_weights, h_weights)
+
+        buf = SampleBuffer(d_values, d_weights)
+
+        dest_values = allocate(backend, val_type, (size,))
+        _test_getvalues(backend)(buf, dest_values; ndrange = length(buf))
+        @test isapprox(Array(dest_values), h_values)
+
+        dest_weights = allocate(backend, w_type, (size,))
+        _test_getweights(backend)(buf, dest_weights; ndrange = length(buf))
+        @test isapprox(Array(dest_weights), h_weights)
+
+    end
+
+    @testset "setindex" begin
+
+        # input
+        # we generate randoms on CPU to be more stable across backends
+        h_values = allocate(CPU(), val_type, (size,))
+        rand!(CPU_RNG, h_values)
+
+        h_weights = allocate(CPU(), w_type, (size,))
+        rand!(CPU_RNG, h_weights)
+
+        d_values = allocate(backend, val_type, (size,))
+        copyto!(d_values, h_values)
+
+        d_weights = allocate(backend, w_type, (size,))
+        copyto!(d_weights, h_weights)
+
+        values = allocate(backend, val_type, (size,))
+        weights = allocate(backend, w_type, (size,))
+        buf = SampleBuffer(values, weights)
+
+        _test_setvalues(backend)(buf, d_values; ndrange = length(buf))
+        @test isapprox(Array(buf.samples.value), h_values)
+
+        _test_setweights(backend)(buf, d_weights; ndrange = length(buf))
+        @test isapprox(Array(buf.samples.weight), h_weights)
+    end
+
+    return nothing
+end

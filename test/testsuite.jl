@@ -28,6 +28,13 @@ function testsuite_run(backend, vec_type, el_type)
         256
     )
 
+    @testset "sample buffer" testsuite_sample_buffer(
+        backend,
+        SVector{4, el_type},
+        el_type,
+        256
+    )
+
     @testset "filter scan" testsuite_filter_scan(
         backend,
         vec_type,
