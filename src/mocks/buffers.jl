@@ -35,17 +35,18 @@ struct MockSampleBuffer{Tv, Tw, V, W} <: AbstractSampleBuffer
             Tw, W <: AbstractVector{Tw},
         }
         @assert length(vals) == length(ws)
-        @assert get_backend(vals) isa typeof(get_backend(ws))
 
-        return new{Tv, Tw, V, W}(vals, w)
+        return new{Tv, Tw, V, W}(vals, ws)
     end
 end
 
 Adapt.@adapt_structure MockSampleBuffer
 
 KernelAbstractions.get_backend(buf::MockSampleBuffer) = get_backend(buf.values)
+RejectionSamplers.value_type(::MockSampleBuffer{Tv}) where {Tv} = Tv
+RejectionSamplers.weight_type(::MockSampleBuffer{Tv, Tw}) where {Tv, Tw} = Tw
 Base.length(buf::MockSampleBuffer) = length(buf.values)
-Base.eltype(buf::MockSampleBuffer) = eltype(buf.values)
+Base.eltype(buf::MockSampleBuffer{Tv, Tw}) where {Tv, Tw} = Sample{Tv, Tw}
 Base.getindex(buf::MockSampleBuffer, idx) = Sample(buf.values[idx], buf.weights[idx])
 function Base.setindex!(buf::MockSampleBuffer, sample, idx)
     buf.values[idx] = sample.value

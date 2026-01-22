@@ -15,9 +15,16 @@ function testsuite_run(backend, vec_type, el_type)
         256
     )
 
-    @testset "buffer" testsuite_buffer_interface(
+    @testset "buffer interface" testsuite_buffer_interface(
         backend,
         SVector{4, el_type},
+        256
+    )
+
+    @testset "sample buffer interface" testsuite_sample_buffer_interface(
+        backend,
+        SVector{4, el_type},
+        el_type,
         256
     )
 

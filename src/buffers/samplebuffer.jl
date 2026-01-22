@@ -13,8 +13,8 @@ end
 
 Adapt.@adapt_structure SampleBuffer
 
-@inline valtype(buf::SampleBuffer{Tv}) where {Tv} = Tv
-@inline wtype(buf::SampleBuffer{Tv, Tw}) where {Tv, Tw} = Tw
+@inline value_type(buf::SampleBuffer{Tv}) where {Tv} = Tv
+@inline weight_type(buf::SampleBuffer{Tv, Tw}) where {Tv, Tw} = Tw
 
 KernelAbstractions.get_backend(buf::SampleBuffer) = get_backend(buf.samples.value)
 

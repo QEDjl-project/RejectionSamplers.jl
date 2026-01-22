@@ -7,8 +7,9 @@ export allocate_samples
 # buffers
 export AbstractBuffer
 export AbstractSampleBuffer
+export value_type, weight_type
 export getsample, getsamples, setsample!, setsamples!
-export getvalue, getvalues, setsample!, setvalues!
+export getvalue, getvalues, setvalue!, setvalues!
 export getweight, getweights, setweight!, setweights!
 
 # utils

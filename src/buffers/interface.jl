@@ -18,27 +18,27 @@ Interface functions
 from AbstractBuffer:
 - `KernelAbstractions.get_backend(buf)`
     - `Base.length(buf)`
-    - `Base.eltype(buf)` -> Sample{valtype(buf),wtype(buf)}
+    - `Base.eltype(buf)` -> Sample{value_type(buf),weight_type(buf)}
     - `Base.getindex(buf,idx)`
-    - `Bsae.setindex!(buf,idx,x)`
+    - `Bsae.setindex!(buf,x,idx)`
 
     additionally:
     - `value_type(buf)`
     - `weight_type(buf)`
     - `getsample(buf,idx)`
-    - `setsample!(buf,idx)`
+    - `setsample!(buf,sample, idx)`
 """
 abstract type AbstractSampleBuffer <: AbstractBuffer end
 
 """
-    valtype(buf)
+    value_type(buf)
 """
-function valtype end
+function value_type end
 
 """
-    wtype(buf)
+    weight_type(buf)
 """
-function wtype end
+function weight_type end
 
 """
     getsample(buf,idx)
@@ -46,7 +46,7 @@ function wtype end
 function getsample end
 
 """
-    setsample!(buf, idx, sample)
+    setsample!(buf, sample, idx)
 
 Optional
 """
@@ -108,7 +108,7 @@ end
 
 function _setsamples!(buf, samples)
     broadcast(Base.Fix1(setsample!, buf), samples, 1:length(buf))
-    return setsample!.(buf, 1:length(buf), samples)
+    return setsample!.(buf, samples, 1:length(buf))
 end
 
 function setsamples!(buf, samples)
@@ -131,19 +131,19 @@ function setsamples!(buf, samples)
     return _setsamples!(buf, samples)
 end
 
-@inline function setvalue!(buf, idx, value)
+@inline function setvalue!(buf, value, idx)
     return setsample!(
         buf,
-        idx,
         Sample(
             value,
             getweight(buf, idx)
-        )
+        ),
+        idx,
     )
 end
 
 function _setvalues!(buf, values)
-    return setvalue!.(buf, 1:length(buf), values)
+    return setvalue!.(buf, values, 1:length(buf))
 end
 
 function setvalues!(buf, values)
@@ -153,7 +153,7 @@ function setvalues!(buf, values)
         )
     )
 
-    valtype(buf) == eltype(values) ||  throw(
+    value_type(buf) == eltype(values) ||  throw(
         ArgumentError(
             "buffer and values vector must have the same element type"
         )
@@ -166,19 +166,20 @@ function setvalues!(buf, values)
     return _setvalues!(buf, values)
 end
 
-@inline function setweight!(buf, idx, weight)
+@inline function setweight!(buf, weight, idx)
     return setsample!(
         buf,
-        idx,
         Sample(
             getvalue(buf, idx),
             weight
-        )
+        ),
+        idx,
+
     )
 end
 
 function _setweights!(buf, weights)
-    return setweight!.(buf, 1:length(buf), weights)
+    return setweight!.(buf, weights, 1:length(buf))
 end
 
 function setweights!(buf, weights)
@@ -188,7 +189,7 @@ function setweights!(buf, weights)
         )
     )
 
-    valtype(buf) == eltype(weights) ||  throw(
+    value_type(buf) == eltype(weights) ||  throw(
         ArgumentError(
             "buffer and weights vector must have the same element type"
         )
