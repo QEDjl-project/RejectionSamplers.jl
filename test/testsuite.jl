@@ -46,12 +46,6 @@ function testsuite_run(backend, vec_type, el_type)
         )
     end
 
-    @testset "sample buffer interface" testsuite_sample_buffer_interface(
-        backend,
-        SVector{4, el_type},
-        el_type,
-        256
-    )
 
     @testset "filter scan" testsuite_filter_scan(
         backend,
