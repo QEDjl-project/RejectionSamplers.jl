@@ -202,11 +202,6 @@ function setsamples!(buf, samples)
             "buffer and samples vector must have the same element type"
         )
     )
-    get_backend(samples) isa typeof(get_backend(buf)) || throw(
-        ArgumentError(
-            "buffer and samples vector must have compatible backends"
-        )
-    )
     return _setsamples!(buf, samples)
 end
 
