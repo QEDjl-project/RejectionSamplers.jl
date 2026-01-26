@@ -1,7 +1,18 @@
 # TODO:
 # - use the mock proposal and implement the new interface
 
-struct MockSampler{T, D, TT} <: RejectionSamplers.AbstractSampler{TT, T}
+abstract type AbstractMockSampler{TT, T} <: RejectionSamplers.AbstractSampler{TT, T} end
+
+function RejectionSamplers.allocate_buffer(
+        rng::AbstractRNG,
+        sampler::AbstractMockSampler{TT, T},
+        backend::KernelAbstractions.Backend,
+        size
+    ) where {T, TT}
+    return SampleBuffer(backend, TT, T, size)
+end
+
+struct MockSampler{T, D, TT} <: AbstractMockSampler{TT, T}
     weight::T
 
     # scalar sample
@@ -16,59 +27,62 @@ end
 
 RejectionSamplers.degrees_of_freedom(::MockSampler{T, D, TT}) where {T, D, TT} = D
 
-### overwriting the generic because MockSampler is not random
+### Sample functions
+# - these functions should work in both cases, host-side and device-side
+# - the sampling is the same for every RNG passed
+# - the samples are deterministically determined by the length of the buffer and a
+# constant weight stored in the sampler
 
-
-# scalar
-function RejectionSamplers._rand!(
-        rng::AbstractRNG,
-        sampler::MockSampler{T, 1},
-        samples::AbstractVector,
-        backend::KernelAbstractions.Backend
-    ) where {T <: Real}
-
-    n = length(sample_dest)
+# Scalar
+function _mock_rand!(rng, sampler::MockSampler{T}, backend, buf) where {T <: Real}
+    n = length(buf)
     steps = T(2 / (n + 1))
-    samples.value .= StepRangeLen(-1 + steps, steps, n)
-    samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
+    buf.samples.value .= StepRangeLen(-1 + steps, steps, n)
+    buf.samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
 
     return nothing
 end
 
 # SVector
-function RejectionSamplers._rand!(
-        rng::AbstractRNG,
-        sampler::MockSampler{T, D, TT},
-        samples::AbstractVector,
-        backend::KernelAbstractions.Backend
-    ) where {T <: Real, D, TT <: SVector{D, T}}
-
-    n = length(samples)
+function _mock_rand!(rng, sampler::MockSampler{T, D, TT}, backend, buf) where {T <: Real, D, TT <: SVector{D, T}}
+    n = length(buf)
     steps = T(2 / (n + 1))
-    map!(i -> fill(-1 + i * steps, TT), samples.value, 1:n)
-    samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
+    map!(i -> fill(-1 + i * steps, TT), buf.samples.value, 1:n)
+    buf.samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
     return nothing
 end
 
 # NTuple
 # WARN: this only works on GPU for D<=10
 # (because of unrolled tuple construction in `ntuple()`)
-function RejectionSamplers._rand!(
-        rng::AbstractRNG,
-        sampler::MockSampler{T, D, TT},
-        samples::AbstractVector,
-        backend::KernelAbstractions.Backend
-    ) where {T <: Real, D, TT <: NTuple{D, T}}
-
-    n = length(sample_dest)
+function _mock_rand!(rng, sampler::MockSampler{T, D, TT}, backend, buf) where {T <: Real, D, TT <: NTuple{D, T}}
+    n = length(buf)
     steps = T(2 / (n + 1))
-    map!(i -> ntuple(x -> -1 + i * steps, D), samples.value, 1:n)
-    samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
+    map!(i -> ntuple(x -> -1 + i * steps, D), buf.samples.value, 1:n)
+    buf.samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
     return nothing
 end
 
+function RejectionSamplers._rand_from_device!(
+        rng::AbstractRNG,
+        sampler::MockSampler,
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer
+    )
+    return _mock_rand!(rng, sampler, backend, buf)
+end
+
+function RejectionSamplers._rand_from_host!(
+        rng::AbstractRNG,
+        sampler::MockSampler,
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer
+    )
+    return _mock_rand!(rng, sampler, backend, buf)
+end
+
 # implements only `_rand_single`
-struct MockSamplerSingle{T, N, TT} <: RejectionSamplers.AbstractSampler{TT, T}
+struct MockSamplerSingle{T, N, TT} <: AbstractMockSampler{TT, T}
     weight::T
 
     # scalar sample
@@ -80,6 +94,9 @@ struct MockSamplerSingle{T, N, TT} <: RejectionSamplers.AbstractSampler{TT, T}
     # NTuple sample
     MockSamplerSingle(::Type{TT}, w::T) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT}(w)
 end
+
+### sampling functions
+# - returns always the sample `Sample(-1, sampler.weight)`
 
 function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSingle{T, 1}) where {T <: Real}
     return Sample(-one(T), sampler.weight)

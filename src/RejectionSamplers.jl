@@ -4,6 +4,9 @@ module RejectionSamplers
 export Sample, SampleVector, value_type, weight_type
 export allocate_samples, rand_single
 
+# rng strategies
+export HostSide, DeviceSide
+
 # buffers
 export AbstractBuffer
 export AbstractSampleBuffer
@@ -18,7 +21,7 @@ export getweight, getweights, setweight!, setweights!
 export filter_scan
 
 # abstract sampler
-export AbstractSampler
+export AbstractSampler, allocate_buffer
 
 # proposal
 export propose!
@@ -42,6 +45,7 @@ using GPUArrays
 using StaticArrays
 using StaticArrays: sacollect
 using StructArrays
+using SimpleTraits
 
 include("patches/gpuarrays.jl")
 
@@ -59,8 +63,9 @@ include("proposal/interface.jl")
 include("proposal/generics.jl")
 include("proposal/uniform.jl")
 
-#include("sampler/interface.jl")
-#include("sampler/generics.jl")
+include("sampler/interface.jl")
+include("sampler/random.jl")
+include("sampler/utils.jl")
 
 include("target.jl")
 
@@ -80,6 +85,6 @@ include("plotting.jl")
 
 include("testutils/TestUtils.jl")
 
-#include("mocks/Mocks.jl")
+include("mocks/Mocks.jl")
 
 end

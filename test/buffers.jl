@@ -33,9 +33,6 @@ end
     @inbounds dest[idx] = getweight(buf, idx)
 end
 
-
-
-
 function testsuite_buffer_interface(backend, val_type, size)
 
     @testset "properties" begin

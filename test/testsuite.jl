@@ -55,6 +55,7 @@ function testsuite_run(backend, vec_type, el_type)
 
         @testset "sampler" testsuite_abstract_sampler(
             backend,
+            vec_type,
             val_type,
             el_type,
             256

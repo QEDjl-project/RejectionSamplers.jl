@@ -17,4 +17,6 @@ using oneAPI
     return TestSetup(backend, (oneVector,), element_types)
 end
 
+# oneAPI only supports the GPUArrays.RNG
+RejectionSamplers.TestUtils.get_host_rngs(::oneAPIBackend) = (GPUArrays.default_rng(oneArray),)
 end

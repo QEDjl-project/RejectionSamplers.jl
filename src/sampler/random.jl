@@ -1,17 +1,102 @@
-@inline value_type(::AbstractSampler{Ts}) where {Ts} = Ts
-@inline weight_type(::AbstractSampler{Ts, Tw}) where {Ts, Tw} = Tw
+### RNG strategies
 
-# convenience function for allocating samples
-@inline function allocate_samples(backend, ::AbstractSampler{Ts, Tw}, batch_size) where {Ts, Tw}
-    return allocate_samples(backend, Ts, Tw, batch_size)
+abstract type AbstractRNGStrategy end
+struct HostSide <: AbstractRNGStrategy end
+struct DeviceSide <: AbstractRNGStrategy end
+
+"""
+    _rng_strategy(::AbstractRNG)::AbstractRNGStrategy
+
+"""
+function _rng_strategy end
+
+#_rng_strategy(::AbstractRNG) = HostSide()
+_rng_strategy(::Xoshiro) = HostSide()
+_rng_strategy(::MersenneTwister) = HostSide()
+_rng_strategy(::GPUArrays.RNG) = HostSide()
+
+### backend specific rand functions
+# these functions can be overwritten for different backends
+function _rand_backend!(
+        rng::R,
+        ::HostSide,
+        sampler::AbstractSampler{Ts, Tw},
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer,
+    ) where {Ts, Tw, R <: Random.AbstractRNG}
+
+    _rand_from_host!(rng, sampler, backend, buf)
+
+    return nothing
 end
+
+function _rand_backend!(
+        rng::R,
+        ::DeviceSide,
+        sampler::AbstractSampler,
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer
+    ) where {R <: AbstractRNG}
+
+    _rand_from_device!(rng, sampler, backend, buf)
+
+    return nothing
+end
+
+
+### internal rand function
+# can be overwritten for specific combinations of all inputs (especially combinations of
+# rng and sampler)
+@inline function _rand!(
+        rng::Random.AbstractRNG,
+        sampler::AbstractSampler,
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer
+    )
+    _rand_backend!(rng, _rng_strategy(rng), sampler, backend, buf)
+    return nothing
+end
+#=
+# CPU version: needs _rand_single to be implemented
+function _rand_backend!(
+        rng::Random.AbstractRNG,
+        sampler::AbstractSampler,
+        ::KernelAbstractions.CPU,
+    buf::AbstractSampleBuffer
+    )
+    @inbounds for i in 1:length(buf)
+        sample = _rand_single(rng, sampler)
+        setsample!(buf, sample, idx)
+    end
+    return nothing
+end
+=#
+
+### generic implementation which falls back to _rand_single
+# NOTE: only works for device side rng and if _rand_single is implemented
+
+@kernel function _rand_gpu_kernel(rng, sampler::AbstractSampler, buf::AbstractSampleBuffer)
+    idx = @index(Global, Linear)
+    sample = _rand_single(rng, sampler)
+    setsample!(buf, sample, idx)
+end
+
+function _rand_from_device!(
+        rng::AbstractRNG,
+        sampler::AbstractSampler,
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer,
+    )
+    _rand_gpu_kernel(backend, 32)(
+        rng, samples, sampler;
+        ndrange = size(samples)
+    )
+    return nothing
+end
+
 
 ### User-facing sampler API
 
-
-# TODO:
-# - update docs
-# - add unit testsj
 """
 rand_single([rng::AbstractRNG = default_rng()], Sampler::AbstractSampler)::Sample
 
@@ -22,15 +107,10 @@ Draw a single `Sample` from `sampler` using the global default RNG.
     This only works on CPU.
 
 """
-function rand_single(rng::AbstractRNG, sampler::AbstractSampler)
+@inline function rand_single(rng::AbstractRNG, sampler::AbstractSampler)
     return _rand_single(rng, sampler)
 end
-# TODO: find out how rand() finds the correct default_rng if called in a KA kernel
-#rand_single(sampler::AbstractSampler) = rand_single(Random.default_rng(), sampler)
 
-
-# TODO:
-# - write unit tests checking different versions of this
 """
     Random.rand!(
 [rng::AbstractRNG = default_rng()],
@@ -45,39 +125,22 @@ The backend is inferred from the array type of `samples` by default,
 but can be overridden via the `backend` keyword.
 
 """
-function Random.rand!(
+@inline function Random.rand!(
         rng::AbstractRNG,
         sampler::AbstractSampler{Ts, Tw},
-        samples::SampleVector{Ts, Tw},
-        backend::KernelAbstractions.Backend
+        backend::KernelAbstractions.Backend,
+        buf::AbstractSampleBuffer
     ) where {Ts, Tw}
 
-    _rand!(rng, sampler, samples, backend)
-    return nothing
-end
-
-@inline function Random.rand!(
-        sampler::AbstractSampler{Ts, Tw},
-        samples::SampleVector{Ts, Tw},
-        backend::KernelAbstractions.Backend
-    ) where {Ts, Tw}
-    rand!(default_rng(typeof(samples.value)), sampler, samples; backend)
+    _rand!(rng, sampler, backend, buf)
     return nothing
 end
 
 @inline function Random.rand!(
         rng::AbstractRNG,
         sampler::AbstractSampler{Ts, Tw},
-        samples::SampleVector{Ts, Tw},
+        buf::AbstractSampleBuffer
     ) where {Ts, Tw}
-    rand!(rng, sampler, samples, get_backend(samples.value))
-    return nothing
-end
-
-@inline function Random.rand!(
-        sampler::AbstractSampler{Ts, Tw},
-        samples::SampleVector{Ts, Tw},
-    ) where {Ts, Tw}
-    rand!(default_rng(typeof(samples.value)), sampler, samples, get_backend(samples.value))
+    _rand!(rng, sampler, get_backend(buf), buf)
     return nothing
 end
