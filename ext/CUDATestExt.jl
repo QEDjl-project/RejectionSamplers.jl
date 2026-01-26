@@ -16,7 +16,7 @@ end
 
 # register Metal RNGs
 RejectionSamplers._rng_strategy(::CUDA.RNG) = HostSide()
-RejectionSamplers._rng_strategy(::CUDAND.RNG) = HostSide()
+RejectionSamplers._rng_strategy(::CURAND.RNG) = HostSide()
 RejectionSamplers._rng_strategy(::CUDA.Philox2x32) = DeviceSide()
 
 # for testing
