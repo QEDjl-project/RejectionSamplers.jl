@@ -14,7 +14,7 @@ using CUDA
     return TestSetup(backends, (CuVector,), (Float16, Float32, Float64))
 end
 
-# register Metal RNGs
+# register CUDA RNGs
 RejectionSamplers._rng_strategy(::CUDA.RNG) = HostSide()
 RejectionSamplers._rng_strategy(::CURAND.RNG) = HostSide()
 RejectionSamplers._rng_strategy(::CUDA.Philox2x32) = DeviceSide()
