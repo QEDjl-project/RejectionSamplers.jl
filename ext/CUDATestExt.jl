@@ -20,6 +20,6 @@ RejectionSamplers._rng_strategy(::CURAND.RNG) = HostSide()
 RejectionSamplers._rng_strategy(::CUDA.Philox2x32) = DeviceSide()
 
 # for testing
-RejectionSamplers.TestUtils.get_host_rngs(::CUDABackend) = (GPUArrays.default_rng(CuArray), CURAND.RNG(), CUDA.RNG())
+RejectionSamplers.TestUtils.get_host_rngs(::CUDABackend) = (GPUArrays.default_rng(CuArray),)
 RejectionSamplers.TestUtils.get_device_rngs(::CUDABackend) = (CUDA.Philox2x32(),)
 end

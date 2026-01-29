@@ -45,7 +45,6 @@ using GPUArrays
 using StaticArrays
 using StaticArrays: sacollect
 using StructArrays
-using SimpleTraits
 
 include("patches/gpuarrays.jl")
 

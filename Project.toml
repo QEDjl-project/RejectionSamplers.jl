@@ -1,12 +1,7 @@
 name = "RejectionSamplers"
 uuid = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
 version = "0.1.1"
-authors = [
-  "Uwe Hernandez Acosta <u.hernandez@hzdr.de>",
-  "Simeon Ehrig",
-  "Anton Reinhard",
-  "René Widera",
-]
+authors = ["Uwe Hernandez Acosta <u.hernandez@hzdr.de>", "Simeon Ehrig", "Anton Reinhard", "René Widera"]
 
 [deps]
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
@@ -16,7 +11,6 @@ GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-SimpleTraits = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
@@ -44,7 +38,6 @@ KernelAbstractions = "0.9.34"
 Metal = "1"
 QuadGK = "2.11.2"
 Random = "1.10"
-SimpleTraits = "0.9.5"
 StaticArrays = "1.9.14"
 StatsFuns = "1.5.0"
 StatsPlots = "0.15.7"
