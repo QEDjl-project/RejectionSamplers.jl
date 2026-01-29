@@ -57,7 +57,7 @@ function testsuite_buffer_interface(backend, val_type, size)
         dest = allocate(backend, val_type, (size,))
         _test_getindex(backend)(mock_buffer, dest; ndrange = length(mock_buffer))
 
-        @test isapprox(Array(dest), h_arr)
+        @test _isapprox(Array(dest), h_arr)
     end
 
     @testset "setindex" begin
@@ -73,7 +73,7 @@ function testsuite_buffer_interface(backend, val_type, size)
 
         _test_setindex(backend)(mock_buffer, d_input; ndrange = length(mock_buffer))
 
-        @test isapprox(Array(mock_buffer.data), h_input)
+        @test _isapprox(Array(mock_buffer.data), h_input)
     end
 
     return nothing
@@ -112,11 +112,11 @@ function testsuite_sample_buffer_interface(backend, val_type, w_type, size)
 
         dest_values = allocate(backend, val_type, (size,))
         _test_getvalues(backend)(mock_buffer, dest_values; ndrange = length(mock_buffer))
-        @test isapprox(Array(dest_values), h_values)
+        @test _isapprox(Array(dest_values), h_values)
 
         dest_weights = allocate(backend, w_type, (size,))
         _test_getweights(backend)(mock_buffer, dest_weights; ndrange = length(mock_buffer))
-        @test isapprox(Array(dest_weights), h_weights)
+        @test _isapprox(Array(dest_weights), h_weights)
 
     end
 
@@ -141,10 +141,10 @@ function testsuite_sample_buffer_interface(backend, val_type, w_type, size)
         mock_buffer = Mocks.MockSampleBuffer(values, weights)
 
         _test_setvalues(backend)(mock_buffer, d_values; ndrange = length(mock_buffer))
-        @test isapprox(Array(mock_buffer.values), h_values)
+        @test _isapprox(Array(mock_buffer.values), h_values)
 
         _test_setweights(backend)(mock_buffer, d_weights; ndrange = length(mock_buffer))
-        @test isapprox(Array(mock_buffer.weights), h_weights)
+        @test _isapprox(Array(mock_buffer.weights), h_weights)
     end
 
     return nothing
@@ -181,11 +181,11 @@ function testsuite_sample_buffer(backend, val_type, w_type, size)
 
         dest_values = allocate(backend, val_type, (size,))
         _test_getvalues(backend)(buf, dest_values; ndrange = length(buf))
-        @test isapprox(Array(dest_values), h_values)
+        @test _isapprox(Array(dest_values), h_values)
 
         dest_weights = allocate(backend, w_type, (size,))
         _test_getweights(backend)(buf, dest_weights; ndrange = length(buf))
-        @test isapprox(Array(dest_weights), h_weights)
+        @test _isapprox(Array(dest_weights), h_weights)
 
     end
 
@@ -210,10 +210,10 @@ function testsuite_sample_buffer(backend, val_type, w_type, size)
         buf = SampleBuffer(values, weights)
 
         _test_setvalues(backend)(buf, d_values; ndrange = length(buf))
-        @test isapprox(Array(buf.samples.value), h_values)
+        @test _isapprox(Array(buf.samples.value), h_values)
 
         _test_setweights(backend)(buf, d_weights; ndrange = length(buf))
-        @test isapprox(Array(buf.samples.weight), h_weights)
+        @test _isapprox(Array(buf.samples.weight), h_weights)
     end
 
     return nothing

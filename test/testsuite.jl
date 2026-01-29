@@ -7,33 +7,44 @@ include("target.jl")
 include("generate.jl")
 include("max_finder.jl")
 
+if VERSION >= v"1.11"
+    _get_value_types(el_type, ::Val{N} = Val(4)) where {N} = (el_type, SVector{N, el_type}, NTuple{N, el_type})
+else
+    # Julia 1.10 does not support random generation of NTuple on CPU
+    @warn "Julia 1.10 does not support random generation of NTuple on CPU"
+    _get_value_types(el_type, ::Val{N} = Val(4)) where {N} = (el_type, SVector{N, el_type})
+end
+
 function testsuite_run(backend, vec_type, el_type)
-    @testset "samples" testsuite_samples(
-        backend,
-        SVector{4, el_type},
-        el_type,
-        256
-    )
+    # TODO: every testsuite using val_type into this block
+    @testset "val_type: $val_type" for val_type in _get_value_types(el_type)
+        @testset "samples" testsuite_samples(
+            backend,
+            val_type,
+            el_type,
+            256
+        )
 
-    @testset "buffer interface" testsuite_buffer_interface(
-        backend,
-        SVector{4, el_type},
-        256
-    )
+        @testset "buffer interface" testsuite_buffer_interface(
+            backend,
+            val_type,
+            256
+        )
 
-    @testset "sample buffer interface" testsuite_sample_buffer_interface(
-        backend,
-        SVector{4, el_type},
-        el_type,
-        256
-    )
+        @testset "sample buffer interface" testsuite_sample_buffer_interface(
+            backend,
+            val_type,
+            el_type,
+            256
+        )
 
-    @testset "sample buffer" testsuite_sample_buffer(
-        backend,
-        SVector{4, el_type},
-        el_type,
-        256
-    )
+        @testset "sample buffer" testsuite_sample_buffer(
+            backend,
+            val_type,
+            el_type,
+            256
+        )
+    end
 
     @testset "filter scan" testsuite_filter_scan(
         backend,
