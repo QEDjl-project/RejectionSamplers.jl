@@ -1,7 +1,3 @@
-# generic fallback to Random.rand! (used on CPU)
-_rand!(rng::AbstractRNG, a::Vector) = Random.rand!(rng, a)
-
-#=
 function gpu_rand(
         ::Type{TT},
         threadid,
@@ -11,11 +7,18 @@ function gpu_rand(
     return TT(ntuple(x -> GPUArrays.gpu_rand(T, threadid, randstate), N))
 end
 
-# TODO: is this necessary
-function _rand!(
+function gpu_rand(
+        ::Type{TT},
+        threadid,
+        randstate::AbstractVector{NTuple{4, UInt32}},
+    ) where {N, T, TT <: NTuple{N, T}}
+    return ntuple(x -> GPUArrays.gpu_rand(T, threadid, randstate), N)
+end
+
+function Random.rand!(
         rng::GPUArrays.RNG,
         A::GPUArrays.AnyGPUArray{TT},
-    ) where {T, N, TT <: SVector{N, T}}
+    ) where {T, N, TT <: Union{SVector{N, T}, NTuple{N, T}}}
     isempty(A) && return A
     @kernel function rand!(a, randstate)
         idx = @index(Global, Linear)
@@ -24,15 +27,3 @@ function _rand!(
     rand!(get_backend(A))(A, rng.state; ndrange = size(A))
     return A
 end
-=#
-
-"""
-
-    default_rng(v::AbstractVector)
-
-Return default rng to randomize given vector. Uses fallbacks on `Random.default_rng` and `GPUArrays.default_rng`.
-"""
-function default_rng end
-
-default_rng(::Type{T}) where {T} = Random.default_rng()
-default_rng(::Type{V}) where {V <: GPUArrays.AnyGPUArray} = GPUArrays.default_rng(V)
