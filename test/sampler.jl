@@ -45,7 +45,7 @@ function testsuite_abstract_sampler(backend, vec_type, val_type, w_type, batch_s
             end
         end
     end
-#=
+    #=
     @testset "device side rng" begin
         @testset "rng: $(typeof(rng))" for rng in TestUtils.get_device_rngs(backend)
 

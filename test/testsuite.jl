@@ -8,7 +8,6 @@ include("generate.jl")
 include("max_finder.jl")
 
 
-
 function testsuite_run(backend, vec_type, el_type)
     # TODO: every testsuite using val_type into this block
     @testset "val_type: $val_type" for val_type in _get_value_types(el_type)
