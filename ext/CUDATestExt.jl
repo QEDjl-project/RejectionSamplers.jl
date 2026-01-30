@@ -2,6 +2,7 @@ module CUDATestExt
 
 using RejectionSamplers
 using RejectionSamplers.TestUtils
+using GPUArrays
 using CUDA
 
 @inline function RejectionSamplers.TestUtils.get_test_setup(backend::CUDABackend)

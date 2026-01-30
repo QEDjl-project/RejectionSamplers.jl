@@ -121,6 +121,7 @@ if isempty(SETUPS)
 end
 
 
+include("testutils.jl")
 include("testsuite.jl")
 include("patches/testsuite.jl")
 

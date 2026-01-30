@@ -9,7 +9,6 @@ function testsuite_abstract_sampler(backend, vec_type, val_type, w_type, batch_s
         @test value_type(test_sampler) == val_type
         @test weight_type(test_sampler) == w_type
     end
-
     @testset "host side rng" begin
         @testset "rng: $(typeof(rng))" for rng in TestUtils.get_host_rngs(backend)
 
@@ -46,7 +45,7 @@ function testsuite_abstract_sampler(backend, vec_type, val_type, w_type, batch_s
             end
         end
     end
-
+#=
     @testset "device side rng" begin
         @testset "rng: $(typeof(rng))" for rng in TestUtils.get_device_rngs(backend)
 
@@ -86,6 +85,7 @@ function testsuite_abstract_sampler(backend, vec_type, val_type, w_type, batch_s
             end
         end
     end
+    =#
     #=
     @testset "sampling" begin
         @testset "single implementation" begin

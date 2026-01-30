@@ -2,6 +2,7 @@ module oneAPITestExt
 
 using RejectionSamplers
 using RejectionSamplers.TestUtils
+using GPUArrays
 using oneAPI
 
 @inline function RejectionSamplers.TestUtils.get_test_setup(backend::oneAPIBackend)
