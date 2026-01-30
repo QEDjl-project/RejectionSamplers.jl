@@ -7,7 +7,7 @@ QEDprocesses = "46de9c38-1bb3-4547-a1ec-da24d767fdad"
 RejectionSamplers = "90f62166-f53e-5083-ac0e-6e2bf74182ae"
 
 [sources]
-RejectionSamplers = {path = "/Users/uwe/Work/jlProjects/QEDjl-project/forks/RejectionSamplers.jl"}
+RejectionSamplers = { path = ".." }
 
 [compat]
 Documenter = "1"
