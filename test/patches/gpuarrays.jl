@@ -12,6 +12,7 @@ function testsuite_gpuarrays_rand(backend, vec_type, val_type, size)
 
     rand!(test_rng, payload)
 
-    return @test !any(_isapprox.(Array(payload_untouched), Array(payload)))
+    @test !all(_isapprox.(Array(payload_untouched), Array(payload)))
 
+    return nothing
 end
