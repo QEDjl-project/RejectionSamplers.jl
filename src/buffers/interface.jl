@@ -43,7 +43,10 @@ Additional sample-specific interface:
 - `value_type(buf)`
 - `weight_type(buf)`
 - `getsample(buf, idx)`
-- `setsample!(buf, sample, idx)` (optional but recommended)
+- `setsample!(buf, sample, idx)` (optional)
+
+The implementation of `setsample!` is optional, because if the buffer is static, or if there are other
+way implemented to update the samples, this one is not needed.
 """
 abstract type AbstractSampleBuffer <: AbstractBuffer end
 
