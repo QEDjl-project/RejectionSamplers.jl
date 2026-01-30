@@ -1,3 +1,8 @@
+## rand! implementation for NTuple and SVector for GPUArrays.RNG
+# can be removed if added to GPUArrays or
+# https://github.com/JuliaGPU/AMDGPU.jl/issues/881
+# is solved.
+
 function gpu_rand(
         ::Type{TT},
         threadid,
