@@ -1,7 +1,7 @@
 """
     AbstractBuffer
 
-Abstract supertype for array-like buffers that can be used as targets for
+Abstract supertype for vector-like buffers that can be used as targets for
 CPU- or GPU-based kernels.
 
 An `AbstractBuffer` represents a one-dimensional, indexable container with
@@ -53,16 +53,14 @@ abstract type AbstractSampleBuffer <: AbstractBuffer end
 """
     value_type(buf)
 
-Return the element type of the `value` field stored in the samples
-contained in `buf`.
+Return the element type of the `value` of the samples contained in `buf`.
 """
 function value_type end
 
 """
     weight_type(buf)
 
-Return the element type of the `weight` field stored in the samples
-contained in `buf`.
+Return the element type of the `weight` of the samples contained in `buf`.
 """
 function weight_type end
 
@@ -215,7 +213,7 @@ end
 """
     setvalue!(buf, value, idx)
 
-Update only the `value` field of the sample at index `idx`, leaving the
+Update only the `value` of the sample at index `idx`, leaving the
 associated weight unchanged.
 """
 @inline function setvalue!(buf, value, idx)
@@ -265,7 +263,7 @@ end
 """
     setweight!(buf, weight, idx)
 
-Update only the `weight` field of the sample at index `idx`, leaving the
+Update only the `weight` of the sample at index `idx`, leaving the
 associated value unchanged.
 """
 @inline function setweight!(buf, weight, idx)
@@ -276,7 +274,6 @@ associated value unchanged.
             weight
         ),
         idx,
-
     )
 end
 
@@ -287,7 +284,7 @@ end
 """
     setweights!(buf, weights)
 
-Update the `weight` field of all samples stored in `buf`, leaving all
+Update the `weight` of all samples stored in `buf`, leaving all
 values unchanged.
 
 The buffer and input vector must have the same length, weight type,
