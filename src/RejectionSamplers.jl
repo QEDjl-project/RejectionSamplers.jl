@@ -40,6 +40,7 @@ using StaticArrays
 using StaticArrays: sacollect
 using StructArrays
 
+include("patches/gpuarrays.jl")
 
 include("samples/interface.jl")
 include("samples/generic.jl")

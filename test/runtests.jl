@@ -122,9 +122,17 @@ end
 
 
 include("testsuite.jl")
+include("patches/testsuite.jl")
 
 for stp in SETUPS
+
     @testset "$backend $vec_type $el_type" for (backend, vec_type, el_type) in combinations(stp)
         testsuite_run(backend, vec_type, el_type)
+    end
+
+    @testset "patches" begin
+        @testset "$backend $vec_type $el_type" for (backend, vec_type, el_type) in combinations(stp)
+            testsuite_patches_run(backend, vec_type, el_type)
+        end
     end
 end
