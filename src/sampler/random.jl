@@ -10,7 +10,6 @@ struct DeviceSide <: AbstractRNGStrategy end
 """
 function _rng_strategy end
 
-#_rng_strategy(::AbstractRNG) = HostSide()
 _rng_strategy(::Xoshiro) = HostSide()
 _rng_strategy(::MersenneTwister) = HostSide()
 _rng_strategy(::GPUArrays.RNG) = HostSide()
