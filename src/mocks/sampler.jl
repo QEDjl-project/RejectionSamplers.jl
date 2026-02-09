@@ -58,7 +58,7 @@ end
 function _mock_rand!(rng, sampler::MockSampler{T, D, TT}, backend, buf) where {T <: Real, D, TT <: NTuple{D, T}}
     n = length(buf)
     steps = T(2 / (n + 1))
-    map!(i -> ntuple(x -> -1 + i * steps, D), buf.samples.value, 1:n)
+    map!(i -> ntuple(x -> -1 + i * steps, Val(D)), buf.samples.value, 1:n)
     buf.samples.weight .= KernelAbstractions.ones(backend, T, n) * sampler.weight
     return nothing
 end
@@ -113,7 +113,7 @@ end
 
 function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSingle{T, N, TT}) where {N, T <: Real, TT <: NTuple{N, T}}
     return Sample(
-        ntuple(x -> -one(T), N),
+        ntuple(x -> -one(T), Val(N)),
         sampler.weight
     )
 end
