@@ -1,8 +1,11 @@
 module RejectionSamplers
 
 # samples
-export Sample
-export allocate_samples
+export Sample, SampleVector, value_type, weight_type
+export allocate_samples, rand_single
+
+# rng strategies
+export HostSide, DeviceSide
 
 # buffers
 export AbstractBuffer
@@ -16,6 +19,9 @@ export getweight, getweights, setweight!, setweights!
 
 # utils
 export filter_scan
+
+# abstract sampler
+export AbstractSampler, allocate_buffer
 
 # proposal
 export propose!
@@ -55,6 +61,10 @@ include("proposal/random.jl")
 include("proposal/interface.jl")
 include("proposal/generics.jl")
 include("proposal/uniform.jl")
+
+include("sampler/interface.jl")
+include("sampler/random.jl")
+include("sampler/utils.jl")
 
 include("target.jl")
 

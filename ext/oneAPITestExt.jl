@@ -2,6 +2,7 @@ module oneAPITestExt
 
 using RejectionSamplers
 using RejectionSamplers.TestUtils
+using GPUArrays
 using oneAPI
 
 @inline function RejectionSamplers.TestUtils.get_test_setup(backend::oneAPIBackend)
@@ -17,4 +18,6 @@ using oneAPI
     return TestSetup(backend, (oneVector,), element_types)
 end
 
+# oneAPI only supports the GPUArrays.RNG
+RejectionSamplers.TestUtils.get_host_rngs(::oneAPIBackend) = (GPUArrays.default_rng(oneArray),)
 end

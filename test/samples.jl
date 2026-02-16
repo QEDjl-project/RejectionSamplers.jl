@@ -23,6 +23,7 @@ function testsuite_samples(backend, value_type, weight_type, batch_size)
         @test length(test_samples_soa.value) == batch_size
         @test eltype(test_samples_soa.weight) == weight_type
         @test length(test_samples_soa.weight) == batch_size
+        @test test_samples_soa isa SampleVector
     end
 
     return @testset "sanity check" begin

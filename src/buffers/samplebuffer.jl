@@ -1,3 +1,48 @@
+"""
+    SampleBuffer{Tv, Tw, S} <: AbstractSampleBuffer
+
+Concrete implementation of `AbstractSampleBuffer` that stores weighted
+samples in a structure-of-arrays layout.
+
+`SampleBuffer` represents a one-dimensional buffer of `Sample{Tv,Tw}`
+elements, where values and weights are stored in separate contiguous
+arrays via a `StructVector`. This layout enables efficient
+field-wise access and mutation, and is suitable for both CPU and GPU
+backends.
+
+### Type parameters
+- `Tv`: value type of the samples
+- `Tw`: weight type of the samples
+- `S`: underlying storage type (typically `StructVector{Sample{Tv,Tw}}`)
+
+### Constructors
+
+- `SampleBuffer(samples)`
+
+    Wrap an existing `StructVector{Sample}` as a `SampleBuffer`. The input
+    storage is used directly without copying and must already reside on
+    the desired backend.
+
+
+- `SampleBuffer(values, weights)`
+
+    Construct a `SampleBuffer` from separate value and weight vectors.
+    The two vectors must have the same length and compatible backends.
+    Internally, the data is stored in a structure-of-arrays representation.
+
+
+- `SampleBuffer(backend, valuetype, weighttype, size)`
+
+    Allocate a new `SampleBuffer` of the given `size` on the specified
+    `backend`, with sample values of type `valuetype` and weights of type
+    `weighttype`. Storage allocation is backend-aware.
+
+### Notes
+
+`SampleBuffer` satisfies the full `AbstractSampleBuffer` interface and
+can be used interchangeably with other sample buffer implementations in
+samplers and kernel-based algorithms.
+"""
 struct SampleBuffer{Tv, Tw, S} <: AbstractSampleBuffer
     samples::S
 

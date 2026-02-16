@@ -36,7 +36,7 @@ julia> Pkg.add("RejectionSamplers")
 
 You can also use the Pkg REPL mode by pressing `]` and then running:
 
-```
+```julia
 pkg> add RejectionSamplers
 ```
 
@@ -54,7 +54,6 @@ cd RejectionSamplers.jl
 julia --project=@.
 julia> ] instantiate
 ```
-
 
 ## Contributing
 
