@@ -30,6 +30,7 @@ PlotEx = "StatsPlots"
 oneAPITestExt = "oneAPI"
 
 [compat]
+AMDGPU = "2"
 Adapt = "4.4.0"
 Atomix = "1.1.1"
 Distributions = "0.25.119"
