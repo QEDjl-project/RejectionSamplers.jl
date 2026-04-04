@@ -52,6 +52,14 @@ function testsuite_run(backend, vec_type, el_type)
             el_type,
             256
         )
+
+        @testset "sampler" testsuite_transformbased_sampler(
+            backend,
+            vec_type,
+            val_type,
+            el_type,
+            256
+        )
     end
 
     @testset "filter scan" testsuite_filter_scan(
