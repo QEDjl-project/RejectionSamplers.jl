@@ -72,8 +72,8 @@ function _rand_from_device!(
         buf::AbstractSampleBuffer,
     )
     _rand_gpu_kernel(backend, 32)(
-        rng, samples, sampler;
-        ndrange = size(samples)
+        rng, sampler, buf;
+        ndrange = length(buf)
     )
     return nothing
 end

@@ -64,6 +64,7 @@ include("proposal/uniform.jl")
 
 include("sampler/interface.jl")
 include("sampler/random.jl")
+include("sampler/transform.jl")
 include("sampler/utils.jl")
 
 include("target.jl")

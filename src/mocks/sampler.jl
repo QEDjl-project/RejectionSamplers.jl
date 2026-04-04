@@ -2,10 +2,11 @@
 # - use the mock proposal and implement the new interface
 
 abstract type AbstractMockSampler{TT, T} <: RejectionSamplers.AbstractSampler{TT, T} end
+abstract type AbstractMockTransformbasedSampler{TT, T} <: RejectionSamplers.AbstractTransformBasedSampler{TT, T} end
 
 function RejectionSamplers.allocate_buffer(
         rng::AbstractRNG,
-        sampler::AbstractMockSampler{TT, T},
+        sampler::Union{AbstractMockSampler{TT, T}, AbstractMockTransformbasedSampler{TT, T}},
         backend::KernelAbstractions.Backend,
         size
     ) where {T, TT}
@@ -116,4 +117,74 @@ function RejectionSamplers._rand_single(rng::AbstractRNG, sampler::MockSamplerSi
         ntuple(x -> -one(T), Val(N)),
         sampler.weight
     )
+end
+
+### transform based sampler
+struct MockTransformBasedSampler{T, D, TT} <: AbstractMockTransformbasedSampler{TT, T}
+    weight::T
+
+    # scalar sample
+    MockTransformBasedSampler(::Type{T}, w::T) where {T <: Real} = new{T, 1, T}(w)
+
+    # SVector sample
+    MockTransformBasedSampler(::Type{TT}, w::T) where {N, T <: Real, TT <: SVector{N, T}} = new{T, N, TT}(w)
+
+    # NTuple sample
+    MockTransformBasedSampler(::Type{TT}, w::T) where {N, T <: Real, TT <: NTuple{N, T}} = new{T, N, TT}(w)
+end
+
+RejectionSamplers.degrees_of_freedom(::MockTransformBasedSampler{T, D, TT}) where {T, D, TT} = D
+
+@inline function RejectionSamplers._transform_value(
+        sampler::MockTransformBasedSampler{T, 1},
+        v::T,
+    ) where {T}
+    w = sampler.weight
+    return w
+end
+
+@inline function RejectionSamplers._transform_value(
+        sampler::MockTransformBasedSampler{T, N},
+        v::SVector{N, T},
+    ) where {N, T}
+    w = sampler.weight
+    return SVector{N, T}(
+        ntuple(
+            x -> w,
+            Val(N),
+        ),
+    )
+end
+
+
+@inline function RejectionSamplers._transform_value(
+        sampler::MockTransformBasedSampler{T, N},
+        v::NTuple{N, T},
+    ) where {N, T}
+    w = sampler.weight
+    return ntuple(x -> w, Val(N))
+end
+
+@inline function RejectionSamplers._transform_weight(
+        sampler::MockTransformBasedSampler{T},
+        v,
+        value::T
+    ) where {T}
+    return one(T)
+end
+
+@inline function RejectionSamplers._transform_weight(
+        sampler::MockTransformBasedSampler{T, N},
+        v,
+        value::NTuple{N, T}
+    ) where {T, N}
+    return one(T)
+end
+
+@inline function RejectionSamplers._transform_weight(
+        sampler::MockTransformBasedSampler{T, N},
+        v,
+        value::SVector{N, T}
+    ) where {T, N}
+    return one(T)
 end

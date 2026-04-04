@@ -45,6 +45,8 @@ to enable more efficient or more specialized sampling strategies:
 """
 abstract type AbstractSampler{Ts, Tw} end
 
+Base.broadcastable(s::AbstractSampler) = Ref(s)
+
 """
     _rand_from_host!(host_side_rng, sampler, backend, buf)
 

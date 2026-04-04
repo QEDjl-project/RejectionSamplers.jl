@@ -25,3 +25,24 @@ end
 groundtruth_sinlge_sample(::Type{VALTYPE}) where {VALTYPE <: Real} = -one(VALTYPE)
 groundtruth_sinlge_sample(::Type{VALTYPE}) where {T, N, VALTYPE <: SVector{N, T}} = .- ones(VALTYPE)
 groundtruth_sinlge_sample(::Type{VALTYPE}) where {T, N, VALTYPE <: NTuple{N, T}} = ntuple(x -> - one(T), Val(N))
+
+function groundtruth_transformbased_samples(::Type{T}, sampler, size) where {T <: Real}
+    return SampleBuffer(
+        fill(sampler.weight, size),
+        ones(T, size)
+    )
+end
+
+function groundtruth_transformbased_samples(::Type{VALTYPE}, sampler, size) where {T, N, VALTYPE <: SVector{N, T}}
+    return SampleBuffer(
+        fill(SVector{N, T}(ntuple(j -> sampler.weight, Val(N))), size),
+        ones(T, size)
+    )
+end
+
+function groundtruth_transformbased_samples(::Type{VALTYPE}, sampler, size) where {T, N, VALTYPE <: NTuple{N, T}}
+    return SampleBuffer(
+        fill(ntuple(j -> sampler.weight, Val(N)), size),
+        ones(T, size)
+    )
+end
